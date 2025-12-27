@@ -1,19 +1,26 @@
-# STEP 1 — HTTP apex → HTTPS apex
-http://sevenangelsmassage.com/* https://sevenangelsmassage.com/:splat 301!
+# ----------------------------
+# Apex handler (Netlify use)
+# ----------------------------
 
-# STEP 2 — HTTPS apex → HTTPS www
-https://sevenangelsmassage.com/* https://www.sevenangelsmassage.com/:splat 301!
+# HTTP -> HTTPS (apex)
+http://sevenangelsmassage.com/*  https://sevenangelsmassage.com/:splat  301
 
-# STEP 3 — Clean /home on www
-https://www.sevenangelsmassage.com/home  https://www.sevenangelsmassage.com 301!
-https://www.sevenangelsmassage.com/home/ https://www.sevenangelsmassage.com 301!
+# Apex -> WWW (canonical)
+https://sevenangelsmassage.com/*  https://www.sevenangelsmassage.com/:splat  301
 
-# 4) Worker-down fallback (only applies when Pages/Netlify is serving)
-#    Put LAST so it doesn't override the canonical redirects above.
-#    NOTE: This is mainly for your Pages/WWW scenario.
-#    If this repo is serving WWW, it can redirect to origin.
-#    If this repo is serving apex, you probably *don't* want this to override.
-#    So keep it scoped (see below).
-https://www.sevenangelsmassage.com/*  https://origin.sevenangelsmassage.com/:splat  302
-https://origin.sevenangelsmassage.com/home  https://origin.sevenangelsmassage.com 301!
-https://origin.sevenangelsmassage.com/home/  https://origin.sevenangelsmassage.com 301!
+
+# ----------------------------
+# WWW fallback (Pages use)
+# Only affects www when www is served by Pages
+# ----------------------------
+
+/*  https://origin.sevenangelsmassage.com/:splat  302
+
+
+# ----------------------------
+# Clean /home normalization (optional)
+# Use RELATIVE patterns so Pages accepts them
+# ----------------------------
+
+/home  /  301
+/home/ /  301
