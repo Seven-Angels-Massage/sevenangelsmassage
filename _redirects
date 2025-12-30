@@ -1,15 +1,4 @@
 # ----------------------------
-# Apex handler (Netlify use)
-# ----------------------------
-
-# HTTP -> HTTPS (apex)
-http://sevenangelsmassage.com/*  https://sevenangelsmassage.com/:splat  301
-
-# Apex -> WWW (canonical)
-https://sevenangelsmassage.com/*  https://www.sevenangelsmassage.com/:splat  301
-
-
-# ----------------------------
 # WWW fallback (Pages use)
 # Only affects www when www is served by Pages
 # ----------------------------
