@@ -5,3 +5,4 @@
   Content-Type: text/vcard; charset=utf-8
   Content-Disposition: attachment; filename="seven-angels-massage.vcf"
   Cache-Control: public, max-age=864000
+  X-Content-Type-Options: nosniff
