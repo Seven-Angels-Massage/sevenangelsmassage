@@ -39,4 +39,4 @@
 /chat/email            /chat/fallback?app=email       200
 
 # Safety net
-/chat/*                /chat/fallback                 200
+/chat/*                /contact-us                    200
