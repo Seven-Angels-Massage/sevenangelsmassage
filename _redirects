@@ -35,6 +35,7 @@
 /chat/signal          /chat/fallback        200
 /chat/line            /chat/fallback        200
 /chat/kakaotalk       /chat/fallback        200
+/chat/vcard           /chat/fallback        200
 /chat/email           /chat/fallback        200
 
 # 3) Safety net: anything else under /chat/ goes to fallback too
