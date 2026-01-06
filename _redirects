@@ -18,25 +18,25 @@
 # Uses 200 rewrites (NOT 302 redirects)
 # ==========================================
 
-# 0) Never rewrite the fallback page itself
-/chat/fallback        /chat/fallback        200
+# Never rewrite the fallback page itself
+/chat/fallback         /chat/fallback         200
 
-# 1) Never rewrite tracking beacons (let Worker handle; if Worker is down, tracking loss is OK)
-/chat/track/*         /chat/track/:splat    200
+# Never rewrite tracking beacons
+/chat/track/*          /chat/track/:splat     200
 
-# 2) Rewrite each chat route to the fallback HTML (query string stays intact)
-/chat/wechat-qr       /chat/fallback        200
-/chat/whatsapp        /chat/fallback        200
-/chat/viber           /chat/fallback        200
-/chat/telegram        /chat/fallback        200
-/chat/messenger       /chat/fallback        200
-/chat/sms-globe       /chat/fallback        200
-/chat/sms-smart       /chat/fallback        200
-/chat/signal          /chat/fallback        200
-/chat/line            /chat/fallback        200
-/chat/kakaotalk       /chat/fallback        200
-/chat/vcard           /chat/fallback        200
-/chat/email           /chat/fallback        200
+# Rewrite each chat route to fallback WITH app hint (preserves query string)
+/chat/wechat-qr        /chat/fallback?app=wechat-qr   200
+/chat/whatsapp         /chat/fallback?app=whatsapp    200
+/chat/viber            /chat/fallback?app=viber       200
+/chat/telegram         /chat/fallback?app=telegram    200
+/chat/messenger        /chat/fallback?app=messenger   200
+/chat/sms-globe        /chat/fallback?app=sms-globe   200
+/chat/sms-smart        /chat/fallback?app=sms-smart   200
+/chat/signal           /chat/fallback?app=signal      200
+/chat/line             /chat/fallback?app=line        200
+/chat/kakaotalk        /chat/fallback?app=kakaotalk   200
+/chat/vcard            /chat/fallback?app=vcard       200
+/chat/email            /chat/fallback?app=email       200
 
-# 3) Safety net: anything else under /chat/ goes to fallback too
-/chat/*               /chat/fallback        200
+# Safety net
+/chat/*                /chat/fallback                 200
