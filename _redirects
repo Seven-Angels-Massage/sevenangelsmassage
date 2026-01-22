@@ -1,11 +1,4 @@
 # ----------------------------
-# WWW fallback (Pages use)
-# Only affects www when www is served by Pages
-# ----------------------------
-
-/*  https://origin.sevenangelsmassage.com/:splat  302
-
-# ----------------------------
 # Clean /home normalization (optional)
 # Use RELATIVE patterns so Pages accepts them
 # ----------------------------
