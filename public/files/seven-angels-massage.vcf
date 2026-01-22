@@ -1,0 +1,15 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Seven Angels Massage;;;;
+FN:Seven Angels Massage
+ORG:Seven Angels Massage Services
+TITLE:24/7 Mobile Massage Services — Metro Manila
+TEL;TYPE=PREF,CELL,VOICE:+639174476203
+TEL;TYPE=CELL,VOICE:+639083972327
+EMAIL;TYPE=INTERNET:24-7_on-call@sevenangelsmassage.com
+ADR;TYPE=WORK:;;Valero Street\, Salcedo Village\, Barangay Bel-Air;Makati City;Metro Manila;1227;Philippines
+URL:https://www.sevenangelsmassage.com
+LOGO;VALUE=URI:https://www.sevenangelsmassage.com/assets/logo-512.png
+PHOTO;VALUE=URI:https://www.sevenangelsmassage.com/assets/logo-512.png
+NOTE:Mobile massage service available 24/7 across Metro Manila. Bookings, inquiries, and therapist availability via chat or call anytime.
+END:VCARD

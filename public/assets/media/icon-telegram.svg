@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   fill="#000000"
+   height="250"
+   width="250"
+   version="1.1"
+   id="Capa_1"
+   viewBox="0 0 18.75 18.75"
+   xml:space="preserve"
+   sodipodi:docname="icon-telegram.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs2" /><sodipodi:namedview
+   id="namedview2"
+   pagecolor="#ffffff"
+   bordercolor="#000000"
+   borderopacity="0.25"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   inkscape:zoom="3.0228815"
+   inkscape:cx="133.64732"
+   inkscape:cy="121.24193"
+   inkscape:window-width="1920"
+   inkscape:window-height="1057"
+   inkscape:window-x="-8"
+   inkscape:window-y="-8"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Capa_1"
+   inkscape:lockguides="true" />
+<path
+   id="path1"
+   d="M 3.9537506,0 C 3.4965631,0 3.1250153,0.38196575 3.1250153,0.85156744 V 3.2098231 H 13.858749 c 0.801563,0 1.453766,0.669921 1.453766,1.4935697 v 8.1359932 h 0.495621 L 18.75,15.861131 V 0.85156744 C 18.75,0.38196575 18.378452,0 17.921265,0 Z M 0.82873534,3.851825 C 0.37154784,3.851825 0,4.2337909 0,4.7033928 V 18.75 l 2.941864,-3.021745 h 10.916885 c 0.457188,0 0.828736,-0.381966 0.828736,-0.851568 V 4.7033928 c 0,-0.4696019 -0.371548,-0.8515678 -0.828736,-0.8515678 z M 3.4374847,7.0616481 h 3.75 C 7.3602972,7.0616481 7.5,7.2054653 7.5,7.3826494 7.5,7.5598331 7.3602972,7.70365 7.1874847,7.70365 h -3.75 c -0.1728125,0 -0.3124694,-0.1438169 -0.3124694,-0.3210006 0,-0.1771841 0.1396569,-0.3210013 0.3124694,-0.3210013 z m 0,2.2469138 H 11.25 c 0.172812,0 0.312515,0.1438168 0.312515,0.3210009 0,0.1771838 -0.139703,0.3209541 -0.312515,0.3209541 H 3.4374847 c -0.1728125,0 -0.3124694,-0.1437703 -0.3124694,-0.3209541 0,-0.1771841 0.1396569,-0.3210009 0.3124694,-0.3210009 z m 0,2.2469131 H 11.25 c 0.172812,0 0.312515,0.143771 0.312515,0.320954 0,0.177184 -0.139703,0.321002 -0.312515,0.321002 H 3.4374847 c -0.1728125,0 -0.3124694,-0.143818 -0.3124694,-0.321002 0,-0.177183 0.1396569,-0.320954 0.3124694,-0.320954 z"
+   style="fill:#24a1de;fill-opacity:1;stroke-width:0.316716"
+   sodipodi:insensitive="true" />
+</svg>

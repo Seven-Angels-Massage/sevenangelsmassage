@@ -1,0 +1,5 @@
+User-agent: *
+Crawl-Delay: 20
+Disallow:
+Allow: /
+Sitemap: https://www.sevenangelsmassage.com/sitemap.xml

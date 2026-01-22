@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: CorelDRAW X5 -->
+
+<svg
+   xml:space="preserve"
+   width="42"
+   height="42"
+   style="clip-rule:evenodd;fill-rule:evenodd;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"
+   viewBox="0 0 1111.25 1111.25"
+   version="1.1"
+   id="svg2"
+   sodipodi:docname="wall-clock.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
+   id="namedview2"
+   pagecolor="#ffffff"
+   bordercolor="#000000"
+   borderopacity="0.25"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   inkscape:document-units="px"
+   inkscape:zoom="21.035354"
+   inkscape:cx="19.966386"
+   inkscape:cy="20.085234"
+   inkscape:window-width="1920"
+   inkscape:window-height="1057"
+   inkscape:window-x="-8"
+   inkscape:window-y="-8"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="svg2"
+   inkscape:lockguides="true"
+   showgrid="false" />
+ <defs
+   id="defs1"><style
+     type="text/css"
+     id="style1">
+   <![CDATA[
+    .fil1 {fill:#2C3A4E}
+    .fil0 {fill:white}
+   ]]>
+  </style></defs>
+ 
+ <path
+   class="fil1"
+   d="m 555.62502,26.458333 c 292.28477,0 529.16668,236.881917 529.16668,529.166687 0,292.28477 -236.88191,529.16668 -529.16668,529.16668 -292.28477,0 -529.166687,-236.88191 -529.166687,-529.16668 0,-292.28477 236.881917,-529.166687 529.166687,-529.166687 z m -256.44329,937.052857 45.81147,-79.25511 31.172,17.92074 -45.81148,79.38132 c 61.58678,32.68646 131.2505,52.37396 205.07891,55.40286 V 854.34611 h 40.76338 V 1036.961 c 73.82841,-3.0289 143.36593,-22.8426 204.95271,-55.40286 l -45.81148,-79.38132 31.172,-17.92074 45.81147,79.25511 C 873.52888,924.89326 925.52427,872.89786 964.016,811.5635 l -79.12891,-45.68528 17.92075,-31.17199 79.1289,45.68527 C 1014.497,718.93093 1034.0583,649.51961 1037.0872,575.9436 H 854.59852 v -40.76337 h 182.48868 c -3.0289,-73.82841 -22.8426,-143.49214 -55.52906,-205.07891 l -78.7503,45.55907 -17.92075,-31.172 78.7503,-45.43286 C 925.14566,237.97356 873.15027,186.10437 811.9421,147.61264 l -45.43286,78.6241 -31.172,-17.92074 45.43287,-78.6241 C 719.30954,97.13168 649.89821,77.570307 576.32221,74.415247 V 257.03013 H 535.55883 V 74.415247 C 461.85663,77.444105 392.44531,97.13168 330.85853,129.6919 l 45.43287,78.6241 -31.172,17.92074 -45.43286,-78.6241 c -61.20817,38.49173 -113.07736,90.36092 -151.69529,151.44289 l 78.7503,45.43286 -17.92074,31.172 -78.7503,-45.55907 C 97.384085,391.68809 77.570307,461.35182 74.54145,535.18023 H 257.28253 V 575.9436 H 74.54145 c 3.028857,73.57601 22.716433,142.98733 55.15045,204.4479 l 79.12891,-45.68527 17.92074,31.17199 -79.12891,45.68528 c 38.49173,61.33436 90.48712,113.32976 151.69529,151.82149 z M 529.75352,564.08058 719.68814,691.54501 739.75433,661.63504 573.41956,550.07211 701.89361,207.68498 668.19756,195.06474 529.62732,564.08058 Z"
+   id="path2"
+   style="clip-rule:evenodd;display:inline;fill:#ff69b4;fill-opacity:1;fill-rule:evenodd;stroke-width:26.4583;stroke-dasharray:none;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"
+   inkscape:label="path1"
+   sodipodi:insensitive="true" />
+</svg>
