@@ -1,0 +1,1710 @@
+/* @import url('http://example.com/example_style.css'); */
+
+/***********************************************/
+/* CSS @imports must be at the top of the file */
+/* Add them above this section                 */
+/***********************************************/
+
+/*****************************************/
+/* Start your style declarations here    */
+/*****************************************/
+/* === HOME - OffCanvas Navigation Menu === */
+/* Realign offcanvas logo  */
+.header-offcanvas-logo span a {
+  margin-top:10px !important;
+}
+/* Fix Nav offcanvas-close margin  */
+.header-offcanvas-close {
+  margin-right:-20px !important;
+}
+/* Fix Nav offcanvas width & height  */
+.header-offcanvas {
+  width:90% !important;
+  height:652px !important;
+}
+/* Fix Nav text style in mobile offcanvas */
+.header-offcanvas a {
+  text-transform:none !important; /* Keep original casing */
+}
+
+/* ===== 1. HOME - HERO SLIDERS FULL SCREEN (Desktop + Mobile) ===== */
+.hero-item {
+  height:100vh !important;   /* each slide fills the screen */
+  background-size:cover !important;
+  background-position:center center !important;
+  background-repeat:no-repeat !important;
+  position: relative;
+}
+
+/* ===== HOME - HERO SLIDERS' TEXTS (H1, H2s, & H3s) ===== */
+  /* Slider 1: H1 */
+.hero-item .hero-item-content h1 {
+  font-size:60px !important;
+}
+.hero-item .hero-item-content .hero-slider-1 h2 {
+  font-size:42px !important;
+}
+  /* Sliders 2–7: H2 */
+.hero-item .hero-item-content h2 {
+  font-size:48px !important;
+  color:#ffffff !important;
+}
+  /* Sliders 1–7: H3 */
+.hero-item .hero-item-content h3 {
+  color:#ffffff !important;
+}
+/* Mobile responsiveness for hero slider text */
+@media (max-width: 767px) {
+  /* Slider 1: H1 */
+  .hero-item .hero-item-content h1 {
+    font-size:42px !important;
+  }
+  .hero-item .hero-item-content .hero-slider-1 h2 {
+  font-size:30px !important;
+  }
+  /* Sliders 2–7: H2 */
+  .hero-item .hero-item-content h2 {
+    font-size:36px !important;
+  }
+}
+
+/* ===== HOME - CHEVRON SCROLL INDICATOR ===== */
+.scroll-down {
+  position: absolute;
+  bottom: 20px;              /* distance from bottom of hero */
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  animation: bounce 2s infinite;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 33px;               /* fixed width container for centering */
+  height: 33px;              /* fixed height container */
+}
+.scroll-down img {
+  display: block;
+  filter: drop-shadow(0 0 3px rgba(255,215,0,0.8));
+  animation: pulse-glow 1.5s infinite;
+  width: 30px;
+  height: 30px;
+}
+/* Bounce animation */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); }
+  40% { transform: translate(-50%, -10px); }
+  60% { transform: translate(-50%, -5px); }
+}
+/* Optional glittery pulsating gold glow */
+@keyframes pulse-glow {
+  0% { filter: drop-shadow(0 0 2px #ffd700); }
+  50% { filter: drop-shadow(0 0 8px #ffd700); }
+  100% { filter: drop-shadow(0 0 2px #ffd700); }
+}
+
+/* ===== 3. HOME - FUTURE-READY BACKGROUND SWAPPING ===== */
+/* Example: Desktop (default), Tablet, Mobile for EACH of the 7 slides */
+
+/* ----- SLIDE 1 ----- */
+.hero-item.slide-1 {
+  /* Desktop */
+  /* background-image: url("https://yourdomain.com/slide1-desktop.webp") !important; */
+}
+@media (max-width: 1024px) {
+  .hero-item.slide-1 {
+    /* Tablet */
+    /* background-image: url("https://yourdomain.com/slide1-tablet.webp") !important; */
+  }
+}
+@media (max-width: 767px) {
+  .hero-item.slide-1 {
+    /* Mobile */
+    /* background-image: url("https://yourdomain.com/slide1-mobile.webp") !important; */
+  }
+}
+
+/* ----- SLIDE 2 ----- */
+.hero-item.slide-2 {
+  /* background-image: url("https://yourdomain.com/slide2-desktop.webp") !important; */
+}
+@media (max-width: 1024px) {
+  .hero-item.slide-2 {
+    /* background-image: url("https://yourdomain.com/slide2-tablet.webp") !important; */
+  }
+}
+@media (max-width: 767px) {
+  .hero-item.slide-2 {
+    /* background-image: url("https://yourdomain.com/slide2-mobile.webp") !important; */
+  }
+}
+
+/* ----- SLIDE 3 ----- */
+.hero-item.slide-3 {
+  /* background-image: url("https://yourdomain.com/slide3-desktop.webp") !important; */
+}
+@media (max-width: 1024px) {
+  .hero-item.slide-3 {
+    /* background-image: url("https://yourdomain.com/slide3-tablet.webp") !important; */
+  }
+}
+@media (max-width: 767px) {
+  .hero-item.slide-3 {
+    /* background-image: url("https://yourdomain.com/slide3-mobile.webp") !important; */
+  }
+}
+
+/* ----- SLIDE 4 ----- */
+.hero-item.slide-4 {
+  /* background-image: url("https://yourdomain.com/slide4-desktop.webp") !important; */
+}
+@media (max-width: 1024px) {
+  .hero-item.slide-4 {
+    /* background-image: url("https://yourdomain.com/slide4-tablet.webp") !important; */
+  }
+}
+@media (max-width: 767px) {
+  .hero-item.slide-4 {
+    /* background-image: url("https://yourdomain.com/slide4-mobile.webp") !important; */
+  }
+}
+
+/* ----- SLIDE 5 ----- */
+.hero-item.slide-5 {
+  /* background-image: url("https://yourdomain.com/slide5-desktop.webp") !important; */
+}
+@media (max-width: 1024px) {
+  .hero-item.slide-5 {
+    /* background-image: url("https://yourdomain.com/slide5-tablet.webp") !important; */
+  }
+}
+@media (max-width: 767px) {
+  .hero-item.slide-5 {
+    /* background-image: url("https://yourdomain.com/slide5-mobile.webp") !important; */
+  }
+}
+
+/* ----- SLIDE 6 ----- */
+.hero-item.slide-6 {
+  /* background-image: url("https://yourdomain.com/slide6-desktop.webp") !important; */
+}
+@media (max-width: 1024px) {
+  .hero-item.slide-6 {
+    /* background-image: url("https://yourdomain.com/slide6-tablet.webp") !important; */
+  }
+}
+@media (max-width: 767px) {
+  .hero-item.slide-6 {
+    /* background-image: url("https://yourdomain.com/slide6-mobile.webp") !important; */
+  }
+}
+
+/* ----- SLIDE 7 ----- */
+.hero-item.slide-7 {
+  /* background-image: url("https://yourdomain.com/slide7-desktop.webp") !important; */
+}
+@media (max-width: 1024px) {
+  .hero-item.slide-7 {
+    /* background-image: url("https://yourdomain.com/slide7-tablet.webp") !important; */
+  }
+}
+@media (max-width: 767px) {
+  .hero-item.slide-7 {
+    /* background-image: url("https://yourdomain.com/slide7-mobile.webp") !important; */
+  }
+}
+
+/* === HOME - Reclaim Your Energy, Restore Yor Balance === */
+.about-section .section-heading h3 {
+  font-size: 32px;
+}
+@media (max-width: 767px) {
+  .about-section .section-heading h3 {
+    font-size: 30px;
+  }
+}
+.features-list .features-box {
+  align-items: center;
+  margin-bottom:30px !important;
+}
+
+/* === HOME - Why Choose Seven Angels Massage === */
+.feature-section .section-heading h3 {
+  font-size: 32px;
+}
+@media (max-width: 767px) {
+  .feature-section .section-heading h3 {
+    font-size: 30px;
+  }
+}
+
+/* === HOME - The Seven Angels Experience === */
+.gallery-section .section-heading h3 {
+  font-size: 32px;
+}
+@media (max-width: 767px) {
+  .gallery-section .section-heading h3 {
+    font-size: 30px;
+  }
+}
+/* Hide the last two gallery tiles visually, but keep them in the DOM for Venobox */
+.cell_1762375184504-hidden,
+.cell_1762375184505-hidden,
+.module_1762374993075-hidden,
+.module_17623750078573-hidden {
+  position: absolute !important;
+  left: -9999px !important;
+  top: 0 !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+/* === HOME - Popular Massage Services === */
+.poular-package-section .section-heading h3 {
+  font-size: 32px;
+}
+@media (max-width: 767px) {
+  .poular-package-section .section-heading h3 {
+    font-size: 30px;
+  }
+}
+/* For desktop layout */
+.poular-package-section .content a h4  {
+  color:#212529 !important;
+}
+.poular-package-section .content a h4:hover {
+  color:#ff69b4 !important;
+}
+.poular-package-section .meta-box {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+/* === HOME - Insights for a Calmer, Better-Feeling You === */
+.blog-section .section-heading {
+  margin-bottom: 45px;
+}
+.blog-section .section-heading h3 {
+  font-size: 32px;
+}
+@media (max-width: 767px) {
+  .blog-section .section-heading h3 {
+    font-size: 30px;
+  }
+}
+.blog-section .section-heading p {
+  max-width: 570px;
+}
+.sam-articles {
+  padding-bottom: 60px;
+}
+@media (max-width: 767px) {
+  .sam-articles {
+    padding-bottom: 30px;
+  }
+}
+.thumbnail a.category {
+  background:#e38e6a !important;
+  color:#000000 !important;
+  text-decoration:none !important;
+  font-weight:500 !important;
+}
+.thumbnail a.category:hover {
+  background:#ff69b4 !important;
+  color:#00008B !important;
+}
+.info a.link {
+  color: #212529;
+}
+.info a.link:hover {
+  color: #ff69b4;
+}
+.blog .info h3 {
+  font-size:26px !important;
+}
+@media (max-width: 767px) {
+  .blog .info h3 {
+    font-size:24px !important;
+  }
+}
+
+/* === HOME - What Our Clients' Say === */
+#hs_cos_wrapper_dnd_area-dnd_partial-7-module-3 .section-heading {
+  margin-bottom: 36px;
+}
+.testimonial-section .section-heading h3 {
+  font-size: 32px;
+}
+@media (max-width: 767px) {
+  .testimonial-section .section-heading h3 {
+    font-size: 30px;
+  }
+}
+.testimonial-content h4 {
+  color: #ff69b4;
+}
+.author-name a {
+  color: #212529;
+}
+.author-name a:hover {
+  color: #ff69b4;
+}
+
+/* === HOME - Brand Logos Center Alignment === */
+.brand-grid-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;  /* allows responsiveness */
+  text-align: center;
+}
+.brand-grid-wrap .single-brand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.brand-grid-wrap img {
+  display: block;
+  margin: 0 auto;
+}
+
+/* === HOME - Be The First to Unwind === */
+.newsletter-section .section-heading {
+  margin-bottom: 30px;
+}
+.newsletter-section .section-heading h3 {
+  font-size: 32px;
+}
+@media (max-width: 767px) {
+  .newsletter-section .section-heading h3 {
+    font-size: 30px;
+  }
+}
+.newsletter-section span p {
+  text-align: center;
+  line-height: 1.5;
+  font-size: 0.95rem;
+  margin: auto 0px;
+}
+.newsletter-section span p a {
+  color:#212529;
+}
+.newsletter-section span p a:hover {
+  color:#ff69b4;
+}
+.newsletter-form {
+  display: flex;
+  justify-content: center;
+}
+@media (min-width: 768px) {
+  [data-hsfc-id=Renderer] .hsfc-Step .hsfc-Step__Content {
+    width:700px !important;
+    padding:15px 0px 30px !important;
+  }
+}
+@media (max-width: 767px) {
+  [data-hsfc-id=Renderer] .hsfc-Step .hsfc-Step__Content {
+    padding:15px 5px 30px !important;
+  }
+}
+[data-hsfc-id=Renderer] .hsfc-ErrorAlert {
+  margin-top: -10px;
+}
+/* Get Updates - CTA Button */
+[data-hsfc-id=Renderer] .hsfc-NavigationRow {
+  margin-top:30px !important;
+}
+@media (max-width: 575px) {
+  [data-hsfc-id=Renderer] .hsfc-NavigationRow__Buttons>* {
+    width:auto !important;
+  }
+}
+[data-hsfc-id=Renderer] .hsfc-NavigationRow__Buttons {
+  align-items:end !important;
+}
+[data-hsfc-id=Renderer] .hsfc-Button {
+  background-color:#e38e6a !important;
+  border:1px !important;
+  border-color:#e38e6a !important;
+  border-radius:5px !important;
+  color:#000000 !important;
+  font-size:14px !important;
+}
+[data-hsfc-id=Renderer] .hsfc-Button:hover {
+  background-color:#ff69b4 !important;
+  border-color:#ff69b4 !important;
+  color:#00008b !important;
+}
+[data-hsfc-id=Renderer] .hsfc-Button:not([disabled]):hover {
+  transform:none !important;
+}
+
+/* === ABOUT US - Page Banner (Hero Section) === */
+.page-banner-section {
+  height:600px !important;
+}
+.page-banner-content h1 {
+  font-size:60px !important;
+}
+@media (max-width: 767px) {
+  .page-banner-content h1 {
+    font-size:42px !important;
+  }
+}
+.page-banner-content p {
+  color: #ffffff;
+}
+
+/* === ABOUT US – Story Section (Our Story: Calm...) === */
+.about-section .section-heading {
+  margin-bottom: 45px;
+}
+.about-section .section-heading h2 {
+  font-size:32px !important;
+}
+@media (max-width: 767px) {
+  .about-section .section-heading h2 {
+    font-size:30px !important;
+  }
+}
+.about-section .section-heading p {
+  margin:12px auto !important;          /* spacing BEFORE paragraph */
+}
+.about-section .section-heading p.sam-about-story {
+  text-align: left;
+  max-width:1000px !important;
+}
+.about-section .section-heading p a {
+  color:#212529;
+}
+.about-section .section-heading p a:hover {
+  color:#ff69b4;
+}
+.about-section .features-list{
+  max-width:1000px !important;  /* adjust: 760–980 depending on your taste */
+  margin:0 auto !important;     /* centers the whole block */
+}
+.about-section .content h3 {
+  font-size:26px !important;
+}
+@media (max-width: 767px) {
+  .about-section .content h3 {
+    font-size:24px !important;
+  }
+}
+
+/* === ABOUT US – Video Gallery Section (How Your Seven Angels Massage...) === */
+.video-section .section-heading h2 {
+  font-size:32px !important;
+}
+@media (max-width: 767px) {
+  .video-section .section-heading h2 {
+    font-size:30px !important;
+  }
+}
+.video-section .section-heading h3 {
+  font-size:26px !important;
+  margin-bottom: 8px;
+}
+@media (max-width: 767px) {
+  .video-section .section-heading h3 {
+    font-size:24px !important;
+  }
+}
+.video-section .section-heading p.sam-session-intro {
+  max-width:700px !important;
+  margin:0 auto 40px !important;
+}
+.video-section .section-heading p.sam-session-steps {
+  margin-bottom:24px !important;
+}
+.video-gallery .thumbnail .video-popup {
+  display:none !important;
+}
+.video-section .section-heading p.sam-session-button {
+  margin-top: 40px;
+}
+.video-section .section-heading p.sam-session-button a {
+  display: inline-block;
+  padding: 12px 28px;
+  background: #e38e6a;
+  color: #212529;
+  font-size: 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.video-section .section-heading p.sam-session-button a:hover {
+  background: #ff69b4;
+  color: #00008B;
+}
+
+/* === ABOUT US – Team Section (Our Therapists, Our Promise) */
+/* Section Heading Size + Spacing */
+.team-section .section-heading h2 {
+  font-size:32px !important;
+}
+@media (max-width: 767px) {
+  .team-section .section-heading h2 {
+    font-size:30px !important;
+  }
+}
+/* Section heading paragraph */
+.team-section .section-heading p {
+  max-width:720px !important;
+  margin:12px auto !important;          /* spacing BEFORE paragraph */
+}
+/* Team Card Content Layout & Breathing Room */
+/* Inner content wrapper */
+.team .content {
+  display: block !important;
+  justify-content: center !important;
+  margin-left: 30px !important;
+  margin-right: 30px !important;
+}
+.team .content .info {
+  flex: 0 !important;
+}
+.team .content .info {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+/* Card titles (Rigorous Screening, etc.) */
+.team .content .info h3 {
+  font-size:22px !important;
+  text-align: center !important;
+}
+/* Card body copy */
+.team .content .info p {
+  font-size: 14px !important;
+  text-align: left !important;
+}
+@media (max-width: 767px) {
+  .team .content .info p {
+    margin-left: 10px !important;
+  }
+}
+.team .content .share-icon {
+  left: -15px !important;
+}
+.team .content .share-icon .toggle {
+  line-height: 27px !important;
+  width: 30px !important;
+  height: 30px !important;
+  cursor: default !important;
+}
+.team .share-icon .toggle svg {
+  width: 20px !important;
+  height: 20px !important;
+  opacity: 0.6;
+  transition: 0.2s ease;
+}
+.team .share-icon .toggle svg:hover {
+  opacity: 1;
+  transform: scale(1.08);
+}
+.team .content .share-icon .list {
+    display: none !important;
+}
+
+/* === ABOUT US - WHho We Serve: turn the testimonial slider into a simple stacked list === */
+.testimonial-section .section-heading h2 {
+  font-size: 32px !important;
+}
+@media (max-width: 767px) {
+  .testimonial-section .section-heading h2 {
+    font-size: 30px !important;
+  }
+}
+.who-we-serve-list {
+  margin-bottom: 66px;
+}
+@media (max-width: 767px) {
+  .who-we-serve-list {
+    margin-bottom: 36px;
+  }
+}
+/* Target this specific module: .testimonial.who-we-serve-list */
+.who-we-serve-list .nav-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+/* Stack items vertically instead of as a sliding track */
+.who-we-serve-list .swiper-wrapper {
+  display: block;
+  transform:none !important;
+}
+.who-we-serve-list .swiper-wrapper:last-child {
+  display:none !important;
+  margin-bottom: 0px;
+}
+/* Only show the 4 main slides; hide Swiper's duplicates */
+.who-we-serve-list .swiper-slide-duplicate {
+  display:none !important;
+  margin-bottom: 0px;
+}
+/* Each item takes full width and has spacing */
+.who-we-serve-list .swiper-slide {
+  width: 100%;
+  margin-bottom: 24px;
+}
+.who-we-serve-list .swiper-slide:last-child {
+  display:none !important;
+  margin-bottom: 0px;
+}
+.who-we-serve-list .swiper-slide-duplicate-prev {
+  display:none !important;
+  margin-bottom: 0px;
+}
+.who-we-serve-list .swiper-slide-duplicate-next {
+/*  display:none !important;
+  margin-bottom: 0px;  */
+}
+/* Left-align the content but keep it centered as a block */
+.who-we-serve-list .testimonial-content {
+  text-align:left !important;
+}
+.who-we-serve-list .testimonial-content h3 {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+@media (max-width: 767px) {
+  .who-we-serve-list .testimonial-content h3 {
+    font-size: 24px;
+  }
+}
+/* Hide quote image */
+.who-we-serve-list .testimonial-content img {
+  display:none !important;
+  margin-bottom: 0px;
+}
+/* Hide left/right arrows */
+.who-we-serve-list .testimonial-slider-prev,
+.who-we-serve-list .testimonial-slider-next {
+  display:none !important;
+  margin-bottom: 0px;
+}
+/* Hide the avatar thumbnail row entirely */
+.who-we-serve-list .testimonial-thumb-wrap {
+  display:none !important;
+  margin-bottom: 0px;
+}
+/* Remove any leftover spacing caused by rating stars */
+.who-we-serve-list .testimonial-content .rating {
+  display: none;
+  margin-bottom: 0px;
+}
+.testimonial-section .section-heading p.sam-career-button {
+  margin-top:24px !important;
+}
+.testimonial-section .section-heading p.sam-career-button a {
+  display: inline-block;
+  padding: 12px 28px;
+  background: #e38e6a;
+  color: #212529;
+  font-size: 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.testimonial-section .section-heading p.sam-career-button a:hover {
+  background: #ff69b4;
+  color: #00008B;
+}
+#hs_cos_wrapper_widget_1764373663964 .section-heading {
+  margin-bottom: 0px;
+}
+
+/* === SERVICES DETAILS - Choose The Massage That Fits... === */
+/* SERVICES SHORTCUTS – 2 Columns, 3 Rows per Column */
+/* Two columns on tablet/desktop */
+#hs_cos_wrapper_module_176470120511211 .features-list {
+  display: grid;
+  row-gap: 12px;
+  column-gap: 48px;
+  margin: 0 auto;               /* center under the heading */
+}
+@media (min-width: 768px) {
+  #hs_cos_wrapper_module_176470120511211 .features-list {
+    grid-template-rows: repeat(3, 1fr); /* Three rows, each taking 1 fraction of space */
+    grid-auto-flow: column;             /* Fill items vertically, then move to next column */
+    max-width:700px !important;
+  }
+}
+/* Each row: icon + text on one line */
+#hs_cos_wrapper_module_176470120511211 .features-list .features-box {
+  align-items: center;   /* vertically center icon + text */
+  margin-bottom: 0px !important;
+}
+.features-box .content h3 a {
+  color:#212529 !important;
+}
+.features-box .content h3 a:hover {
+  color:#ff69b4 !important;
+}
+/* Icon column – same width for all rows */
+#hs_cos_wrapper_module_176470120511211 .features-list .icon {
+  width: 42px;
+  height: 42px;
+  margin: 0 14px 0 auto;
+}
+/* Make sure the SVG itself doesn’t add weird inline spacing */
+#hs_cos_wrapper_module_176470120511211 .features-list .icon svg {
+  display: block;
+}
+/* Text column */
+#hs_cos_wrapper_module_176470120511211 .features-list .content {
+  flex: 1;
+}
+#hs_cos_wrapper_module_176470120511211 .features-list .content h3 {
+  margin: 0;
+}
+#hs_cos_wrapper_module_176470120511211 .features-list .content a {
+  text-decoration: none;
+}
+
+/* === SERVICES DETAILS - All (SSTCMBFHM) === */
+.sam-services-details h2 {
+  font-size:32px !important;
+}
+@media (max-width: 767px) {
+  .sam-services-details h2 {
+    font-size:30px !important;
+  }
+}
+.sam-services-details h3 {
+  font-size:26px !important;
+}
+@media (max-width: 767px) {
+  .sam-services-details h3 {
+    font-size:24px !important;
+  }
+}
+.sam-services-details .content .service-list {
+  padding-left:16px !important;
+}
+.sam-services-details .content .service-list li {
+  line-height:1.2 !important;
+  margin-bottom:6px !important;
+}
+
+/* === SERVICES DETAILS - Send Your Details... === */
+#hs_cos_wrapper_module_17654040123259 .section-heading {
+  margin-bottom: 30px;
+}
+.feature-section .section-heading h2 {
+  font-size:32px !important;
+}
+@media (max-width: 767px) {
+  .feature-section .section-heading h2 {
+    font-size:30px !important;
+  }
+}
+#hs_cos_wrapper_module_17654040123259 .section-heading p {
+  margin-bottom: 12px;
+}
+.feature-section .section-heading p.sam-send-your-details {
+  margin-bottom: auto;
+  text-align: left;
+}
+.feature-section .section-heading p.sam-send-your-details-sub {
+  font-size: 0.95rem;
+  margin-top: 12px;
+  text-align: left;
+}
+#hs_cos_wrapper_module_17654040123259 .section-heading ul {
+  display: inline-block;         /* keeps list centered under the text */
+}
+#hs_cos_wrapper_module_17654040123259 .section-heading ul li {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-left: 12px;
+  padding-left: 24px;            /* room for the check icon */
+  font-size: 0.98rem;
+}
+/* Green check icon */
+#hs_cos_wrapper_module_17654040123259 .section-heading ul li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("https://spa.sevenangelsmassage.com/hubfs/green-check.svg");
+}
+
+/* === CONTACT US - We're Here to Help === */
+#hs_cos_wrapper_dnd_area-module-3 h2 {
+  font-size: 32px;
+}
+.contact-info-box .icon {
+  font-size:0 !important;
+}
+.contact-info-box h3 {
+  font-size: 26px;
+}
+@media (max-width: 767px) {
+  .contact-info-box h3 {
+    font-size: 24px;
+  }
+}
+.contact-info-box a {
+  color: #00008b;
+  text-decoration: underline;
+}
+.contact-info-box a:hover {
+  color: #ff69b4;
+}
+/* === CONTACT US - Message Us on Your Preferred App === */
+#hs_cos_wrapper_module_17654048825547 .section-heading {
+  margin-bottom: 30px;
+}
+#hs_cos_wrapper_module_17654048825547 .section-heading h2 {
+  font-size: 32px;
+}
+@media (max-width: 767px) {
+  #hs_cos_wrapper_module_17654048825547 .section-heading h2 {
+    font-size: 30px;
+  }
+}
+#hs_cos_wrapper_module_17654048825547 .section-heading h3 {
+  font-size: 26px;
+}
+@media (max-width: 767px) {
+  #hs_cos_wrapper_module_17654048825547 .section-heading h3 {
+    font-size: 24px;
+  }
+}
+#hs_cos_wrapper_module_17654048825547 .section-heading a {
+  color: #00008b;
+  text-decoration: underline;
+}
+#hs_cos_wrapper_module_17654048825547 .section-heading a:hover {
+  color: #ff69b4;
+}
+.sam-preffered-app {
+  margin-bottom: 40px !important;
+}
+.sam-main-messaging-channels, .sam-additional-chat-apps {
+  display: inline-block;
+}
+.sam-main-messaging-channels {
+  margin-bottom: 24px;
+}
+.sam-additional-chat-apps {
+  margin-bottom: 12px;
+}
+.sam-main-messaging-channels li, .sam-additional-chat-apps li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+}
+.sam-main-messaging-channels li:last-child, .sam-additional-chat-apps li:last-child {
+  margin-bottom:0 !important;
+}
+.sam-main-messaging-channels li img, .sam-additional-chat-apps li img {
+  width:20px !important;
+  height:20px !important;
+}
+.sam-addchat-apps {
+  margin-bottom: 12px !important;
+}
+
+/* === CONTACT US - WeChat Modal === */
+/* Modal wrapper */
+.wechat-modal {
+  display: none;
+  position: fixed;
+  z-index: 99999;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+/* Modal content */
+.wechat-modal-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+  position: relative;
+}
+.wechat-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+}
+/* Shared WeChat bits */
+.wechat-user-id {
+  font-size: 0.90rem;
+  font-weight: 600;
+  margin-top: 16px;
+  margin-bottom: 0px;
+}
+.wechat-qr {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  -webkit-touch-callout: default; /* iOS: allow Save Image menu */
+  user-select: none;
+}
+.wechat-save-hint {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+.wechat-desc {
+  margin: 10px 0 0 0;
+}
+
+/* === CONTACT US - WeChat QR Fallback === */
+/* Fallback wrapper */
+.wechat-fallback {
+  display: none;
+  position: fixed;
+  z-index: 99999;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+/* QR content */
+.wechat-qr-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+  position: relative;
+}
+
+/* === CONTACT US - What to Send When Booking === */
+#hs_cos_wrapper_module_176640516307514 .section-heading {
+  margin-bottom: 30px;
+}
+#hs_cos_wrapper_module_176640516307514 .section-heading p {
+  max-width:570px !important;
+  text-align: left;
+}
+#hs_cos_wrapper_module_176640516307514 .section-heading ul {
+  display: inline-block;         /* keeps list centered under the text */
+}
+#hs_cos_wrapper_module_176640516307514 .section-heading ul li {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-left: 12px;
+  padding-left: 24px;            /* room for the check icon */
+  font-size: 0.98rem;
+}
+/* Green check icon */
+#hs_cos_wrapper_module_176640516307514 .section-heading ul li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("https://spa.sevenangelsmassage.com/hubfs/green-check.svg");
+}
+
+/* === CONTACT US - FAQ Accordion (details/summary) === */
+#hs_cos_wrapper_module_176642944508715 .section-heading {
+  margin-bottom:30px !important;
+}
+.sam-faq {
+  max-width: 760px;
+  margin: 0 auto;
+}
+.sam-faq-intro,
+.sam-faq-outro {
+  text-align: center;
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+.sam-faq-item {
+  background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 14px;
+  margin: 14px 0;
+  overflow: hidden;
+  text-align: left;
+}
+.sam-faq-item summary {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 16px 18px 16px 28px;
+  font-weight: 600;
+  position: relative;
+  list-style: none;
+}
+@media (max-width: 575px) {
+  .sam-faq-item summary {
+    padding: 16px 18px 16px 24px;
+  }
+}
+.sam-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+/* subtle question icon */
+.sam-faq-item summary::before {
+  content: "";
+  padding-right: 16.23px;
+  width:9.23px !important;
+  height:16px !important;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("https://spa.sevenangelsmassage.com/hubfs/red-question-mark.svg");
+}
+/* plus / minus indicator */
+.sam-faq-item summary::after {
+  content: "+";
+  position: absolute;
+  top: 9px;
+  right: 18px;
+  font-size: 22px;
+  opacity: 0.6;
+}
+.sam-faq-item[open] summary::after {
+  content: "–";
+}
+.sam-faq-answer {
+  padding: 0 18px 16px 44px;
+  line-height: 1.55;
+  opacity: 0.95;
+  text-align: left;
+}
+@media (max-width: 575px) {
+  .sam-faq-answer {
+    padding: 0 18px 16px 40px;
+  }
+}
+.sam-faq-item[open] summary {
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+/* === CONTACT US - Scan to Book Instantly === */
+#hs_cos_wrapper_widget_1767811698922 .section-heading h2 {
+  font-size: 32px;
+}
+@media (min-width: 768px) {
+  .cell_17678094151567-row-2-vertical-alignment > .row-fluid {
+    max-width: 900px;
+  }
+}
+@media (min-width: 768px) {
+  #hs_cos_wrapper_module_176780941515613 .contact-info-box, #hs_cos_wrapper_module_176780941515615 .contact-info-box,
+  #hs_cos_wrapper_module_176780941515617 .contact-info-box, #hs_cos_wrapper_module_17678113888513 .contact-info-box,
+  #hs_cos_wrapper_module_17678095105749 .contact-info-box, #hs_cos_wrapper_module_176780951057411 .contact-info-box,
+  #hs_cos_wrapper_module_176780951057413 .contact-info-box {
+    width: 268px;
+  }
+}
+@media (max-width: 767px) {
+  .sam-qr-codes {
+    display: inline-block;
+  }
+}
+@media (max-width: 767px) {
+  .sam-qr-codes img {
+    height:200px !important;
+    width:auto !important;
+  }
+}
+#hs_cos_wrapper_module_176780941515613 .contact-info-box .icon, #hs_cos_wrapper_module_176780941515615 .contact-info-box .icon,
+#hs_cos_wrapper_module_176780941515617 .contact-info-box .icon, #hs_cos_wrapper_module_17678113888513 .contact-info-box .icon,
+#hs_cos_wrapper_module_17678095105749 .contact-info-box .icon, #hs_cos_wrapper_module_176780951057411 .contact-info-box .icon,
+#hs_cos_wrapper_module_176780951057413 .contact-info-box .icon {
+  display: none;
+}
+.cell_17678094151567-row-2-vertical-alignment {
+  margin-bottom: 43px;
+}
+
+/* === CONTACT US - Work With Us === */
+#hs_cos_wrapper_module_17680437094417 .section-heading {
+  margin-bottom: 30px;
+}
+#hs_cos_wrapper_module_17680437094417 .section-heading p {
+  max-width: 600px;
+}
+#hs_cos_wrapper_widget_1768044307405 ul,
+#hs_cos_wrapper_widget_1768044317581 ul {
+  list-style: disc;
+  margin-left: 20px;
+  margin-bottom: 15px;
+}
+#hs_cos_wrapper_widget_1768045667333 {
+  margin-bottom: 24px;
+}
+#hs_cos_wrapper_widget_1768045667333 h3 {
+  font-size: 26px;
+}
+@media (max-width: 767px) {
+  #hs_cos_wrapper_widget_1768045667333 h3 {
+    font-size: 24px;
+  }
+}
+
+/* === CONTACT US - Google Maps Adjustments === */
+#hs_cos_wrapper_widget_1768057106439 .section-heading {
+  margin-bottom: 30px;
+}
+#hs_cos_wrapper_widget_1768057106439 .section-heading h2 {
+  font-size: 32px;
+}
+@media (max-width: 767px) {
+  #hs_cos_wrapper_widget_1768057106439 .section-heading h2 {
+    font-size: 30px;
+  }
+}
+.embed_container .iframe_wrapper iframe {
+  height: 500px;
+}
+
+/* === ARTICLES - Blog: Comment Button Customization === */
+.actions .hs-button {
+  font-size: 14px;
+  padding: 13px 23px;
+  background: #e38e6a;
+  color: #000000;
+  border: 1px;
+  border-color: #e38e6a;
+}
+.actions .hs-button:hover {
+  background: #ff69b4;
+  color: #00008b;
+  border: 1px;
+  border-color:#ff69b4;
+}
+
+/* === ARTICLES - Blog Details === */
+.blog-section .section-heading h2 {
+  font-size: 32px;
+}
+@media (max-width: 767px) {
+  .blog-section .section-heading h2 {
+    font-size: 30px;
+  }
+}
+.blog-details-section h2 {
+  font-size:32px !important;
+}
+@media (max-width: 767px) {
+  .blog-details-section h2 {
+    font-size:30px !important;
+  }
+}
+.blog-details-content {
+  margin-bottom: 24px;
+}
+.hs_cos_wrapper_type_rich_text a {
+  color:#212529;
+}
+.hs_cos_wrapper_type_rich_text a:hover {
+  color:#ff69b4;
+}
+.entry-post-tags a:hover {
+  color: #ff69b4;
+}
+.post-tag-share .list a:hover {
+  color: #ff69b4;
+}
+.post-tag-share .entry-post-tags .tag {
+  line-height: 1.5;
+}
+._hs-audio-player_1nxo7_1 {
+  --primary:#004857 !important;
+  --secondary:#ffbcac !important;
+  --tertiary:#004857 !important;
+  --primary-alt:#004857 !important;
+}
+._hs-audio-player_1nxo7_1:hover {
+  --primary:#e38e6a !important;
+  --secondary:#004857 !important;
+  --tertiary:#e38e6a !important;
+  --primary-alt:#e38e6a !important;
+}
+/* Blog comment form: make the 2-column row span full width on tablets+ */
+.blog-details-section .block-title-2 {
+  display: flex;
+  justify-content: center;
+}
+.blog-details-section .section-heading {
+  margin-bottom:45px !important;
+}
+@media (min-width: 768px) {
+  .blog-details-section .section-heading {
+    width: 700px;
+  }
+}
+.blog-details-section .comment-form {
+  display: flex;
+  justify-content: center;
+}
+.comment-form .hs-input {
+  color:#212529;
+  background-color:#f5f8fa;
+  line-height: normal;
+  width:100% !important;
+  border-radius: 3px;
+  padding: 10px;
+}
+@media (min-width: 768px) {
+  .hs-form-private {
+    width: 700px;
+  }
+  fieldset.form-columns-2 {
+    margin:0px !important;
+  }
+  fieldset.form-columns-2 .hs-form-field {
+    padding:0px !important;
+  }
+  fieldset.form-columns-2 .hs_firstname {
+    padding-right:15px !important;
+  }
+  fieldset.form-columns-2 .hs_lastname {
+    padding-left:15px !important;
+  }
+}
+form label {
+  color:#212d3a !important;
+}
+.hs-form-required, .hs-error-msg {
+  color:#e51520 !important;
+}
+.hs-error-msg {
+  margin-top: -15px;
+}
+
+/* Website Cookies Buttons (HubSpot) */
+#hs-eu-cookie-confirmation #hs-eu-confirmation-button {
+  color:#000000 !important;
+  background-color:#e38e6a !important;
+  border:1px solid #e38e6a !important;
+}
+#hs-eu-cookie-confirmation #hs-eu-decline-button {
+  color:#00008b !important;
+  background-color:#ff69b4 !important;
+  border:1px solid #ff69b4 !important;
+}
+
+/* SAM Customized CTA BUTTONS */
+.sam-cta-buttons, .sam-cta-null-button {
+  margin-top: 30px;
+  text-align: center;
+}
+.sam-cta-buttons a.btn, .sam-cta-null-button a.btn {
+  text-transform: none;
+}
+
+/* ==== FALLBACK-PAGE ==== */
+.fallback-center .body-container-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+.fallback-center .body-container-wrapper > .container-fluid,
+.fallback-center .body-container-wrapper > .container-fluid > .row-fluid-wrapper,
+.fallback-center .body-container-wrapper > .container-fluid > .row-fluid-wrapper > .row-fluid,
+.fallback-center .body-container-wrapper > .container-fluid > .row-fluid-wrapper > .row-fluid > [class*="span"],
+.fallback-center .dnd-section,
+.fallback-center .dnd-column {
+  width: 100%;
+}
+#fallbackRoot {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  padding: 22px;
+  line-height: 1.45;
+  max-width: 520px;
+  margin: 0 auto;
+  text-align: left;
+}
+#fallbackRoot h1 {
+  font-size: 46px;
+  margin: 0 0 10px 0;
+}
+@media (max-width: 767px) {
+  #fallbackRoot h1 {
+    font-size: 42px;
+  }
+}
+/* Subtext under title */
+#fallbackRoot .fallback-subtext {
+  color: #666666;
+  margin: 0 0 12px 0;
+}
+/* Buttons */
+#openBtn,
+#openBtnWeChat,
+#openBtnVcard {
+  display: block;
+  margin: 12px 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #111;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 800;
+  text-align: center;
+}
+/* vCard box */
+#vcardBox {
+  display: none;
+  margin-top: 18px;
+  text-align: center;
+}
+#vcardBox .vcard-title {
+  margin: 0 0 10px 0;
+  font-weight: 800;
+}
+#vcardBox .vcard-hint {
+  font-size: 14px;
+  opacity: 0.85;
+  line-height: 1.4;
+  margin: 8px 0 0 0;
+}
+/* Optional vCard QR image if you ever enable it */
+#vcardQRImg {
+  max-width: 320px;
+  width: 90%;
+  border-radius: 12px;
+  margin: 0 auto 12px auto;
+  display: block;
+}
+
+/* =========================================================
+   Legal Pages (Privacy Policy / Terms) — alignment + bullets
+   Targets only content inside .legal-body
+   ========================================================= */
+/* Keep the H1 centered (optional). Remove if you want it left. */
+#hs_cos_wrapper_widget_1768983949341 .section-heading > h1 {
+  font-size: 48px;
+  margin-bottom: 60px;
+}
+/* Make EVERYTHING inside legal-body left aligned */
+.section-heading .legal-body,
+.section-heading .legal-body * {
+  text-align: left !important;
+}
+/* Constrain line length + center the block on the page */
+.section-heading .legal-body {
+  max-width: 820px;
+  margin: 0 auto;              /* centers the block, not the text */
+  padding: 0 18px;             /* nice gutter on mobile */
+}
+/* Paragraph spacing */
+.section-heading .legal-body p {
+  max-width: 820px;
+  margin: 0 0 14px 0 !important;
+}
+/* Headings spacing inside legal body */
+.section-heading .legal-body h2 {
+  font-size: 32px;
+  margin: 28px 0 12px !important;
+}
+.section-heading .legal-body h3 {
+  font-size: 26px;
+  margin: 18px 0 10px !important;
+}
+/* Restore bullets + indentation (many themes remove them globally) */
+.section-heading .legal-body ul,
+.section-heading .legal-body ol {
+  list-style-position: outside !important;
+  padding-left: 1.25rem !important;  /* creates the indent */
+  margin: 0 0 16px 0 !important;
+}
+/* Make sure bullets actually render even if theme forces weird displays */
+.section-heading .legal-body ul {
+  list-style-type: disc !important;
+}
+.section-heading .legal-body ol {
+  list-style-type: decimal !important;
+}
+.section-heading .legal-body li {
+  display: list-item !important;
+  margin: 0 0 8px 0 !important;
+}
+@media (max-width: 767px) {
+  #hs_cos_wrapper_widget_1768983949341 .section-heading > h1 {
+    font-size: 36px;
+  }
+  .section-heading .legal-body h2 {
+    font-size: 30px;
+  }
+  .section-heading .legal-body h3 {
+    font-size: 24px;
+  }
+}
+/* Optional: nicer link wrapping on mobile */
+.section-heading .legal-body a {
+  color: #00008b;
+  text-decoration: underline;
+  word-break: break-word;
+}
+.section-heading .legal-body a:hover {
+  color: #ff69b4;
+}
+/* Optional: tighten on very small screens */
+@media (max-width: 480px) {
+  .section-heading .legal-body {
+    padding: 0px;
+  }
+}
+
+/* === MOBILE DEVICES VIEWPORT HEADING BREAK === */
+/* Hide the break by default (desktop) */
+.mobile-break {
+  display: none;
+}
+/* Show the break on mobile */
+@media screen and (max-width: 767px) {
+  .mobile-break {
+    display: inline;
+  }
+}
+
+/* ===== FOOTER's TEXTS (H4s, & H5s) ===== */
+footer h4, footer h5 {
+  color:#ffffff !important;
+}
+/* Footer Logo Margin Adjustments */
+.footer-logo {
+  margin-bottom:10px !important;
+}
+/* Put all payment option images on one row */
+.footer-payment-row {
+  display: flex;              /* force row layout */
+  justify-content: center;    /* center entire row */
+  align-items: center;        /* vertically align different heights */
+  gap: 7px;                   /* same as your old padding-left */
+}
+/* optional: make sure images don’t shrink oddly */
+.footer-payment-row img {
+  width: auto !important;     /* preserve aspect ratio */
+  height: auto;               /* let your inline height override this */
+}
+
+/* ===== FOOTER BUSINESS HOURS ===== */
+.hours {
+  max-width: 420px;
+}
+.hours p {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: baseline;
+  line-height: 1;
+}
+.hours .day { text-align: left; }
+.hours .time { text-align: left; }
+.hours .highlight {
+  font-weight: bold;
+}
+
+/* ===== FOOTER BOOK NOW BUTTON ===== */
+.footer-cta-button {
+  text-align: center;
+}
+.footer-cta-button a {
+  background-color: #e38e6a;   /* your gold accent */
+  border-color: #e38e6a;       /* your gold accent */
+  color: #000000;
+}
+.footer-cta-button a:hover {
+  background-color: #ff69b4;
+  border-color: #ff69b4;
+  color: #00008b;
+}
+
+/* ===== FOOTER TRUST LINE ===== */
+.footer-trust {
+  display: flex;
+}
+.footer-trust ul {
+  margin: 12px auto !important;
+}
+.footer-trust ul li {
+  position: relative;
+  padding-left: 24px;            /* room for the check icon */
+  font-size: 0.92rem;
+  color: #b4b5b7;
+  line-height: 1.2;   /* slight bump for better baseline */
+}
+/* “Check” icon before each item */
+.footer-trust ul li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 16px;                    /* adjust to taste */
+  height: 16px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  /* curved gold checkmark SVG */
+  background-image: url("https://spa.sevenangelsmassage.com/hubfs/gold-check.svg");
+}
+
+/* ===== FOOTER REVIEWS CTA ===== */
+.footer-reviews {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center !important;
+  align-items: center !important;
+  margin-top: 24px !important;
+  margin-bottom: 8px !important;
+  color: #b4b5b7 !important; /* default text color */
+}
+.footer-reviews strong {
+  color: #ffffff !important; /* highlight the rating number */
+}
+.footer-reviews a {
+  color: #ffd700 !important; /* gold link */
+  text-decoration: none !important;
+}
+.footer-reviews a:hover {
+  color: #ff69b4 !important;
+}
+.footer-reviews span {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  font-size: 0.95rem !important;
+  gap: 6px !important;
+}
+/* Gold star icon before the Fresha rating */
+.footer-reviews span::before {
+  content: "";
+  display: in-block;
+  width: 15px;                    /* same as checkmark */
+  height: 15px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  background-image: url("https://spa.sevenangelsmassage.com/hubfs/gold-star.svg");
+}
+.footer-reviews div {
+  font-size: 0.8em !important;
+  color: #b4b5b7 !important;
+  margin-top: 2px;
+}
+
+/* ===== FOOTER SOCIAL ITEMS ===== */
+@media (min-width: 1024px) {
+  .footer-social {
+    margin-top: 15px;
+  }
+}
+.social-item li a svg {
+  width:20px !important;
+  height:20px !important;
+}
+.footer-social-items {
+  position:absolute;
+  top:17px;
+  right:10.5%;
+}
+.footer-social-items .footer-social-icons {
+  font-size:12px;
+}
+.footer-social-items .footer-social-icons a {
+  margin:0 13.8px;
+}
+.footer-social-items .footer-social-icons a svg {
+  width:20px !important;
+  height:20px !important;
+}
+.footer-social-items .footer-social-icons a span {
+  display:inline-block;
+  fill:#b4b5b7;
+}
+.footer-social-items .footer-social-icons a span:hover {
+  fill:#ff69b4;
+}
+/* mobile view */
+@media (max-width: 767px) {
+  .footer-social-items {
+    position:relative !important;       /* pull it out of absolute */
+    top:auto !important;
+    right:auto !important;
+    margin-top:20px !important;
+    text-align:center !important;       /* center container */
+    width:100% !important;              /* so text-align works */
+  }
+  .footer-social-items .footer-social-icons a {
+    margin:0 12px !important;
+  }
+}
+
+/* === HTML/BODY - Force body and html to clip horizontal overflow === */
+html, body {
+  overflow-x: hidden !important;
+}
+/* Make images and videos responsive */
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* === The Foundation for Cross-Page Hash Landings === */
+/* Smooth scroll */
+html {
+  scroll-behavior:smooth !important;
+  scroll-padding-top:200px !important; /* TRUE default for native hash landings */
+}
+section[id],
+[id][data-anchor],
+h1[id], h2[id], h3[id], h4[id], h5[id] {
+  scroll-margin-top:0px !important;
+}
+
+/* If AOS is attached, neutralize it so opacity never sticks at 0 */
+.cell_1762375184504-hidden [data-aos],
+.cell_1762375184505-hidden [data-aos] {
+  transition: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+/* Respect OS-level reduced-motion setting */
+@media screen and (prefers-reduced-motion: reduce) {
+  /* AOS: stop transforms/transitions entirely */
+  [data-aos] {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;   /* avoid AOS pre-init fade = 0 */
+  }
+}
+
+/* Lighthouse / Chrome: avoid deprecated overflow behavior on media elements */
+img, video, canvas {
+  overflow: clip; /* best modern behavior */
+}
+/* Fallback for older browsers that don't support overflow: clip */
+@supports not (overflow: clip) {
+  img, video, canvas {
+    overflow: hidden;
+  }
+}

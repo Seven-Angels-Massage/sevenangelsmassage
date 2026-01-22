@@ -1,0 +1,68 @@
+.content-wrapper {
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media screen and (min-width: 1380px) {
+  .content-wrapper {
+    padding: 0;
+  }
+}
+
+.dnd-section > .row-fluid {
+  margin: 0 auto;
+}
+
+.dnd-section .dnd-column {
+  padding: 0 1rem;
+}
+.hero-banner .dnd-column{
+  padding: 0px !important;
+}
+.dnd-row > .row-fluid , .relxo-container > .row-fluid {
+  max-width: 1200px;
+	margin: 0 auto;
+}
+.hero-banner .row-fluid {
+  max-width: none !important;
+  width: 100%;
+	margin: 0 auto;
+}
+@media only screen and (min-width: 1200px) and (max-width: 1549px) {
+  .dnd-row > .row-fluid , .relxo-container > .row-fluid {
+    max-width: 1200px; 
+  }
+}
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+  .dnd-row > .row-fluid , .relxo-container > .row-fluid {
+    max-width: 960px;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .dnd-row > .row-fluid , .relxo-container > .row-fluid {
+    max-width: 720px;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .dnd-row > .row-fluid , .relxo-container > .row-fluid {
+    max-width: 540px;
+  }
+}
+@media only screen and (max-width: 575px) {
+  .dnd-row > .row-fluid , .relxo-container > .row-fluid {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .dnd-section .dnd-column {
+    padding: 0;
+  }
+}
+
+
+
+/* Row & Column Space */
+
+
