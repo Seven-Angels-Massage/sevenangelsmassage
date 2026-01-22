@@ -27,6 +27,7 @@
 /about-us/kr/                /about-us              302
 /about-us/cn                 /about-us              302
 /about-us/cn/                /about-us              302
+/articles/                   /articles              301
 /homecondo-massage           /services-details      301
 /homecondo-massage/          /services-details      301
 /homecondo-massage/jp        /services-details      302
@@ -43,6 +44,7 @@
 /hotel-massage/kr/           /services-details      302
 /hotel-massage/cn            /services-details      302
 /hotel-massage/cn/           /services-details      302
+/services-details/           /services-details      301
 /contact-us/                 /contact-us            301
 /contact-us/jp               /contact-us            302
 /contact-us/jp/              /contact-us            302
