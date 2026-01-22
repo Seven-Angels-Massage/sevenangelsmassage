@@ -1,67 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
 
-<url>
-  <loc>https://www.sevenangelsmassage.com/</loc>
-  <lastmod>2025-10-27T12:00:00+00:00</lastmod>
-  <changefreq>weekly</changefreq>
-  <priority>1.00</priority>
-  <xhtml:link rel="alternate" hreflang="en" href="https://www.sevenangelsmassage.com/"/>
-  <xhtml:link rel="alternate" hreflang="ja" href="https://www.sevenangelsmassage.com/home/jp"/>
-  <xhtml:link rel="alternate" hreflang="ko" href="https://www.sevenangelsmassage.com/home/kr"/>
-  <xhtml:link rel="alternate" hreflang="zh" href="https://www.sevenangelsmassage.com/home/cn"/>
-</url>
-<url>
-  <loc>https://www.sevenangelsmassage.com/about-us</loc>
-  <lastmod>2025-10-27T12:00:00+00:00</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.80</priority>
-  <xhtml:link rel="alternate" hreflang="en" href="https://www.sevenangelsmassage.com/about-us"/>
-  <xhtml:link rel="alternate" hreflang="ja" href="https://www.sevenangelsmassage.com/about-us/jp"/>
-  <xhtml:link rel="alternate" hreflang="ko" href="https://www.sevenangelsmassage.com/about-us/kr"/>
-  <xhtml:link rel="alternate" hreflang="zh" href="https://www.sevenangelsmassage.com/about-us/cn"/>
-</url>
-<url>
-  <loc>https://www.sevenangelsmassage.com/#h.p_nZR6oTOR14WV</loc>
-  <lastmod>2025-10-27T12:00:00+00:00</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.90</priority>
-  <xhtml:link rel="alternate" hreflang="en" href="https://www.sevenangelsmassage.com/#h.p_nZR6oTOR14WV"/>
-  <xhtml:link rel="alternate" hreflang="ja" href="https://www.sevenangelsmassage.com/home/jp#h.h0x4xr1f5mze"/>
-  <xhtml:link rel="alternate" hreflang="ko" href="https://www.sevenangelsmassage.com/home/kr#h.pa0dvu7619uy"/>
-  <xhtml:link rel="alternate" hreflang="zh" href="https://www.sevenangelsmassage.com/home/cn#h.ghwubf36gox0"/>
-</url>
-<url>
-  <loc>https://www.sevenangelsmassage.com/homecondo-massage</loc>
-  <lastmod>2025-10-27T12:00:00+00:00</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.80</priority>
-  <xhtml:link rel="alternate" hreflang="en" href="https://www.sevenangelsmassage.com/homecondo-massage"/>
-  <xhtml:link rel="alternate" hreflang="ja" href="https://www.sevenangelsmassage.com/homecondo-massage/jp"/>
-  <xhtml:link rel="alternate" hreflang="ko" href="https://www.sevenangelsmassage.com/homecondo-massage/kr"/>
-  <xhtml:link rel="alternate" hreflang="zh" href="https://www.sevenangelsmassage.com/homecondo-massage/cn"/>
-</url>
-<url>
-  <loc>https://www.sevenangelsmassage.com/hotel-massage</loc>
-  <lastmod>2025-10-27T12:00:00+00:00</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.80</priority>
-  <xhtml:link rel="alternate" hreflang="en" href="https://www.sevenangelsmassage.com/hotel-massage"/>
-  <xhtml:link rel="alternate" hreflang="ja" href="https://www.sevenangelsmassage.com/hotel-massage/jp"/>
-  <xhtml:link rel="alternate" hreflang="ko" href="https://www.sevenangelsmassage.com/hotel-massage/kr"/>
-  <xhtml:link rel="alternate" hreflang="zh" href="https://www.sevenangelsmassage.com/hotel-massage/cn"/>
-</url>
-<url>
-  <loc>https://www.sevenangelsmassage.com/contact-us</loc>
-  <lastmod>2025-10-27T12:00:00+00:00</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.80</priority>
-  <xhtml:link rel="alternate" hreflang="en" href="https://www.sevenangelsmassage.com/contact-us"/>
-  <xhtml:link rel="alternate" hreflang="ja" href="https://www.sevenangelsmassage.com/contact-us/jp"/>
-  <xhtml:link rel="alternate" hreflang="ko" href="https://www.sevenangelsmassage.com/contact-us/kr"/>
-  <xhtml:link rel="alternate" hreflang="zh" href="https://www.sevenangelsmassage.com/contact-us/cn"/>
-</url>
+  <!-- Home -->
+  <url>
+    <loc>https://www.sevenangelsmassage.com</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Core Pages -->
+  <url>
+    <loc>https://www.sevenangelsmassage.com/about-us</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.sevenangelsmassage.com/services-details</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://www.sevenangelsmassage.com/contact-us</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Articles Index -->
+  <url>
+    <loc>https://www.sevenangelsmassage.com/articles</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog Articles -->
+  <url>
+    <loc>https://www.sevenangelsmassage.com/articles/best-times-to-book-mobile-massage-makati</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://www.sevenangelsmassage.com/articles/swedish-vs-deep-tissue-which-do-i-need</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://www.sevenangelsmassage.com/articles/hotel-outcall-massage-what-to-expect</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Legal -->
+  <url>
+    <loc>https://www.sevenangelsmassage.com/privacy-policy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://www.sevenangelsmassage.com/terms-and-conditions</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
 
 </urlset>
