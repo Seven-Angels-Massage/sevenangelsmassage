@@ -4191,7 +4191,7 @@ _hsp.push(['addPrivacyConsentListener', function(consent){
 <div class="newsletter-form" data-aos="fade-up">
   <span id="hs_cos_wrapper_dnd_area-dnd_partial-9-module-5_" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_form" style="" data-hs-cos-general-type="widget" data-hs-cos-type="form"><h3 id="hs_cos_wrapper_form_725511019_title" class="hs_cos_wrapper form-title" data-hs-cos-general-type="widget_field" data-hs-cos-type="text"></h3>
 
-<div id="hs_form_target_form_725511019" class="hs-form-frame" data-form-id="a8e00675-911e-492c-807c-4e00fdfff76a" data-portal-id="243726556" data-region="na2"></div>
+<div id="hs_form_target_form_725511019" class="hs-form-html" data-form-id="a8e00675-911e-492c-807c-4e00fdfff76a" data-portal-id="243726556" data-region="na2"></div>
 
 </span>
 </div>
@@ -4666,7 +4666,35 @@ var hsVars = hsVars || {}; hsVars['language'] = 'en-ph';
 </script>
 <script src="/assets/js/modules/Newsletter.module.js"></script>
 
-<script src="https://js-na2.hsforms.net/forms/embed/243726556.js" defer></script>
+
+  <script data-hs-allowed="true">
+    ((d=document,q='querySelectorAll',l='hs-form-html',m='script',b='/_hcms/forms/embed/v4/render-definition/ssr',u='https://js-na2.hsforms.net/forms/embed/243726556.js') => {
+      const a = (t,i) => t.replace(/{{hs_form_instance_id_placeholder}}/g,i);
+      const i = (f,o) => {f.innerHTML=o;for(const s of f[q](m)){const n=d.createElement(m);for(const{name:e,value:t}of s.attributes)n.setAttribute(e,t);n.appendChild(d.createTextNode(s.innerHTML)),s.parentNode.replaceChild(n,s)}};
+      const j = (e,f) => {try{if(e.status === 404)return;}catch(_){}const n=f.cloneNode(true);n.classList.replace(l,'hs-form-frame');i(f,'<'+m+' src="'+u+'"></'+m+'>'+n.outerHTML);};
+      const r = (el,c=el.dataset) => {if(c.fetched)return;c.fetched=Date.now();fetch(`${b}/${c.portalId}/${c.formId}`).then((r) => r.text().then((t) => {i(el,a(t,el.id));c.loaded=Date.now();})).catch((e) => j(e,el));};
+      d[q]('.'+l).forEach((el) => r(el));
+    })();
+  </script>
+
+
+  <script data-hs-allowed="true">
+    ((el) => {
+      el && el.addEventListener('hs-form-event:on-ready', (e) => {
+      window.HubSpotFormsV4.getFormFromEvent(e).setExtraSubmissionMetadata({
+        
+        
+        
+        
+        
+        
+        
+      });
+    });
+    })(document.getElementById('hs_form_target_form_725511019'));
+  </script>
+
+
 
 <!-- Start of HubSpot Embed Code -->
 <script type="text/javascript" id="hs-script-loader" async defer src="//js-na2.hs-scripts.com/243726556.js"></script>
