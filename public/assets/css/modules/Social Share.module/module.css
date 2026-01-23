@@ -1,0 +1,40 @@
+.post-tag-share .post-share {
+    display: flex;
+    align-items: center;
+  }
+  .post-tag-share .post-share strong {
+    color: var(--secondary-color);
+    margin-right: 15px;
+  }
+  .post-tag-share .post-share .list {
+    display: flex;
+    align-items: center;
+  }
+  .post-tag-share .post-share .list a {
+    margin-right: 20px;
+  }
+  .post-tag-share .post-share .list a:last-child {
+    margin-right: 0;
+  }
+  .post-tag-share .post-share .list a svg {
+    width: 18px;
+    height: 18px;
+  }
+
+.post-tag-share .post-share .list a svg path {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+/* ACCESSIBILITY: visually hidden helper text (for descriptive link labels) */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}

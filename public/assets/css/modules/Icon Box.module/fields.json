@@ -1,0 +1,278 @@
+[ {
+  "id" : "bc7a6601-befb-a1dc-4824-fb4d6641d139",
+  "name" : "animation_direction",
+  "label" : "Animation Direction",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "fade-up", "Fade Up" ], [ "fade-down", "Fade Down" ], [ "fade-left", "Fade Left" ], [ "fade-right", "Fade Right" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "fade-up"
+}, {
+  "id" : "a5b6603c-de93-16bd-6c23-a4e1204dbc0c",
+  "name" : "icon_image",
+  "label" : "Icon Image",
+  "required" : false,
+  "locked" : false,
+  "responsive" : true,
+  "resizable" : true,
+  "show_loading" : false,
+  "type" : "image",
+  "display_width" : null,
+  "default" : {
+    "size_type" : "auto",
+    "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/feature-one-1.svg",
+    "alt" : "feature-one-1",
+    "loading" : "lazy",
+    "width" : 56,
+    "height" : 54,
+    "max_width" : 56,
+    "max_height" : 54
+  }
+}, {
+  "id" : "45ec2179-f2d1-0e0c-c4c5-757404a89460",
+  "name" : "box_title",
+  "label" : "Box Title",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "<h4>Right Nutrition</h4>"
+}, {
+  "id" : "5face379-caed-4328-8ee9-7067cb7fb1b7",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "036bcf4d-f2bb-f19b-8105-38a6d3e1c330",
+    "name" : "alignment",
+    "label" : "Alignment",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "a3956949-6c8d-b824-1cf9-8c237e14f0e2",
+      "name" : "alignment",
+      "label" : "Alignment",
+      "required" : false,
+      "locked" : false,
+      "display" : "select",
+      "choices" : [ [ "left", "Left" ], [ "center", "Center" ], [ "right", "Right" ] ],
+      "multiple" : false,
+      "reordering_enabled" : true,
+      "preset" : null,
+      "type" : "choice",
+      "display_width" : null,
+      "default" : "left"
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "alignment" : "left"
+    }
+  }, {
+    "id" : "98c9d9a8-1de8-2890-1460-4c05d957c873",
+    "name" : "icon_box_border_radius",
+    "label" : "Icon Box Border Radius",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "e26a77d7-4936-a77f-492a-6f64cbd22e8d",
+      "name" : "overwrite",
+      "label" : "Overwrite",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "3532c10a-f660-21a5-9eea-235d0268e962",
+      "name" : "value",
+      "label" : "Value",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 1,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 5
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "overwrite" : false,
+      "value" : 5
+    }
+  }, {
+    "id" : "e1ff9a61-f287-fe25-f29f-ff3b4fdda5e6",
+    "name" : "color_field",
+    "label" : "Color Field",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "df8b7040-a54e-ed34-3d6f-31627275366f",
+      "name" : "feature_icon_box_background_color",
+      "label" : "Feature Icon Box Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "bf0cf6cf-266a-1913-14c7-046fc9a47505",
+      "name" : "feature_icon_box_background_hover_color",
+      "label" : "Feature Icon Box Background Hover Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "e5a4c819-7c38-6e8c-86b3-70de1c6a44fa",
+      "name" : "icon_color",
+      "label" : "Icon Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "59c47d1f-123a-ca39-ae14-1e88bc0a8e38",
+      "name" : "icon_hover_color",
+      "label" : "Icon Hover Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "1bfb29c7-e910-0d9e-ba32-94b9a56ddfbd",
+      "name" : "title_hover_color",
+      "label" : "Title Hover Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "893d4d1f-952d-3c9a-977b-e9140094ce3f",
+      "name" : "excerpt_hover_color",
+      "label" : "Excerpt Hover Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "feature_icon_box_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "feature_icon_box_background_hover_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "icon_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "icon_hover_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "title_hover_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "excerpt_hover_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "alignment" : {
+      "alignment" : "left"
+    },
+    "icon_box_border_radius" : {
+      "overwrite" : false,
+      "value" : 5
+    },
+    "color_field" : {
+      "feature_icon_box_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "feature_icon_box_background_hover_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "icon_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "icon_hover_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "title_hover_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "excerpt_hover_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }
+  }
+}, {
+  "id" : "9a17a26c-b3bc-2391-31fd-f918c262d22d",
+  "name" : "excerpt",
+  "label" : "Excerpt",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "<p>Many desktop publish packages web page editors now text search.</p>"
+} ]

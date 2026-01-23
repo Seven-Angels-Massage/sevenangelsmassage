@@ -1,0 +1,31 @@
+[ {
+  "id" : "3eb2060e-6c28-5249-397e-1a7de45b9f27",
+  "name" : "animation_direction",
+  "label" : "Animation Direction",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "fade-up", "Fade Up" ], [ "fade-down", "Fade Down" ], [ "fade-left", "Fade Left" ], [ "fade-right", "Fade Right" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "fade-up"
+}, {
+  "id" : "ecef8783-e998-cc40-645a-757b90e9817f",
+  "name" : "newsletter_form",
+  "label" : "Newsletter Form",
+  "required" : false,
+  "locked" : false,
+  "embed_versions" : [ "v2", "v4" ],
+  "type" : "form",
+  "display_width" : null,
+  "default" : {
+    "form_id" : "",
+    "response_type" : "inline",
+    "message" : "Thanks for submitting the form.",
+    "gotowebinar_webinar_key" : null,
+    "form_type" : "HUBSPOT"
+  }
+} ]

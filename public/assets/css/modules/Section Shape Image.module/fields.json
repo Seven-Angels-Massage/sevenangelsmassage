@@ -1,0 +1,90 @@
+[ {
+  "id" : "ba2f843a-8ead-6023-c760-d898b7c19350",
+  "name" : "shape_image_item",
+  "label" : "Shape Image Item",
+  "required" : false,
+  "locked" : false,
+  "occurrence" : {
+    "min" : null,
+    "max" : null,
+    "sorting_label_field" : "68343a64-b33f-0d13-5936-4af1a2c16bd2",
+    "default" : null
+  },
+  "children" : [ {
+    "id" : "68343a64-b33f-0d13-5936-4af1a2c16bd2",
+    "name" : "shape_image_number_class",
+    "label" : "Shape Image Number Class",
+    "help_text" : "Please add an image shape number class like \"shape-1\"",
+    "required" : false,
+    "locked" : false,
+    "allow_new_line" : false,
+    "type" : "text",
+    "display_width" : null,
+    "default" : ""
+  }, {
+    "id" : "fc8905b6-ddfb-31bc-4726-da7576315e8d",
+    "name" : "image_move_animation",
+    "label" : "Image Move Animation",
+    "required" : false,
+    "locked" : false,
+    "display" : "select",
+    "choices" : [ [ "scene", "Add Animation" ], [ "null", "Off Animation" ] ],
+    "multiple" : false,
+    "reordering_enabled" : true,
+    "preset" : null,
+    "type" : "choice",
+    "display_width" : null,
+    "default" : "scene"
+  }, {
+    "id" : "a0fb2088-448b-575a-4f67-8d3ac3f4c4d3",
+    "name" : "animation_depth",
+    "label" : "Animation Depth",
+    "required" : false,
+    "locked" : false,
+    "allow_new_line" : false,
+    "type" : "text",
+    "display_width" : null,
+    "default" : "3"
+  }, {
+    "id" : "5fc52313-67b8-d8af-4d4a-fe9a980be703",
+    "name" : "shape_image",
+    "label" : "Shape Image",
+    "required" : false,
+    "locked" : false,
+    "responsive" : true,
+    "resizable" : true,
+    "show_loading" : false,
+    "type" : "image",
+    "display_width" : null,
+    "default" : {
+      "size_type" : "auto",
+      "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/shape-three.png",
+      "alt" : "shape-three",
+      "loading" : "lazy",
+      "width" : 95,
+      "height" : 111,
+      "max_width" : 95,
+      "max_height" : 111
+    }
+  } ],
+  "tab" : "CONTENT",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "shape_image_number_class" : "",
+    "image_move_animation" : "scene",
+    "animation_depth" : "3",
+    "shape_image" : {
+      "size_type" : "auto",
+      "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/shape-three.png",
+      "alt" : "shape-three",
+      "loading" : "lazy",
+      "width" : 95,
+      "height" : 111,
+      "max_width" : 95,
+      "max_height" : 111
+    }
+  }
+} ]

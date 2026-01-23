@@ -1,0 +1,401 @@
+[ {
+  "id" : "b4cf2717-9daa-f863-a661-d32a27576b3e",
+  "name" : "animation_direction",
+  "label" : "Animation Direction",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "fade-up", "Fade Up" ], [ "fade-down", "Fade Down" ], [ "fade-left", "Fade Left" ], [ "fade-right", "Fade Right" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "fade-up"
+}, {
+  "id" : "81cab7c3-7b81-18f1-9cde-af9502a26c17",
+  "name" : "team_thumb",
+  "label" : "Team Thumb",
+  "required" : false,
+  "locked" : false,
+  "responsive" : true,
+  "resizable" : true,
+  "show_loading" : false,
+  "type" : "image",
+  "display_width" : null,
+  "default" : {
+    "size_type" : "auto",
+    "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/team-1.png",
+    "alt" : "team-1",
+    "loading" : "lazy",
+    "width" : 370,
+    "height" : 470,
+    "max_width" : 370,
+    "max_height" : 470
+  }
+}, {
+  "id" : "c3f306bf-9b9b-2d7b-c49e-d19e1634f03c",
+  "name" : "share_toggle_icon",
+  "label" : "Share Toggle Icon",
+  "required" : false,
+  "locked" : false,
+  "icon_set" : "fontawesome-5.14.0",
+  "type" : "icon",
+  "display_width" : null,
+  "default" : {
+    "name" : "plus",
+    "unicode" : "f067",
+    "type" : "SOLID"
+  }
+}, {
+  "id" : "83796164-f9c3-4042-23d2-a1466dbe0137",
+  "name" : "social_item",
+  "label" : "Social Item",
+  "required" : false,
+  "locked" : false,
+  "occurrence" : {
+    "min" : null,
+    "max" : null,
+    "sorting_label_field" : "f51bb334-1a99-558d-5450-c415aec2c389",
+    "default" : null
+  },
+  "children" : [ {
+    "id" : "f51bb334-1a99-558d-5450-c415aec2c389",
+    "name" : "social_link",
+    "label" : "Social Link",
+    "required" : false,
+    "locked" : false,
+    "supported_types" : [ "EXTERNAL", "CONTENT", "FILE", "EMAIL_ADDRESS", "BLOG" ],
+    "show_advanced_rel_options" : false,
+    "type" : "link",
+    "display_width" : null,
+    "default" : {
+      "url" : {
+        "content_id" : null,
+        "type" : "EXTERNAL",
+        "href" : ""
+      },
+      "open_in_new_tab" : false,
+      "no_follow" : false
+    }
+  }, {
+    "id" : "ccf754e0-7ef6-daa1-255f-ad30c24c1b23",
+    "name" : "social_icon",
+    "label" : "Social Icon",
+    "required" : false,
+    "locked" : false,
+    "icon_set" : "fontawesome-5.14.0",
+    "type" : "icon",
+    "display_width" : null,
+    "default" : {
+      "name" : "Facebook F",
+      "unicode" : "f39e",
+      "type" : "REGULAR"
+    }
+  } ],
+  "tab" : "CONTENT",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "social_link" : {
+      "url" : {
+        "content_id" : null,
+        "type" : "EXTERNAL",
+        "href" : ""
+      },
+      "open_in_new_tab" : false,
+      "no_follow" : false
+    },
+    "social_icon" : {
+      "name" : "Facebook F",
+      "unicode" : "f39e",
+      "type" : "REGULAR"
+    }
+  }
+}, {
+  "id" : "f741d9cb-d53d-f7d0-7cdf-402218e5afc0",
+  "name" : "team_name",
+  "label" : "Team Name",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "<h3>Rehana Williams</h3>"
+}, {
+  "id" : "29ab2c78-3a89-8861-6d83-f4b1b45d92cf",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "a9d4181d-a751-09d5-2382-0d698577ec4d",
+    "name" : "image_border_radius",
+    "label" : "Image Border Radius",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "b1b6ba57-9fdb-7ad5-46f0-384d65adfb06",
+      "name" : "overwrite",
+      "label" : "Overwrite",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "79087617-0a87-1159-52b5-e1efcff5c846",
+      "name" : "value",
+      "label" : "Value",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 1,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 5
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "overwrite" : false,
+      "value" : 5
+    }
+  }, {
+    "id" : "48b2d1b9-ee65-f019-30cc-5d04881db0e2",
+    "name" : "alignment",
+    "label" : "Alignment",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "9cc03d1b-c3bd-118f-6b81-bc3e7a8f7435",
+      "name" : "alignment",
+      "label" : "Alignment",
+      "required" : false,
+      "locked" : false,
+      "display" : "select",
+      "choices" : [ [ "left", "Left" ], [ "center", "Center" ], [ "right", "Right" ] ],
+      "multiple" : false,
+      "reordering_enabled" : true,
+      "preset" : null,
+      "type" : "choice",
+      "display_width" : null,
+      "default" : "right"
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "alignment" : "right"
+    }
+  }, {
+    "id" : "d0ad0caa-8e3e-848c-aab5-c7ddfa5d4e74",
+    "name" : "content_border_radius",
+    "label" : "Content Border Radius",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "e4bee465-7072-2852-27d4-e38e37a7c05d",
+      "name" : "overwrite",
+      "label" : "Overwrite",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "4ecbcf2a-62a4-790a-6b18-f3a785496a15",
+      "name" : "value",
+      "label" : "Value",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 1,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 5
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "overwrite" : false,
+      "value" : 5
+    }
+  }, {
+    "id" : "809f2fa1-2550-fb85-9735-322714e8d3b2",
+    "name" : "color_field",
+    "label" : "Color Field",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "cceec5e7-2b15-1710-63fd-159640c475f4",
+      "name" : "team_content_background_color",
+      "label" : "Team Content Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "280d650a-9a04-8b2e-0916-3dc5e55fa6ae",
+      "name" : "toggle_background_color",
+      "label" : "Toggle Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "3a56c99c-6260-62d9-b775-e6428a4a0f7d",
+      "name" : "toggle_icon_color",
+      "label" : "Toggle Icon Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "313f4d26-e2e5-ae92-def8-9cf5e30af894",
+      "name" : "social_icon_list_background_color",
+      "label" : "Social Icon List Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "661babe7-99b0-f4b1-957f-145146a23b01",
+      "name" : "social_icon_list_top_border_color",
+      "label" : "Social Icon List Top Border Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "5cb4c5fa-c23c-27c3-324b-4bc19e7dfbae",
+      "name" : "social_icon_color",
+      "label" : "Social Icon Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "team_content_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "toggle_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "toggle_icon_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "social_icon_list_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "social_icon_list_top_border_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "social_icon_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "image_border_radius" : {
+      "overwrite" : false,
+      "value" : 5
+    },
+    "alignment" : {
+      "alignment" : "right"
+    },
+    "content_border_radius" : {
+      "overwrite" : false,
+      "value" : 5
+    },
+    "color_field" : {
+      "team_content_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "toggle_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "toggle_icon_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "social_icon_list_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "social_icon_list_top_border_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "social_icon_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }
+  }
+}, {
+  "id" : "417ab10c-b4dc-6945-1cf5-ec2a9736be59",
+  "name" : "team_designation",
+  "label" : "Team Designation",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "<p>Stone Spa Expert</p>"
+} ]

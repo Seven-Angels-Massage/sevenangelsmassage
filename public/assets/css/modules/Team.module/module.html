@@ -1,0 +1,95 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  {% if module.style.image_border_radius.overwrite %}
+  .team .thumb img {
+    border-radius: {{ module.style.image_border_radius.value }}px;
+  }
+  {% endif %}
+  {% if module.style.content_border_radius.overwrite %}
+  .team .content {
+    border-radius: {{ module.style.content_border_radius.value }}px;
+  }
+  {% endif %}
+  
+  .team .content {
+    background-color: rgba({{ module.style.color_field.team_content_background_color.color|convert_rgb }}, {{ module.style.color_field.team_content_background_color.opacity/100 }});
+  }
+  
+  .team .content .info {
+    {% if module.style.alignment.alignment =='left' %}text-align: left;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}text-align: center;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}text-align: right;{% endif %}
+  }
+  
+  .team .content .share-icon .toggle {
+  background-color: rgba({{ module.style.color_field.toggle_background_color.color|convert_rgb }}, {{ module.style.color_field.toggle_background_color.opacity/100 }});
+  }
+  .team .content .share-icon .toggle svg {
+    color: rgba({{ module.style.color_field.toggle_icon_color.color|convert_rgb }}, {{ module.style.color_field.toggle_icon_color.opacity/100 }});
+  }
+  .team .content .share-icon .list {
+    background: rgba({{ module.style.color_field.social_icon_list_background_color.color|convert_rgb }}, {{ module.style.color_field.social_icon_list_background_color.opacity/100 }});
+  }
+  .team .content .share-icon .list::before {
+    border-top: 8px solid rgba({{ module.style.color_field.social_icon_list_top_border_color.color|convert_rgb }}, {{ module.style.color_field.social_icon_list_top_border_color.opacity/100 }});
+  }
+  .team .content .share-icon .list a svg{
+    color: rgba({{ module.style.color_field.social_icon_color.color|convert_rgb }}, {{ module.style.color_field.social_icon_color.opacity/100 }});
+  }
+  
+  
+  
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+<div class="team" data-aos="{{ module.animation_direction }}">
+  <div class="thumb">
+    {% if module.team_thumb.src %}
+      {% set sizeAttrs = 'width="{{ module.team_thumb.width }}" height="{{ module.team_thumb.height }}"' %}
+      {% if module.team_thumb.size_type == 'auto' %}
+        {% set sizeAttrs = 'width="{{ module.team_thumb.width }}" height="{{ module.team_thumb.height }}" style="max-width: 100%; height: auto;"' %}
+      {% elif module.team_thumb.size_type == 'auto_custom_max' %}
+        {% set sizeAttrs = 'width="{{ module.team_thumb.max_width }}" height="{{ module.team_thumb.max_height }}" style="max-width: 100%; height: auto;"' %}
+      {% endif %}
+       {% set loadingAttr = module.team_thumb.loading != 'disabled' ? 'loading="{{ module.team_thumb.loading }}"' : '' %}
+      <img src="{{ module.team_thumb.src }}" alt="{{ module.team_thumb.alt }}" width="368" height="468" {{ loadingAttr }} {{ sizeAttrs }}>
+    {% endif %}
+ </div>
+  <div class="content">
+    <div class="share-icon">
+      <span class="toggle">
+        {% icon
+          name="{{ module.share_toggle_icon.name }}"
+          style="{{ module.share_toggle_icon.type }}"
+          unicode="{{ module.share_toggle_icon.unicode }}"
+          icon_set="{{ module.share_toggle_icon.icon_set }}"
+        %}
+      </span>
+      <div class="list">
+        {% for item in module.social_item %}
+        {% set href = item.social_link.url.href %}
+          {% if item.social_link.url.type is equalto "EMAIL_ADDRESS" %}
+            {% set href = "mailto:" + href %}
+          {% endif %}
+          <a href="{{ href }}"
+            {% if item.social_link.open_in_new_tab %}target="_blank"{% endif %}
+            {% if item.social_link.rel %}rel="{{ item.social_link.rel }}"{% endif %}
+            >
+            {% icon
+              name="{{ item.social_icon.name }}"
+              style="{{ item.social_icon.type }}"
+              unicode="{{ item.social_icon.unicode }}"
+              icon_set="{{ item.social_icon.icon_set }}"
+            %}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="info">
+      {{ module.team_name }}
+      {{ module.team_designation }}
+    </div>
+  </div>
+</div>

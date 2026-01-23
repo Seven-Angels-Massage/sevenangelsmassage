@@ -1,0 +1,21 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  
+  
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+<!-- Newsletter Form Start -->
+<div class="newsletter-form" data-aos="{{ module.animation_direction }}">
+  {% form
+    form_to_use="{{ module.newsletter_form.form_id }}"
+    response_response_type="{{ module.newsletter_form.response_type }}"
+    response_message="{{ module.newsletter_form.message }}"
+    response_redirect_id="{{ module.newsletter_form.redirect_id }}"
+    response_redirect_url="{{module.newsletter_form.redirect_url}}"
+    gotowebinar_webinar_key="{{ module.newsletter_form.gotowebinar_webinar_key }}"
+  %}
+</div>
+<!-- Newsletter Form End -->

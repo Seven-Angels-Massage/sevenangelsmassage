@@ -1,0 +1,152 @@
+[ {
+  "id" : "266bb210-01cd-41f8-c4ad-10bf7f3aefec",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "67ee8181-a6eb-1929-7f6c-b580f1715a5d",
+    "name" : "alignment",
+    "label" : "Alignment",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "f0eb755d-3d15-2977-4f67-7b8a0d06f5c2",
+      "name" : "alignment",
+      "label" : "Alignment",
+      "required" : false,
+      "locked" : false,
+      "display" : "select",
+      "choices" : [ [ "left", "Left" ], [ "center", "Center" ], [ "right", "Right" ] ],
+      "multiple" : false,
+      "reordering_enabled" : true,
+      "preset" : null,
+      "type" : "choice",
+      "display_width" : null,
+      "default" : "center"
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "alignment" : "center"
+    }
+  }, {
+    "id" : "acf70978-40ab-f506-b951-08e72263bab1",
+    "name" : "color_field",
+    "label" : "Color Field",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "83e65adb-ce6a-8e40-58a8-7d79e6011eb9",
+      "name" : "page_index_background_color",
+      "label" : "Page Index Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "08915a5f-0fa5-c22e-885c-9cf78d39b546",
+      "name" : "page_index_background_hover_color",
+      "label" : "Page Index Background Hover Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#151d28",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "72742288-5734-f8f6-91cb-36bf6b43dfd3",
+      "name" : "page_index_text_color",
+      "label" : "Page Index Text Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "4e936c98-5b7b-3ed0-d63b-f26fc5ea03b9",
+      "name" : "page_index_text_hover_color",
+      "label" : "Page Index Text Hover Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "page_index_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "page_index_background_hover_color" : {
+        "color" : "#151d28",
+        "opacity" : 100
+      },
+      "page_index_text_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "page_index_text_hover_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "alignment" : {
+      "alignment" : "center"
+    },
+    "color_field" : {
+      "page_index_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "page_index_background_hover_color" : {
+        "color" : "#151d28",
+        "opacity" : 100
+      },
+      "page_index_text_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "page_index_text_hover_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }
+  }
+}, {
+  "id" : "17ca100f-3f93-ddc8-e274-6d94474ea8d9",
+  "name" : "section_class",
+  "label" : "Section Class",
+  "required" : false,
+  "locked" : false,
+  "allow_new_line" : false,
+  "type" : "text",
+  "display_width" : null
+} ]

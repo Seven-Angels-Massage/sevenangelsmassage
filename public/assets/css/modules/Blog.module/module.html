@@ -1,0 +1,197 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  .section-heading{
+    {% if module.style.section_title_alignment.alignment =='left' %}text-align: left;{% endif %}
+    {% if module.style.section_title_alignment.alignment =='center'%}text-align: center;{% endif %}
+    {% if module.style.section_title_alignment.alignment =='right'%}text-align: right;{% endif %}
+  }
+  .section-heading p {
+    {% if module.style.section_title_alignment.alignment =='left' %} margin: auto; margin-left: 0;{% endif %}
+    {% if module.style.section_title_alignment.alignment =='center'%}margin: auto;{% endif %}
+    {% if module.style.section_title_alignment.alignment =='right'%}margin: auto;margin-right: 0;{% endif %}
+  }
+  
+  {% if module.style.image_border_radius.overwrite %}
+  .blog .thumbnail .image img {
+    border-radius: {{ module.style.image_border_radius.value }}px;
+}
+  {% endif %}
+  
+  .blog .thumbnail .category{
+    background-color: rgba({{ module.style.color_field.category_background_color.color|convert_rgb }}, {{ module.style.color_field.category_background_color.opacity/100 }});
+    color: rgba({{ module.style.color_field.category_text_color.color|convert_rgb }}, {{ module.style.color_field.category_text_color.opacity/100 }});
+  }
+  .blog .info {
+    {% if module.style.alignment.alignment =='left' %}text-align: left;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}text-align: center;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}text-align: right;{% endif %}
+  }
+  .blog .info .meta {
+    {% if module.style.alignment.alignment =='left' %}
+    justify-content: flex-start;
+    {% endif %}
+    {% if module.style.alignment.alignment =='center'%}
+    justify-content: center;
+    {% endif %}
+    {% if module.style.alignment.alignment =='right'%}
+    justify-content: flex-end;
+    {% endif %}
+  }
+  
+  .blog .info .link {
+    {% if module.style.alignment.alignment =='left' %}
+    justify-content: flex-start;
+    {% endif %}
+    {% if module.style.alignment.alignment =='center'%}
+    justify-content: center;
+    {% endif %}
+    {% if module.style.alignment.alignment =='right'%}
+    justify-content: flex-end;
+    {% endif %}
+  }
+  
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+
+{% if module.blog_layout == 'with-title' %}
+<!-- Blog Section Start -->
+    <div class="blog-section section section-padding {{ module.section_class }}">
+        <div class="container">
+            <!-- Section Heading Start -->
+            <div class="section-heading" data-aos="{{ module.animation_direction }}">
+                {{ module.title }}
+                {{ module.excerpt }}
+            </div>
+            <!-- Section Heading End -->
+            <div class="row mb-n30">
+              {% set posts = blog_recent_posts('default',  module.number_blog_to_show ) %}
+              {% set posts = blog_recent_posts(module.blog, 3) %}
+              {% for post in posts %}
+                <!-- Single Blog Start -->
+                <div class="col-lg-4 col-md-6 mb-30">
+                    <div class="blog" data-aos="{{ module.animation_direction }}">
+                        <div class="thumbnail">
+                            <a href="{{post.absolute_url}}" class="image">
+                                <!-- ------------------------------------------------------------
+                                     CHANGE (ACCESSIBILITY/SEO):
+                                     Use dynamic alt text instead of generic alt="blog"
+                                     This helps audits and improves meaningful image descriptions.
+                                ------------------------------------------------------------- -->
+                                <img src="{{ post.post_list_summary_featured_image }}" width="370" height="218" alt="{{ post.name }}">
+                            </a>
+                            {% if post.tag_list %}
+                              {% for tag in post.tag_list[0] %}
+                              <a href="{{ blog_tag_url(group.id, tag.slug) }}" class="category">{{ tag.name }}</a>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                        <div class="info">
+                            <ul class="meta">
+                                <li><i class="far fa-calendar"></i>{{post.publish_date|datetimeformat('%B %e %Y') }}</li>
+                                <li><i class="far fa-user"></i>{{ post.blog_post_author.display_name }}</li>
+                            </ul>
+                            <h3><a href="{{post.absolute_url}}">{{ post.name }}</a></h3>
+
+                            <!-- ----------------------------------------------------------------
+                                 CHANGE (Lighthouse "Links do not have descriptive text"):
+                                 Keep visible text = "Read More" (module.link_button_text)
+                                 Add descriptive accessible name per link destination:
+                                 aria-label/title/sr-only -> "Read More: <Post Title>"
+                                 NOTE: `.sr-only` class is defined in Blog (module.css).
+                            ----------------------------------------------------------------- -->
+                            <a
+                              class="link"
+                              href="{{post.absolute_url}}"
+                              aria-label="{{ module.link_button_text }}: {{ post.name }}"
+                              title="{{ module.link_button_text }}: {{ post.name }}"
+                            >
+                              <i class="fas fa-arrow-right" aria-hidden="true"></i>{{ module.link_button_text }}
+                              <span class="sr-only">: {{ post.name }}</span>
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+              <!-- Single Blog End -->
+              {% endfor %}
+            </div>
+        </div>
+        {% for item in module.shape_image_item %}
+        <div class="shape {{ item.shape_image_number_class }} {{ item.image_move_animation }}">
+          <span data-depth="{{ item.animation_depth }}">
+              {% if item.shape_image.src %}
+                {% set sizeAttrs = 'width="{{ item.shape_image.width }}" height="{{ item.shape_image.height }}"' %}
+                {% if item.shape_image.size_type == 'auto' %}
+                  {% set sizeAttrs = 'width="{{ item.shape_image.width }}" height="{{ item.shape_image.height }}" style="max-width: 100%; height: auto;"' %}
+                {% elif item.shape_image.size_type == 'auto_custom_max' %}
+                  {% set sizeAttrs = 'width="{{ item.shape_image.max_width }}" height="{{ item.shape_image.max_height }}" style="max-width: 100%; height: auto;"' %}
+                {% endif %}
+                 {% set loadingAttr = item.shape_image.loading != 'disabled' ? 'loading="{{ item.shape_image.loading }}"' : '' %}
+                <img src="{{ item.shape_image.src }}" alt="{{ item.shape_image.alt }}" {{ loadingAttr }} {{ sizeAttrs }}>
+              {% endif %}
+          </span>
+        </div>
+        {% endfor %}
+    </div>
+    <!-- Blog Section End -->
+{% else %}
+<!-- Blog Section Start -->
+<div class="blog-section section section-padding-top {{ module.section_class }}">
+  <div class="container">
+    <div class="row mb-n50">
+      {% for content in contents %}
+      <!-- Single Blog Start -->
+      <div class="col-lg-4 col-md-6 mb-50">
+        <div class="blog" data-aos="{{ module.animation_direction }}">
+          <div class="thumbnail">
+            <a href="{{content.absolute_url}}" class="image">
+              <!-- ------------------------------------------------------------
+                   CHANGE (ACCESSIBILITY/SEO):
+                   Use dynamic alt text instead of generic alt="blog"
+                   This helps audits and improves meaningful image descriptions.
+              ------------------------------------------------------------- -->
+              <img src="{{ content.post_list_summary_featured_image }}" width="370" height="218" alt="{{ content.name }}">
+            </a>
+            {% if content.tag_list %}
+              {% for tag in content.tag_list[0] %}
+              <a href="{{ blog_tag_url(group.id, tag.slug) }}" class="category">{{ tag.name }}</a>
+              {% endfor %}
+              {% endif %}
+          </div>
+          <div class="info">
+            <ul class="meta">
+              <li><i class="far fa-calendar"></i>{{content.publish_date|datetimeformat('%B %e %Y') }}</li>
+              <li><i class="far fa-eye"></i>{{ content.blog_post_author.display_name }}</li>
+            </ul>
+            <h3><a href="{{content.absolute_url}}">{{ content.name }}</a></h3>
+
+            <!-- ----------------------------------------------------------------
+                 CHANGE (Lighthouse "Links do not have descriptive text"):
+                 Keep visible text = "Read More" (module.link_button_text)
+                 Add descriptive accessible name per link destination:
+                 aria-label/title/sr-only -> "Read More: <Post Title>"
+                 NOTE: `.sr-only` class is defined in Blog (module.css).
+            ----------------------------------------------------------------- -->
+            <a
+              class="link"
+              href="{{content.absolute_url}}"
+              aria-label="{{ module.link_button_text }}: {{ content.name }}"
+              title="{{ module.link_button_text }}: {{ content.name }}"
+            >
+              <i class="fas fa-arrow-right" aria-hidden="true"></i>{{ module.link_button_text }}
+              <span class="sr-only">: {{ content.name }}</span>
+            </a>
+
+          </div>
+        </div>
+      </div>
+      <!-- Single Blog End -->
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<!-- Blog Section End -->
+{% endif %}

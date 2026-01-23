@@ -1,0 +1,106 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  {% if module.style.image_border_radius.overwrite %}
+  .single-yoga-package .thumbnail a {
+    border-radius: {{ module.style.image_border_radius.value_top_left }}px {{ module.style.image_border_radius.value_top_right }}px 0 0;
+  }
+  {% endif %}
+  {% if module.style.price_border_radius.overwrite %}
+  .single-yoga-package .thumbnail .price-round{
+    border-radius: {{ module.style.price_border_radius.value }}%;
+  }
+  {% endif %}
+  .single-yoga-package .thumbnail .price-round{
+    {{ theme.typography.h3.font.style }};
+    color: var(--secondary-color);
+    font-size: {{ theme.typography.h3.font.size ~ theme.typography.h3.font.size_unit }};  
+    letter-spacing: {{ theme.typography.h3.letter_spacing ~ 'px' }};
+    text-transform: {{ theme.typography.h3.text_transform }};
+    background-color: rgba({{ module.style.color_field.price_label_background_color.color|convert_rgb }}, {{ module.style.color_field.price_label_background_color.opacity/100 }});
+    color: rgba({{ module.style.color_field.price_label_text_color.color|convert_rgb }}, {{ module.style.color_field.price_label_text_color.opacity/100 }});
+  }
+  .single-yoga-package .content {
+    background-color: rgba({{ module.style.color_field.yoga_package_content_background_color.color|convert_rgb }}, {{ module.style.color_field.yoga_package_content_background_color.opacity/100 }});
+  }
+  .single-yoga-package .content {
+    {% if module.style.alignment.alignment =='left' %}text-align: left;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}text-align: center;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}text-align: right;{% endif %}
+  }
+  {% if module.style.content_border_radius.overwrite %}
+  .single-yoga-package .content {
+    border-radius: 0 0 {{ module.style.content_border_radius.value_bottom_left }}px {{ module.style.content_border_radius.value_top_right }}px;
+  }
+  .single-yoga-package .content .meta-box li svg {
+    color: rgba({{ module.style.color_field.meta_icon_color.color|convert_rgb }}, {{ module.style.color_field.meta_icon_color.opacity/100 }});
+  }
+  {% endif %}
+  
+  
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+
+<div class="yoga-package-slider swiper {{ module.extra_class }}" data-aos="{{ module.animation_direction }}">
+  <div class="swiper-wrapper">
+    {% for item in module.service_item %}
+    <!-- Single Yoga Package Start -->
+    <div class="swiper-slide">
+      <div class="single-yoga-package">
+        <div class="thumbnail">
+          {% set href = item.service_link.url.href %}
+            {% if item.service_link.url.type is equalto "EMAIL_ADDRESS" %}
+              {% set href = "mailto:" + href %}
+            {% endif %}
+            <a href="{{ href }}"
+              {% if item.service_link.open_in_new_tab %}target="_blank"{% endif %}
+              {% if item.service_link.rel %}rel="{{ item.service_link.rel }}"{% endif %}
+              >
+              {% if item.service_image.src %}
+                {% set sizeAttrs = 'width="{{ item.service_image.width }}" height="{{ item.service_image.height }}"' %}
+                {% if item.service_image.size_type == 'auto' %}
+                  {% set sizeAttrs = 'width="{{ item.service_image.width }}" height="{{ item.service_image.height }}" style="max-width: 100%; height: auto;"' %}
+                {% elif item.service_image.size_type == 'auto_custom_max' %}
+                  {% set sizeAttrs = 'width="{{ item.service_image.max_width }}" height="{{ item.service_image.max_height }}" style="max-width: 100%; height: auto;"' %}
+                {% endif %}
+                 {% set loadingAttr = item.service_image.loading != 'disabled' ? 'loading="{{ item.service_image.loading }}"' : '' %}
+                <img src="{{ item.service_image.src }}" alt="{{ item.service_image.alt }}" width="370" height="430" {{ loadingAttr }} {{ sizeAttrs }}>
+              {% endif %}
+            </a>
+          <div class="price price-round">{{ item.service_price }}</div>
+        </div>
+        <div class="content">
+          <span class="course-level">{{ item.course_name }}</span>
+          {% set href = item.service_link.url.href %}
+            {% if item.service_link.url.type is equalto "EMAIL_ADDRESS" %}
+              {% set href = "mailto:" + href %}
+            {% endif %}
+            <a href="{{ href }}"
+              {% if item.service_link.open_in_new_tab %}target="_blank"{% endif %}
+              {% if item.service_link.rel %}rel="{{ item.service_link.rel }}"{% endif %}
+              >
+              {{ item.service_title }}
+            </a>
+          <ul class="meta-box">
+            {% for item2 in item.service_meta_list %}
+            <li>{% icon
+                  name="{{ item2.service_meta_icon.name }}"
+                  style="{{ item2.service_meta_icon.type }}"
+                  unicode="{{ item2.service_meta_icon.unicode }}"
+                  icon_set="{{ item2.service_meta_icon.icon_set }}"
+                %}
+              {{ item2.service_meta_text }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- Single Yoga Package End -->
+    {% endfor %}
+  </div>
+  <div class="swiper-pagination"></div>
+</div>
+
+

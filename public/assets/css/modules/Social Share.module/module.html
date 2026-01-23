@@ -1,0 +1,64 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  .post-tag-share .post-share .list a svg {
+    color: rgba({{ module.style.color_field.social_icon_color.color|convert_rgb }}, {{ module.style.color_field.social_icon_color.opacity/100 }});
+  }
+  .post-tag-share .post-share .list a:hover svg {
+    color: rgba({{ module.style.color_field.social_icon_hover_color.color|convert_rgb }}, {{ module.style.color_field.social_icon_hover_color.opacity/100 }})
+  }
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+
+<div class="post-share">
+  {{ module.share_label_text }}
+  <div class="list">
+    {% for item in module.social_item %}
+      {% set href = item.social_link.url.href %}
+      {% if item.social_link.url.type is equalto "EMAIL_ADDRESS" %}
+        {% set href = "mailto:" + href %}
+      {% endif %}
+
+      {# ============================================
+         CHANGE (A11Y): Give icon-only share links a discernible name
+         - Lighthouse flags <a> that only contains an icon (no text)
+         - We compute a descriptive aria-label based on the URL
+         - Also includes a .sr-only text node for extra robustness
+         - NOTE: .sr-only class lives in module.css / global css (as requested)
+         ============================================ #}
+      {% set href_lower = href|lower %}
+      {% set a11y_label = "Share this page" %}
+      {% if "facebook.com" in href_lower %}
+        {% set a11y_label = "Share on Facebook" %}
+      {% elif "instagram.com" in href_lower %}
+        {% set a11y_label = "Share on Instagram" %}
+      {% elif "linkedin.com" in href_lower %}
+        {% set a11y_label = "Share on LinkedIn" %}
+      {% elif "twitter.com" in href_lower or "x.com" in href_lower %}
+        {% set a11y_label = "Share on X" %}
+      {% elif "whatsapp.com" in href_lower %}
+        {% set a11y_label = "Share on WhatsApp" %}
+      {% elif "t.me" in href_lower or "telegram.me" in href_lower %}
+        {% set a11y_label = "Share on Telegram" %}
+      {% elif "mailto:" in href_lower %}
+        {% set a11y_label = "Share by email" %}
+      {% endif %}
+
+      <a href="{{ href }}"
+        aria-label="{{ a11y_label }}"
+        {% if item.social_link.open_in_new_tab %}target="_blank"{% endif %}
+        {% if item.social_link.rel %}rel="{{ item.social_link.rel }}"{% endif %}
+        >
+        {% icon
+          name="{{ item.social_icon.name }}"
+          style="{{ item.social_icon.type }}"
+          unicode="{{ item.social_icon.unicode }}"
+          icon_set="{{ item.social_icon.icon_set }}"
+        %}
+        <span class="sr-only">{{ a11y_label }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</div>

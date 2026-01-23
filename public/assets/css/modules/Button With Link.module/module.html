@@ -1,0 +1,41 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  .button-wrap .btn-primary {
+      background-color: rgba({{ module.style.button_primary_background_color.color|convert_rgb }}, {{ module.style.button_primary_background_color.opacity/100 }});
+      border-color: rgba({{ module.style.button_primary_border_color.color|convert_rgb }}, {{ module.style.button_primary_border_color.opacity/100 }});
+      color: rgba({{ module.style.button_text_color.color|convert_rgb }}, {{ module.style.button_text_color.opacity/100 }});
+    }
+  .button-wrap .btn-secondary-hover:hover {
+      background-color: rgba({{ module.style.button_secondary_hover_background_color.color|convert_rgb }}, {{ module.style.button_secondary_hover_background_color.opacity/100 }});
+      border-color: rgba({{ module.style.button_secondary_hover_border_color.color|convert_rgb }}, {{ module.style.button_secondary_hover_border_color.opacity/100 }});
+      color: rgba({{ module.style.button_hover_text_color.color|convert_rgb }}, {{ module.style.button_hover_text_color.opacity/100 }});
+    }
+  .button-wrap .btn-primary-outline {
+      background-color: transparent;
+      border-color: rgba({{ module.style.button_primary_outline_border_color.color|convert_rgb }}, {{ module.style.button_primary_outline_border_color.opacity/100 }});
+      color: rgba({{ module.style.button_text_color.color|convert_rgb }}, {{ module.style.button_text_color.opacity/100 }});
+    }
+  .button-wrap .btn-primary-hover:hover {
+      background-color: rgba({{ module.style.button_primary_outline_hover_background_color.color|convert_rgb }}, {{ module.style.button_primary_outline_hover_background_color.opacity/100 }});
+      border-color: rgba({{ module.style.button_primary_outline_hover_border_color.color|convert_rgb }}, {{ module.style.button_primary_outline_hover_border_color.opacity/100 }});
+      color: rgba({{ module.style.button_outline_text_hover_color.color|convert_rgb }}, {{ module.style.button_outline_text_hover_color.opacity/100 }});
+    }
+  
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+
+<div class="button-wrap {{ module.button_class }}">
+  {% set href = module.button_link.url.href %}
+  {% if module.button_link.url.type is equalto "EMAIL_ADDRESS" %}
+    {% set href = "mailto:" + href %}
+  {% endif %}
+  <a class="btn {{ module.button_type }} {{ module.button_rounded }} {{ module.button_size }}" href="{{ href }}"
+    {% if module.button_link.open_in_new_tab %}target="_blank"{% endif %}
+    {% if module.button_link.rel %}rel="{{ module.button_link.rel }}"{% endif %}
+    >
+    {{ module.button_text }}
+  </a>
+</div>

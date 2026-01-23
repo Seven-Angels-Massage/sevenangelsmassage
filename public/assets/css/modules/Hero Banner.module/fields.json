@@ -1,0 +1,653 @@
+[ {
+  "id" : "ac96257c-c668-2986-152a-6ed38095a268",
+  "name" : "section_class",
+  "label" : "Section Class",
+  "help_text" : "If you want to customize the style in your own way, then create an extra \"CLASS\" and style it based on that. ",
+  "required" : false,
+  "locked" : false,
+  "allow_new_line" : false,
+  "type" : "text",
+  "display_width" : null
+}, {
+  "id" : "1b6e1284-0b00-ad18-103c-60e062c34917",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "75d04114-b626-d5aa-33d6-a331575d5665",
+    "name" : "hero_slider_background_color_overlay",
+    "label" : "Hero Slider Background Color Overlay",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "86963ab2-f3da-3aeb-5108-a0fe4b247a40",
+      "name" : "enable",
+      "label" : "Enable",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "e742ec3a-f8cc-8f63-e86f-d70e6ea0f421",
+      "name" : "background_color",
+      "label" : "Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#221f1e",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "9c49ef4c-6415-7c06-7b77-c94c90fde2f7",
+      "name" : "overlay_color",
+      "label" : "Overlay Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "gradient",
+      "display_width" : null,
+      "default" : {
+        "side_or_corner" : {
+          "verticalSide" : "TOP",
+          "horizontalSide" : null
+        },
+        "colors" : [ {
+          "color" : {
+            "r" : 6,
+            "g" : 10,
+            "b" : 16,
+            "a" : 0.5
+          }
+        }, {
+          "color" : {
+            "r" : 6,
+            "g" : 10,
+            "b" : 16,
+            "a" : 0.4
+          }
+        } ]
+      }
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "enable" : false,
+      "background_color" : {
+        "color" : "#221f1e",
+        "opacity" : 100
+      },
+      "overlay_color" : {
+        "side_or_corner" : {
+          "verticalSide" : "TOP",
+          "horizontalSide" : null
+        },
+        "colors" : [ {
+          "color" : {
+            "r" : 6,
+            "g" : 10,
+            "b" : 16,
+            "a" : 0.5
+          }
+        }, {
+          "color" : {
+            "r" : 6,
+            "g" : 10,
+            "b" : 16,
+            "a" : 0.4
+          }
+        } ]
+      }
+    }
+  }, {
+    "id" : "060be375-4a32-209d-48c5-05ea57e2914d",
+    "name" : "alignment",
+    "label" : "Alignment",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "88296f84-2aa0-577f-b9f9-834b4364ebac",
+      "name" : "alignment",
+      "label" : "Alignment",
+      "required" : false,
+      "locked" : false,
+      "display" : "select",
+      "choices" : [ [ "left", "Left" ], [ "center", "Center" ], [ "right", "Right" ] ],
+      "multiple" : false,
+      "reordering_enabled" : true,
+      "preset" : null,
+      "type" : "choice",
+      "display_width" : null,
+      "default" : "center"
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "alignment" : "center"
+    }
+  }, {
+    "id" : "ba0186d7-fbb5-d32e-eae1-d92efaefbd28",
+    "name" : "slider_button_color",
+    "label" : "Slider Button Color",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "3fed1eea-2405-38d8-1a55-994fd3c39193",
+      "name" : "button_primary_background_color",
+      "label" : "Button Primary Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "ec5c23ad-6b79-151f-9bb5-380da23da412",
+      "name" : "button_primary_border_color",
+      "label" : "Button Primary Border Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "2390ec8f-5225-25dd-37b7-b10e1acff02f",
+      "name" : "button_text_color",
+      "label" : "Button Text Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "5494ad64-92d7-9af0-442f-ea972f3cab37",
+      "name" : "button_secondary_hover_background_color",
+      "label" : "Button Secondary Hover Background_color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#151d28",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "504b46b2-199d-b630-5f34-0831b0f61ab3",
+      "name" : "button_secondary_hover_border_color",
+      "label" : "Button Secondary Hover Border Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#151d28",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "8934b8b8-1b8d-17d5-c76c-99912dd90fa5",
+      "name" : "button_hover_text_color",
+      "label" : "button_hover_text_color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "0cf277c8-607a-992b-d59b-3254044b9724",
+      "name" : "button_primary_outline_border_color",
+      "label" : "Button Primary Outline Border Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "8803b03c-23b9-c777-17ab-12bbaca28296",
+      "name" : "button_primary_outline_hover_background_color",
+      "label" : "Button Primary Outline Hover Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "9489e576-8d59-3f24-510e-cc46857e9200",
+      "name" : "button_primary_outline_hover_border_color",
+      "label" : "Button Primary Outline Hover Border Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "dbb8872d-b808-1ef1-7162-634584690492",
+      "name" : "button_outline_text_hover_color",
+      "label" : "Button Outline Text Hover Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "956a9d0f-b69a-b8fc-f7d1-7b6638a246ea",
+      "name" : "icon_background_color",
+      "label" : "Icon Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "a1443d15-2cae-b08f-7984-69d1d150d58c",
+      "name" : "icon_color",
+      "label" : "Icon Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "d9e32118-9068-81f9-3899-92f6c8124cd1",
+      "name" : "icon_background_hover_color",
+      "label" : "Icon Background Hover Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "d945e7d9-1930-9285-0c2a-25292de7bcc2",
+      "name" : "icon_hover_color",
+      "label" : "Icon Hover Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "button_primary_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "button_primary_border_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "button_text_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "button_secondary_hover_background_color" : {
+        "color" : "#151d28",
+        "opacity" : 100
+      },
+      "button_secondary_hover_border_color" : {
+        "color" : "#151d28",
+        "opacity" : 100
+      },
+      "button_hover_text_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "button_primary_outline_border_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "button_primary_outline_hover_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "button_primary_outline_hover_border_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "button_outline_text_hover_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "icon_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "icon_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "icon_background_hover_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "icon_hover_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "hero_slider_background_color_overlay" : {
+      "enable" : false,
+      "background_color" : {
+        "color" : "#221f1e",
+        "opacity" : 100
+      },
+      "overlay_color" : {
+        "side_or_corner" : {
+          "verticalSide" : "TOP",
+          "horizontalSide" : null
+        },
+        "colors" : [ {
+          "color" : {
+            "r" : 6,
+            "g" : 10,
+            "b" : 16,
+            "a" : 0.5
+          }
+        }, {
+          "color" : {
+            "r" : 6,
+            "g" : 10,
+            "b" : 16,
+            "a" : 0.4
+          }
+        } ]
+      }
+    },
+    "alignment" : {
+      "alignment" : "center"
+    },
+    "slider_button_color" : {
+      "button_primary_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "button_primary_border_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "button_text_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "button_secondary_hover_background_color" : {
+        "color" : "#151d28",
+        "opacity" : 100
+      },
+      "button_secondary_hover_border_color" : {
+        "color" : "#151d28",
+        "opacity" : 100
+      },
+      "button_hover_text_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "button_primary_outline_border_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "button_primary_outline_hover_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "button_primary_outline_hover_border_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "button_outline_text_hover_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "icon_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "icon_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "icon_background_hover_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "icon_hover_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }
+  }
+}, {
+  "id" : "b4351943-f06b-a9d8-3b0c-93cf71024f1a",
+  "name" : "slider_item",
+  "label" : "Slider Item",
+  "required" : false,
+  "locked" : false,
+  "occurrence" : {
+    "min" : null,
+    "max" : null,
+    "sorting_label_field" : "629adcc3-5578-8e1f-6428-5a2d9ddcd458",
+    "default" : null
+  },
+  "children" : [ {
+    "id" : "3694ca79-f157-9603-29a7-1d441f46c74a",
+    "name" : "slider_background_image",
+    "label" : "Slider Background Image",
+    "required" : false,
+    "locked" : false,
+    "responsive" : true,
+    "resizable" : true,
+    "show_loading" : false,
+    "type" : "image",
+    "display_width" : null,
+    "default" : {
+      "size_type" : "auto",
+      "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/hero-1-bg-1.jpg",
+      "alt" : "hero-1-bg-1",
+      "loading" : "lazy",
+      "width" : 1920,
+      "height" : 900,
+      "max_width" : 1920,
+      "max_height" : 900
+    }
+  }, {
+    "id" : "629adcc3-5578-8e1f-6428-5a2d9ddcd458",
+    "name" : "slider_title",
+    "label" : "Slider Title",
+    "required" : false,
+    "locked" : false,
+    "type" : "richtext",
+    "display_width" : null,
+    "default" : "<h1>Yoga In Daily Routine <br>To Stay Fit</h1>"
+  }, {
+    "id" : "d13d5f8d-1581-79fe-9b97-9f612b78bdcc",
+    "name" : "slider_excerpt",
+    "label" : "Slider Excerpt",
+    "required" : false,
+    "locked" : false,
+    "type" : "richtext",
+    "display_width" : null,
+    "default" : "<p>Specially designed for Yoga School, Yoga Studio and Yoga Online Classes. set up website easy and fast with superior quality.</p>"
+  }, {
+    "id" : "62a81ec7-e345-6b89-60b8-eeb63fc8b3f9",
+    "name" : "button_type",
+    "label" : "Button Type",
+    "required" : false,
+    "locked" : false,
+    "display" : "select",
+    "choices" : [ [ "btn-primary btn-secondary-hover", "Filled" ], [ "btn-primary-outline btn-primary-hover", "Outline" ] ],
+    "multiple" : false,
+    "reordering_enabled" : true,
+    "preset" : null,
+    "type" : "choice",
+    "display_width" : null,
+    "default" : "btn-primary btn-secondary-hover"
+  }, {
+    "id" : "c99e6fad-4643-f929-a5ee-32f368ce9221",
+    "name" : "button_rounded",
+    "label" : "Button Rounded",
+    "required" : false,
+    "locked" : false,
+    "display" : "select",
+    "choices" : [ [ "btn-radius", "Radius" ], [ "null", "With Out Radius" ] ],
+    "multiple" : false,
+    "reordering_enabled" : true,
+    "preset" : null,
+    "type" : "choice",
+    "display_width" : null,
+    "default" : "null"
+  }, {
+    "id" : "8c371722-bd89-5f10-5614-0933de3eec6d",
+    "name" : "button_size",
+    "label" : "Button Size",
+    "required" : false,
+    "locked" : false,
+    "display" : "select",
+    "choices" : [ [ "btn-lg", "Large" ], [ "btn-md", "Medium" ], [ "btn-sm", "Small" ] ],
+    "multiple" : false,
+    "reordering_enabled" : true,
+    "preset" : null,
+    "type" : "choice",
+    "display_width" : null
+  }, {
+    "id" : "db8c3dc1-a777-fb26-1b2c-10bdf3a7c611",
+    "name" : "button_link",
+    "label" : "Button Link",
+    "required" : false,
+    "locked" : false,
+    "supported_types" : [ "EXTERNAL", "CONTENT", "FILE", "EMAIL_ADDRESS", "BLOG" ],
+    "show_advanced_rel_options" : false,
+    "type" : "link",
+    "display_width" : null,
+    "default" : {
+      "url" : {
+        "content_id" : null,
+        "type" : "EXTERNAL",
+        "href" : ""
+      },
+      "open_in_new_tab" : false,
+      "no_follow" : false
+    }
+  }, {
+    "id" : "f696085c-19ca-b4e5-8cce-3005e83c31b2",
+    "name" : "button_text",
+    "label" : "Button Text",
+    "required" : false,
+    "locked" : false,
+    "allow_new_line" : false,
+    "type" : "text",
+    "display_width" : null,
+    "default" : "Browse Our Coureses"
+  } ],
+  "tab" : "CONTENT",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "slider_background_image" : {
+      "size_type" : "auto",
+      "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/hero-1-bg-1.jpg",
+      "alt" : "hero-1-bg-1",
+      "loading" : "lazy",
+      "width" : 1920,
+      "height" : 900,
+      "max_width" : 1920,
+      "max_height" : 900
+    },
+    "slider_title" : "<h1>Yoga In Daily Routine <br>To Stay Fit</h1>",
+    "slider_excerpt" : "<p>Specially designed for Yoga School, Yoga Studio and Yoga Online Classes. set up website easy and fast with superior quality.</p>",
+    "button_type" : "btn-primary btn-secondary-hover",
+    "button_rounded" : "null",
+    "button_link" : {
+      "url" : {
+        "content_id" : null,
+        "type" : "EXTERNAL",
+        "href" : ""
+      },
+      "open_in_new_tab" : false,
+      "no_follow" : false
+    },
+    "button_text" : "Browse Our Coureses"
+  }
+}, {
+  "id" : "ab8845ea-e52e-4c75-d0f6-5d16166a7082",
+  "name" : "slider_prev_icon",
+  "label" : "Slider Prev Icon",
+  "required" : false,
+  "locked" : false,
+  "icon_set" : "fontawesome-5.14.0",
+  "type" : "icon",
+  "display_width" : null,
+  "default" : {
+    "name" : "arrow-left",
+    "unicode" : "f060",
+    "type" : "SOLID"
+  }
+}, {
+  "id" : "cc60e388-5676-0272-12fe-a112a018ad57",
+  "name" : "slider_next_icon",
+  "label" : "Slider Next Icon",
+  "required" : false,
+  "locked" : false,
+  "icon_set" : "fontawesome-5.14.0",
+  "type" : "icon",
+  "display_width" : null,
+  "default" : {
+    "name" : "arrow-right",
+    "unicode" : "f061",
+    "type" : "SOLID"
+  }
+} ]

@@ -1,0 +1,81 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  {% if module.style.gallery_image_overlay.enable %}
+  .gallery-item .gallery-thumb::before {
+    background-color: rgba({{ module.style.gallery_image_overlay.overlay_color.color|convert_rgb }}, {{ module.style.gallery_image_overlay.overlay_color.opacity/100 }});
+  }
+  {% endif %}
+  
+  {% if module.style.popup_button_blur_radius.overwrite %}
+  .gallery-item .gallery-popup-btn {
+    -webkit-backdrop-filter: blur({{ module.style.popup_button_blur_radius.blur_value }}px);
+          backdrop-filter: blur({{ module.style.popup_button_blur_radius.blur_value }}px);
+    border-radius: {{ module.style.popup_button_blur_radius.radius_value }}%;
+  }
+  {% endif %}
+  
+  .gallery-item .gallery-popup-btn {
+    {{ module.style.popup_button_color_border.popup_button_border.css }}
+    background-color: rgba({{ module.style.popup_button_color_border.popup_button_background_color.color|convert_rgb }}, {{ module.style.popup_button_color_border.popup_button_background_color.opacity/100 }});
+  }
+  .gallery-item .gallery-popup-btn svg {
+    color: rgba({{ module.style.popup_button_color_border.popup_button_icon_color.color|convert_rgb }}, {{ module.style.popup_button_color_border.popup_button_icon_color.opacity/100 }});
+  }
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+<div class="gallery-item" data-aos="{{ module.animation_direction }}">
+  <div class="gallery-thumb">
+    {% if module.gallery_thumb.src %}
+      {% set sizeAttrs = 'width="{{ module.gallery_thumb.width }}" height="{{ module.gallery_thumb.height }}"' %}
+      {% if module.gallery_thumb.size_type == 'auto' %}
+        {% set sizeAttrs = 'width="{{ module.gallery_thumb.width }}" height="{{ module.gallery_thumb.height }}" style="max-width: 100%; height: auto;"' %}
+      {% elif module.gallery_thumb.size_type == 'auto_custom_max' %}
+        {% set sizeAttrs = 'width="{{ module.gallery_thumb.max_width }}" height="{{ module.gallery_thumb.max_height }}" style="max-width: 100%; height: auto;"' %}
+      {% endif %}
+       {% set loadingAttr = module.gallery_thumb.loading != 'disabled' ? 'loading="{{ module.gallery_thumb.loading }}"' : '' %}
+      <img src="{{ module.gallery_thumb.src }}" alt="{{ module.gallery_thumb.alt }}" width="358" height="358" {{ loadingAttr }} {{ sizeAttrs }}>
+    {% endif %}
+  </div>
+
+  {% set href = module.gallery_popup_link.url.href %}
+  {% if module.gallery_popup_link.url.type is equalto "EMAIL_ADDRESS" %}
+    {% set href = "mailto:" + href %}
+  {% endif %}
+
+  {# --------------------------------------------------------------------
+     ACCESSIBILITY (Lighthouse):
+     Fix "Links do not have a discernible name" for icon-only gallery popup links.
+     - Adds aria-label + title for screen readers and accessibility audits
+     - Uses thumbnail alt text when available (best), otherwise fallback text
+     - Marks icon as aria-hidden so screen readers don't announce SVG details
+     - Includes optional sr-only text for extra clarity (requires .sr-only in CSS)
+  --------------------------------------------------------------------- #}
+  {% set popupLabel = module.gallery_thumb.alt|default('View image') %}
+
+  <a class="gallery-popup-btn gallery-popup"
+     data-gall="myGallery"
+     href="{{ href }}"
+     aria-label="{{ popupLabel }}"
+     title="{{ popupLabel }}"
+     {% if module.gallery_popup_link.open_in_new_tab %}target="_blank"{% endif %}
+     {% if module.gallery_popup_link.rel %}rel="{{ module.gallery_popup_link.rel }}"{% endif %}
+  >
+    <span class="sr-only">{{ popupLabel }}</span>
+    {% icon
+      name="{{ module.view_icon.name }}"
+      style="{{ module.view_icon.type }}"
+      unicode="{{ module.view_icon.unicode }}"
+      icon_set="{{ module.view_icon.icon_set }}"
+      no_wrapper=True
+    %}
+  </a>
+</div>
+
+{# NOTE:
+   If your HubSpot {% icon %} helper outputs an <svg> without aria-hidden,
+   and Lighthouse still flags it, we can switch to inline SVG or wrap with
+   an extra container. For now, aria-label/title + sr-only is typically sufficient.
+#}

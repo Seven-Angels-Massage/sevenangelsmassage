@@ -1,0 +1,51 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  {% if module.style.image_border_radius.overwrite %}
+  .video-gallery .thumbnail img {
+    border-radius: {{ module.style.image_border_radius.value }}px;
+  }
+  {% endif %}
+  .video-gallery .thumbnail .video-popup {
+    background: rgba({{ module.style.color_field.popup_button_background_color.color|convert_rgb }}, {{ module.style.color_field.popup_button_background_color.opacity/100 }});
+  }
+  .video-gallery .thumbnail .video-popup svg{
+    color: rgba({{ module.style.color_field.popup_button_icon_color.color|convert_rgb }}, {{ module.style.color_field.popup_button_icon_color.opacity/100 }});
+  }
+  .video-gallery .thumbnail .video-popup::before, .video-gallery .thumbnail .video-popup::after {
+    {{ module.style.animate_border.css }}
+  }
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+<div class="video-gallery {{ module.extra_class }}" data-aos="{{ module.animation_direction }}">
+  <div class="thumbnail">
+    {% if module.video_thumb.src %}
+      {% set sizeAttrs = 'width="{{ module.video_thumb.width }}" height="{{ module.video_thumb.height }}"' %}
+      {% if module.video_thumb.size_type == 'auto' %}
+        {% set sizeAttrs = 'width="{{ module.video_thumb.width }}" height="{{ module.video_thumb.height }}" style="max-width: 100%; height: auto;"' %}
+      {% elif module.video_thumb.size_type == 'auto_custom_max' %}
+        {% set sizeAttrs = 'width="{{ module.video_thumb.max_width }}" height="{{ module.video_thumb.max_height }}" style="max-width: 100%; height: auto;"' %}
+      {% endif %}
+       {% set loadingAttr = module.video_thumb.loading != 'disabled' ? 'loading="{{ module.video_thumb.loading }}"' : '' %}
+      <img src="{{ module.video_thumb.src }}" alt="{{ module.video_thumb.alt }}" width="830" height="520" {{ loadingAttr }} {{ sizeAttrs }}>
+    {% endif %}
+    
+    {% set href = module.video_popup_link.url.href %}
+    {% if module.video_popup_link.url.type is equalto "EMAIL_ADDRESS" %}
+      {% set href = "mailto:" + href %}
+    {% endif %}
+    <a class="video-popup" data-vbtype="video" href="{{ href }}"
+      {% if module.video_popup_link.open_in_new_tab %}target="_blank"{% endif %}
+      {% if module.video_popup_link.rel %}rel="{{ module.video_popup_link.rel }}"{% endif %}
+      >
+      {% icon
+        name="{{ module.play_icon.name }}"
+        style="{{ module.play_icon.type }}"
+        unicode="{{ module.play_icon.unicode }}"
+        icon_set="{{ module.play_icon.icon_set }}"
+      %}
+    </a>
+  </div>
+</div>

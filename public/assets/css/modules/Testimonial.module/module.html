@@ -1,0 +1,118 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  .testimonial-content {
+    {% if module.style.alignment.alignment =='left' %}text-align: left;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}text-align: center;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}text-align: right;{% endif %}
+  }
+  
+  .testimonial-content .rating li svg {
+    color: rgba({{ module.style.color_field.rating_icon_color.color|convert_rgb }}, {{ module.style.color_field.rating_icon_color.opacity/100 }});
+  }
+  {% if module.style.testimonial_image_border_radius.overwrite %}
+  .testimonial-thumb-wrap .testimonial-thumb .clint-thumb img {
+    border-radius: {{ module.style.testimonial_image_border_radius.value }}%;
+  }
+  {% endif %}
+  
+  .testimonial-thumb-wrap .testimonial-thumb.swiper-slide-active .clint-thumb img {
+    outline: rgba({{ module.style.color_field.testimonial_thumb_otline_color.color|convert_rgb }}, {{ module.style.color_field.testimonial_thumb_otline_color.opacity/100 }}) solid 1px;
+  }
+  .testimonial-nav-content .main-slider-nav {
+    background: rgba({{ module.style.color_field.arrow_button_background_color.color|convert_rgb }}, {{ module.style.color_field.arrow_button_background_color.opacity/100 }});
+  }
+  .testimonial-nav-content .main-slider-nav svg {
+    color: rgba({{ module.style.color_field.arrow_button_icon_color.color|convert_rgb }}, {{ module.style.color_field.arrow_button_icon_color.opacity/100 }});
+  }
+  .testimonial-nav-content .main-slider-nav:hover {
+    background-color: rgba({{ module.style.color_field.arrow_button_background_hover_color.color|convert_rgb }}, {{ module.style.color_field.arrow_button_background_hover_color.opacity/100 }});
+  }
+  .testimonial-nav-content .main-slider-nav:hover svg {
+    color: rgba({{ module.style.color_field.arrow_button_icon_hover_color.color|convert_rgb }}, {{ module.style.color_field.arrow_button_icon_hover_color.opacity/100 }});
+  }
+  
+  
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+<div class="testimonial {{ module.extra_class }}" data-aos="{{ module.animation_direction }}">
+  <div class="swiper nav-content testimonial-nav-content">
+    <div class="swiper-wrapper">
+      {% for item in module.testimonial_content_item %}
+      <div class="swiper-slide">
+        <!-- Single Testimonial Content Start -->
+        <div class="testimonial-content">
+          {% if item.quote_image.src %}
+            {% set sizeAttrs = 'width="{{ item.quote_image.width }}" height="{{ item.quote_image.height }}"' %}
+            {% if item.quote_image.size_type == 'auto' %}
+              {% set sizeAttrs = 'width="{{ item.quote_image.width }}" height="{{ item.quote_image.height }}" style="max-width: 100%; height: auto;"' %}
+            {% elif item.quote_image.size_type == 'auto_custom_max' %}
+              {% set sizeAttrs = 'width="{{ item.quote_image.max_width }}" height="{{ item.quote_image.max_height }}" style="max-width: 100%; height: auto;"' %}
+            {% endif %}
+             {% set loadingAttr = item.quote_image.loading != 'disabled' ? 'loading="{{ item.quote_image.loading }}"' : '' %}
+            <img src="{{ item.quote_image.src }}" alt="{{ item.quote_image.alt }}" {{ loadingAttr }} {{ sizeAttrs }}>
+          {% endif %}
+          <ul class="rating d-flex justify-content-center">
+            {% for item2 in item.testimonial_rating_item %}
+            <li>
+              {% icon
+                name="{{ item2.rating_icon.name }}"
+                style="{{ item2.rating_icon.type }}"
+                unicode="{{ item2.rating_icon.unicode }}"
+                icon_set="{{ item2.rating_icon.icon_set }}"
+              %}
+            </li>
+            {% endfor %}
+          </ul>
+          {{ item.testimonial_title }}
+          {{ item.testimonial_excerpt }}
+        </div>
+        <!-- Single Testimonial Content End -->
+      </div>
+      {% endfor %}
+    </div>
+    <div class="testimonial-slider-prev swiper-button-prev main-slider-nav">
+      {% icon
+        name="{{ module.content_slider_prev_icon.name }}"
+        style="{{ module.content_slider_prev_icon.type }}"
+        unicode="{{ module.content_slider_prev_icon.unicode }}"
+        icon_set="{{ module.content_slider_prev_icon.icon_set }}"
+      %}
+    </div>
+    <div class="testimonial-slider-next swiper-button-next main-slider-nav">
+      {% icon
+        name="{{ module.content_slider_next_icon.name }}"
+        style="{{ module.content_slider_next_icon.type }}"
+        unicode="{{ module.content_slider_next_icon.unicode }}"
+        icon_set="{{ module.content_slider_next_icon.icon_set }}"
+      %}
+    </div>
+  </div>
+
+  <div class="swiper nav-thumb testimonial-thumb-wrap">
+    <div class="swiper-wrapper">
+      {% for item in module.thumbnail_slider_item %}
+      <!-- Single Testimonial Thumb Start -->
+      <div class="testimonial-thumb swiper-slide">
+        <div class="clint-thumb">
+          {% if item.author_thumb.src %}
+            {% set sizeAttrs = 'width="{{ item.author_thumb.width }}" height="{{ item.author_thumb.height }}"' %}
+            {% if item.author_thumb.size_type == 'auto' %}
+              {% set sizeAttrs = 'width="{{ item.author_thumb.width }}" height="{{ item.author_thumb.height }}" style="max-width: 100%; height: auto;"' %}
+            {% elif item.author_thumb.size_type == 'auto_custom_max' %}
+              {% set sizeAttrs = 'width="{{ item.author_thumb.max_width }}" height="{{ item.author_thumb.max_height }}" style="max-width: 100%; height: auto;"' %}
+            {% endif %}
+             {% set loadingAttr = item.author_thumb.loading != 'disabled' ? 'loading="{{ item.author_thumb.loading }}"' : '' %}
+            <img src="{{ item.author_thumb.src }}" alt="{{ item.author_thumb.alt }}" width="100" height="100" {{ loadingAttr }} {{ sizeAttrs }}>
+          {% endif %}
+        </div>
+        {{ item.author_name }}
+      </div>
+      <!-- Single Testimonial Thumb End -->
+      {% endfor %}
+    </div>
+  </div>
+
+</div>

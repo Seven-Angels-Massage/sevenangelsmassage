@@ -1,0 +1,54 @@
+
+.section-heading {
+  margin-bottom: 60px;
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .section-heading {
+    margin-bottom: 60px;
+  }
+}
+@media only screen and (max-width: 767px) {
+  .section-heading {
+    margin-bottom: 50px;
+  }
+}
+@media only screen and (max-width: 479px) {
+  .section-heading {
+    margin-bottom: 40px;
+  }
+}
+.section-heading h2 {
+  margin-bottom: 20px;
+}
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+  .section-heading h2 {
+    font-size: 36px;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .section-heading h2 {
+    font-size: 30px;
+  }
+}
+@media only screen and (max-width: 767px) {
+  .section-heading h2 {
+    font-size: 32px;
+  }
+}
+@media only screen and (max-width: 575px) {
+  .section-heading h2 {
+    font-size: 32px;
+  }
+}
+@media only screen and (max-width: 479px) {
+  .section-heading h2 {
+    font-size: 28px;
+  }
+}
+.section-heading p {
+  max-width: 570px;
+}
+.section-heading p:not(:last-child) {
+  margin-bottom: 35px;
+}
+

@@ -1,0 +1,63 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  .blog-pagination ul {
+  {% if module.style.alignment.alignment =='left' %}
+    justify-content: flex-start;
+    {% endif %}
+    {% if module.style.alignment.alignment =='center'%}
+    justify-content: center;
+    {% endif %}
+    {% if module.style.alignment.alignment =='right'%}
+    justify-content: flex-end;
+    {% endif %}
+  }
+  .blog-pagination ul li a {
+    color: rgba({{ module.style.color_field.page_index_text_color.color|convert_rgb }}, {{ module.style.color_field.page_index_text_color.opacity/100 }});
+    background-color: rgba({{ module.style.color_field.page_index_background_color.color|convert_rgb }}, {{ module.style.color_field.page_index_background_color.opacity/100 }});
+  }
+  .blog-pagination ul li a:hover {
+    color: rgba({{ module.style.color_field.page_index_text_hover_color.color|convert_rgb }}, {{ module.style.color_field.page_index_text_hover_color.opacity/100 }});
+  background-color: rgba({{ module.style.color_field.page_index_background_hover_color.color|convert_rgb }}, {{ module.style.color_field.page_index_background_hover_color.opacity/100 }});
+  }
+  
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+
+<!-- Blog Section Start -->
+    <div class="blog-section section section-padding-bottom mt-50 {{ module.section_class }}">
+        <div class="container">
+            <div class="blog-pagination">
+              {% if contents.total_page_count > 1 %}
+              {% set page_index = current_page_num > 0 ? current_page_num : 1 %}
+                <ul class="">
+                    {# First #}
+                    {% if page_index >= 3 %}
+                    <li class="active"><a href="{{ blog_page_link(1) }}">1</a></li>  
+                    <span class="blog-pagination__ellipsis">...</span>
+                    {% endif %}
+                    {% if page_index > 1 %}
+                    <li><a href="{{ blog_page_link(page_index - 1) }}">{{ page_index - 1 }}</a></li>
+                    {% endif %}
+                    <li><a href="{{ blog_page_link(page_index) }}">{{ page_index }}</a></li>
+                    {% if page_index != contents.total_page_count %}
+                    <li><a href="{{ blog_page_link(page_index + 1) }}">{{ page_index + 1 }}</a></li>
+                    {% endif %}
+
+                    {# Last #}
+
+
+                    {% if contents.total_page_count - page_index > 1 %}
+                    <span class="blog-pagination__ellipsis">...</span>
+                    <li><a href="{{ blog_page_link(contents.total_page_count) }}">{{ contents.total_page_count }}</a></li>
+                    {% endif %}
+
+                    {# Next button #}
+                </ul>
+              {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- Blog Section End -->

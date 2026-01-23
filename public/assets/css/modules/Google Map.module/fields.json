@@ -1,0 +1,93 @@
+[ {
+  "id" : "2df5a0d8-a33a-7447-11a0-a2157d73d3c1",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "008e7b06-abef-9690-e140-5e9759284e10",
+    "name" : "map_height",
+    "label" : "Map Height",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "f27cc39f-c06a-8d5b-c504-1cebb25256d0",
+      "name" : "desktop",
+      "label" : "Desktop",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 500,
+      "max" : 600,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 500
+    }, {
+      "id" : "fcc3f81c-6ba8-2e56-2db5-cab280668bd8",
+      "name" : "laptop",
+      "label" : "Laptop",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 400,
+      "max" : 500,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 400
+    }, {
+      "id" : "622de7f3-7e34-ae5e-d0a7-9b3603413f96",
+      "name" : "mobile",
+      "label" : "Mobile",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 300,
+      "max" : 400,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 300
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "desktop" : 500,
+      "laptop" : 400,
+      "mobile" : 300
+    }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "map_height" : {
+      "desktop" : 500,
+      "laptop" : 400,
+      "mobile" : 300
+    }
+  }
+}, {
+  "id" : "eb216a62-e342-8c75-fdee-ea6fffc3b95a",
+  "name" : "map_url",
+  "label" : "Map Url",
+  "required" : false,
+  "locked" : false,
+  "supported_source_types" : [ "html" ],
+  "supported_oembed_types" : [ "photo", "video", "link", "rich" ],
+  "resizable" : true,
+  "show_preview" : true,
+  "supported_media_bridge_providers" : [ ],
+  "type" : "embed",
+  "display_width" : null,
+  "default" : {
+    "source_type" : "html",
+    "embed_html" : "<iframe class=\"contact-map\" src=\"https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2136.986005919501!2d-73.9685579655238!3d40.75862446708152!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c258e4a1c884e5%3A0x24fe1071086b36d5!2sThe%20Atrium!5e0!3m2!1sen!2sbd!4v1585132512970!5m2!1sen!2sbd\" allowfullscreen=\"\" aria-hidden=\"false\" tabindex=\"0\"></iframe>"
+  }
+} ]

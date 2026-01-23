@@ -1,0 +1,26 @@
+.contact-info-box {
+    position: relative;
+    padding: 50px 30px;
+    
+    box-shadow: 0 10px 50px 0 rgba(26, 46, 85, 0.1);
+  }
+  .contact-info-box .icon {
+    width: 80px;
+    height: 80px;
+    text-align: center;
+    line-height: 80px;
+    font-size: 44px;
+    
+    
+    margin: 0 auto;
+    margin-bottom: 35px;
+  }
+  .contact-info-box .icon svg{
+    width: 44px;
+    height: 44px;
+    color: var(--light-color);
+  }
+  .contact-info-box .icon svg path{
+    fill: currentColor;
+    stroke: currentColor;
+  }

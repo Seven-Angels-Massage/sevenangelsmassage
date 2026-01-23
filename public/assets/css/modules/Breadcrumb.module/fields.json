@@ -1,0 +1,173 @@
+[ {
+  "id" : "0f4ec715-dd0c-b615-6249-5384e1aa99b9",
+  "name" : "layout",
+  "label" : "Layout",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "with-out-image", "With Out Image" ], [ "with-image", "With Image" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "with-out-image"
+}, {
+  "id" : "31ee401a-7ab2-5d51-1b78-2c8b6d42be12",
+  "name" : "extra_class",
+  "label" : "Extra Class",
+  "help_text" : "If you want to customize the style in your own way, then create an extra \"CLASS\" and style it based on that. ",
+  "required" : false,
+  "locked" : false,
+  "allow_new_line" : false,
+  "type" : "text",
+  "display_width" : null
+}, {
+  "id" : "30f6d90d-9b00-a186-f46f-a60c0e1555d6",
+  "name" : "page_title",
+  "label" : "Page Title",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "<h1>About Us</h1>"
+}, {
+  "id" : "ef4e439e-906e-b97f-19ea-fbe06aff50a5",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "fbedf5ca-2fb3-18f6-1dcf-a5c1dce708ac",
+    "name" : "section_background_image",
+    "label" : "Section Background Image",
+    "required" : false,
+    "locked" : false,
+    "type" : "backgroundimage",
+    "display_width" : null,
+    "default" : {
+      "background_position" : "MIDDLE_CENTER",
+      "background_size" : "cover",
+      "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/about-page-banner-bg.jpg"
+    }
+  }, {
+    "id" : "aaf4055d-5117-06dc-90d8-fdcdeadcf29f",
+    "name" : "section_background_color",
+    "label" : "Section Background Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "63114af1-54fc-9ffc-2449-6715647dcbfc",
+    "name" : "alignment",
+    "label" : "Alignment",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "ff8eeb06-c59b-b866-925f-23b7085dc659",
+      "name" : "alignment",
+      "label" : "Alignment",
+      "required" : false,
+      "locked" : false,
+      "display" : "select",
+      "choices" : [ [ "left", "Left" ], [ "center", "Center" ], [ "right", "Right" ] ],
+      "multiple" : false,
+      "reordering_enabled" : true,
+      "preset" : null,
+      "type" : "choice",
+      "display_width" : null,
+      "default" : "center"
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "alignment" : "center"
+    }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "section_background_image" : {
+      "background_position" : "MIDDLE_CENTER",
+      "background_size" : "cover",
+      "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/about-page-banner-bg.jpg"
+    },
+    "section_background_color" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    },
+    "alignment" : {
+      "alignment" : "center"
+    }
+  }
+}, {
+  "id" : "3676c966-8f33-73da-4b21-87bf97bdd571",
+  "name" : "breadcrumb_item",
+  "label" : "Breadcrumb Item",
+  "required" : false,
+  "locked" : false,
+  "occurrence" : {
+    "min" : null,
+    "max" : null,
+    "sorting_label_field" : "9d50fe67-20f1-64cd-f886-0903822b5b3c",
+    "default" : null
+  },
+  "children" : [ {
+    "id" : "1e5b818f-102a-59ab-dec3-e51c95432e33",
+    "name" : "breadcrumb_link",
+    "label" : "Breadcrumb Link",
+    "required" : false,
+    "locked" : false,
+    "supported_types" : [ "EXTERNAL", "CONTENT", "FILE", "EMAIL_ADDRESS", "BLOG" ],
+    "show_advanced_rel_options" : false,
+    "type" : "link",
+    "display_width" : null,
+    "default" : {
+      "url" : {
+        "content_id" : null,
+        "type" : "EXTERNAL",
+        "href" : ""
+      },
+      "open_in_new_tab" : false,
+      "no_follow" : false
+    }
+  }, {
+    "id" : "9d50fe67-20f1-64cd-f886-0903822b5b3c",
+    "name" : "breadcrumb_text",
+    "label" : "Breadcrumb Text",
+    "required" : false,
+    "locked" : false,
+    "allow_new_line" : false,
+    "type" : "text",
+    "display_width" : null,
+    "default" : "Home"
+  } ],
+  "tab" : "CONTENT",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "breadcrumb_link" : {
+      "url" : {
+        "content_id" : null,
+        "type" : "EXTERNAL",
+        "href" : ""
+      },
+      "open_in_new_tab" : false,
+      "no_follow" : false
+    },
+    "breadcrumb_text" : "Home"
+  }
+} ]

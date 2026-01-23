@@ -1,0 +1,301 @@
+[ {
+  "id" : "d56d4860-8429-8538-27bd-3799e5b3d21d",
+  "name" : "animation_direction",
+  "label" : "Animation Direction",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "fade-up", "Fade Up" ], [ "fade-down", "Fade Down" ], [ "fade-left", "Fade Left" ], [ "fade-right", "Fade Right" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "fade-up"
+}, {
+  "id" : "7415fd46-a774-a8fa-6e46-b6031f77d9c2",
+  "name" : "custom_class",
+  "label" : "Custom Class",
+  "help_text" : "If you want to customize the style in your own way, then create an extra \"CLASS\" and style it based on that. ",
+  "required" : false,
+  "locked" : false,
+  "allow_new_line" : false,
+  "type" : "text",
+  "display_width" : null
+}, {
+  "id" : "1f4fd38e-c0b6-c463-829c-f9ee53dbf689",
+  "name" : "about_image_one",
+  "label" : "About Image One",
+  "required" : false,
+  "locked" : false,
+  "responsive" : true,
+  "resizable" : true,
+  "show_loading" : false,
+  "type" : "image",
+  "display_width" : null,
+  "default" : {
+    "size_type" : "auto",
+    "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/about-image.png",
+    "alt" : "about-image",
+    "loading" : "lazy",
+    "width" : 378,
+    "height" : 485,
+    "max_width" : 378,
+    "max_height" : 485
+  }
+}, {
+  "id" : "30d0bdb7-d183-6c57-fa03-37ca6dccc7ea",
+  "name" : "about_image_two",
+  "label" : "About Image Two",
+  "required" : false,
+  "locked" : false,
+  "responsive" : true,
+  "resizable" : true,
+  "show_loading" : false,
+  "type" : "image",
+  "display_width" : null,
+  "default" : {
+    "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/about-image-two.png",
+    "alt" : "about-image-two",
+    "width" : 246,
+    "height" : 266,
+    "max_width" : 246,
+    "max_height" : 266
+  }
+}, {
+  "id" : "93fec9bd-6821-38c2-3954-9be3108bc77b",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "b4b368f9-d605-ee7d-7827-0c2418f03f77",
+    "name" : "alignment",
+    "label" : "Alignment",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "69d6eff3-aba9-8336-6b59-3db0163a0979",
+      "name" : "alignment",
+      "label" : "Alignment",
+      "required" : false,
+      "locked" : false,
+      "display" : "select",
+      "choices" : [ [ "left", "Left" ], [ "center", "Center" ], [ "right", "Right" ] ],
+      "multiple" : false,
+      "reordering_enabled" : true,
+      "preset" : null,
+      "type" : "choice",
+      "display_width" : null,
+      "default" : "right"
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "alignment" : "right"
+    }
+  }, {
+    "id" : "5577b609-9127-5e6e-4178-592aade7438e",
+    "name" : "image_border_radius",
+    "label" : "Image Border Radius",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "8ed954e9-d2bc-1055-f0a9-bb1cf845a23c",
+      "name" : "overwrite",
+      "label" : "Overwrite",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "12d2729d-0a97-3532-6269-7bb7f42068e9",
+      "name" : "value",
+      "label" : "Value",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 0,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 5
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "overwrite" : false,
+      "value" : 5
+    }
+  }, {
+    "id" : "62ab6a15-4a79-9989-7943-464e9142efee",
+    "name" : "image_padding",
+    "label" : "Image Padding",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "bed2c98a-6bf7-d66c-b0cf-0416938fdf2f",
+      "name" : "overwrite",
+      "label" : "Overwrite",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "d9dd5bdd-24ef-7d66-6dd4-5d6662f8e53a",
+      "name" : "value",
+      "label" : "Value",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 0,
+      "max" : 20,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 10
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "overwrite" : false,
+      "value" : 10
+    }
+  }, {
+    "id" : "2d503787-dc7e-52f5-f481-52b3dceee927",
+    "name" : "image_background_color",
+    "label" : "Image Background Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "alignment" : {
+      "alignment" : "right"
+    },
+    "image_border_radius" : {
+      "overwrite" : false,
+      "value" : 5
+    },
+    "image_padding" : {
+      "overwrite" : false,
+      "value" : 10
+    },
+    "image_background_color" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    }
+  }
+}, {
+  "id" : "faee1b88-d575-90b9-17e8-a2420ae4ca3f",
+  "name" : "shape_image_item",
+  "label" : "Shape Image Item",
+  "required" : false,
+  "locked" : false,
+  "occurrence" : {
+    "min" : null,
+    "max" : null,
+    "sorting_label_field" : "bd568c57-b17a-8938-928a-5157d0ebf78e",
+    "default" : null
+  },
+  "children" : [ {
+    "id" : "26aa65bd-d05f-027e-5bb3-6beaca461281",
+    "name" : "shape_image_number_class",
+    "label" : "Shape Image Number Class",
+    "help_text" : "Please add an image shape number class like \"shape-1\"",
+    "required" : false,
+    "locked" : false,
+    "allow_new_line" : false,
+    "type" : "text",
+    "display_width" : null,
+    "default" : ""
+  }, {
+    "id" : "1e6ac6c8-0de1-235f-6c46-5184ce81a817",
+    "name" : "image_move_animation",
+    "label" : "Image Move Animation",
+    "required" : false,
+    "locked" : false,
+    "display" : "select",
+    "choices" : [ [ "scene", "Add Animation" ], [ "null", "Off Animation" ] ],
+    "multiple" : false,
+    "reordering_enabled" : true,
+    "preset" : null,
+    "type" : "choice",
+    "display_width" : null,
+    "default" : "scene"
+  }, {
+    "id" : "a7b5cc34-2568-acc7-dc29-59184706003f",
+    "name" : "animation_depth",
+    "label" : "Animation Depth",
+    "required" : false,
+    "locked" : false,
+    "allow_new_line" : false,
+    "type" : "text",
+    "display_width" : null,
+    "default" : "3"
+  }, {
+    "id" : "bd568c57-b17a-8938-928a-5157d0ebf78e",
+    "name" : "about_shape_image",
+    "label" : "About Shape Image ",
+    "required" : false,
+    "locked" : false,
+    "responsive" : true,
+    "resizable" : true,
+    "show_loading" : false,
+    "type" : "image",
+    "display_width" : null,
+    "default" : {
+      "size_type" : "auto",
+      "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/shape-one.png",
+      "alt" : "shape-one",
+      "loading" : "lazy",
+      "width" : 200,
+      "height" : 200,
+      "max_width" : 200,
+      "max_height" : 200
+    }
+  } ],
+  "tab" : "CONTENT",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "shape_image_number_class" : "",
+    "image_move_animation" : "scene",
+    "animation_depth" : "3",
+    "about_shape_image" : {
+      "size_type" : "auto",
+      "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/shape-one.png",
+      "alt" : "shape-one",
+      "loading" : "lazy",
+      "width" : 200,
+      "height" : 200,
+      "max_width" : 200,
+      "max_height" : 200
+    }
+  }
+} ]

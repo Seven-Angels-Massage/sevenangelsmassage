@@ -1,0 +1,255 @@
+[ {
+  "id" : "923684dc-c809-4230-88a6-adb4dce6808b",
+  "name" : "button_class",
+  "label" : "Button Class",
+  "help_text" : "If you want to customize the style in your own way, then create an extra \"CLASS\" and style it based on that. ",
+  "required" : false,
+  "locked" : false,
+  "allow_new_line" : false,
+  "type" : "text",
+  "display_width" : null
+}, {
+  "id" : "6ff2b9f1-4557-af3b-daef-b3ff202f7b72",
+  "name" : "button_type",
+  "label" : "Button Type",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "btn-primary btn-secondary-hover", "Filled" ], [ "btn-primary-outline btn-primary-hover", "Outline" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "btn-primary btn-secondary-hover"
+}, {
+  "id" : "d25292d5-8958-8804-6760-4267a58f66ae",
+  "name" : "button_rounded",
+  "label" : "Button Rounded",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "btn-radius", "Radius" ], [ "null", "With Out Radius" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "null"
+}, {
+  "id" : "68befa15-74a8-4452-0be5-794dd8cb26bf",
+  "name" : "button_size",
+  "label" : "Button Size",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "btn-lg", "Large" ], [ "btn-md", "Medium" ], [ "btn-sm", "Small" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null
+}, {
+  "id" : "af956fe7-2149-b439-0b05-8688869b7e5e",
+  "name" : "button_link",
+  "label" : "Button Link",
+  "required" : false,
+  "locked" : false,
+  "supported_types" : [ "EXTERNAL", "CONTENT", "FILE", "EMAIL_ADDRESS", "BLOG" ],
+  "show_advanced_rel_options" : false,
+  "type" : "link",
+  "display_width" : null,
+  "default" : {
+    "url" : {
+      "content_id" : null,
+      "type" : "EXTERNAL",
+      "href" : ""
+    },
+    "open_in_new_tab" : false,
+    "no_follow" : false
+  }
+}, {
+  "id" : "af77bd13-428e-5863-f9e2-1ada65982a85",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "bf7a15c3-4d30-a219-3b64-3c922315c6b2",
+    "name" : "button_primary_background_color",
+    "label" : "Button Primary Background Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "ac8191de-df00-196c-6010-f7b39957b9c0",
+    "name" : "button_primary_border_color",
+    "label" : "Button Primary Border Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "ad363ead-f358-eca3-8242-bd339499397d",
+    "name" : "button_text_color",
+    "label" : "Button Text Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "29ab73d6-ff4e-1ea4-380d-bd31e1a8d4ef",
+    "name" : "button_secondary_hover_background_color",
+    "label" : "Button Secondary Hover Background Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#151d28",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "ac9428d9-952d-a6b2-8551-cedb672fb883",
+    "name" : "button_secondary_hover_border_color",
+    "label" : "Button Secondary Hover Border Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#151d28",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "ca934958-0427-cb29-742a-a68d50553ad9",
+    "name" : "button_hover_text_color",
+    "label" : "Button Hover Text Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "4c603c40-1f10-5969-d7e1-a78d9c59f0c1",
+    "name" : "button_primary_outline_border_color",
+    "label" : "Button Primary Outline Border Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "f5ac520a-d42e-a7a0-6f5c-70cbf34733d4",
+    "name" : "button_primary_outline_hover_background_color",
+    "label" : "Button Primary Outline Hover Background Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "ae7741ed-968a-4eef-f69b-12a88f55be92",
+    "name" : "button_primary_outline_hover_border_color",
+    "label" : "Button Primary Outline Hover Border Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "ae9e5cee-4869-623d-cdb9-f3399ddb131c",
+    "name" : "button_outline_text_hover_color",
+    "label" : "Button Outline Text Hover Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "button_primary_background_color" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    },
+    "button_primary_border_color" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    },
+    "button_text_color" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    },
+    "button_secondary_hover_background_color" : {
+      "color" : "#151d28",
+      "opacity" : 100
+    },
+    "button_secondary_hover_border_color" : {
+      "color" : "#151d28",
+      "opacity" : 100
+    },
+    "button_hover_text_color" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    },
+    "button_primary_outline_border_color" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    },
+    "button_primary_outline_hover_background_color" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    },
+    "button_primary_outline_hover_border_color" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    },
+    "button_outline_text_hover_color" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    }
+  }
+}, {
+  "id" : "9bbe8d42-e6bf-1056-b416-6722e27d8ab4",
+  "name" : "button_text",
+  "label" : "Button Text",
+  "required" : false,
+  "locked" : false,
+  "allow_new_line" : false,
+  "type" : "text",
+  "display_width" : null,
+  "default" : "Home"
+} ]

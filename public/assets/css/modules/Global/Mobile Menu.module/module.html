@@ -1,0 +1,164 @@
+{% require_css %}
+<style>
+  .header-offcanvas{
+    background-color: rgba({{ module.style.mobile_menu_background_color.color|convert_rgb }}, {{ module.style.mobile_menu_background_color.opacity/100 }});
+  }
+  .header-offcanvas-head {
+    background-color: rgba({{ module.style.menu_header_background_color.color|convert_rgb }}, {{ module.style.menu_header_background_color.opacity/100 }});
+  }
+  .header-offcanvas .offcanvas-menu-nav > ul li > a {
+    color: rgba({{ module.style.menu_text_color.color|convert_rgb }}, {{ module.style.menu_text_color.opacity/100 }});
+  }
+  .header-offcanvas .offcanvas-menu-nav > ul li > a:hover {
+    color: rgba({{ module.style.menu_text_hover_color.color|convert_rgb }}, {{ module.style.menu_text_hover_color.opacity/100 }});
+  }
+  .header-offcanvas .offcanvas-menu-nav > ul li .offcanvas-sub-menu-toggle svg {
+    color: rgba({{ module.style.toggle_icon_color.color|convert_rgb }}, {{ module.style.toggle_icon_color.opacity/100 }});
+  }
+  .header-offcanvas .offcanvas-menu-nav > ul li ul li > a {
+    color: rgba({{ module.style.child_menu_text_color.color|convert_rgb }}, {{ module.style.child_menu_text_color.opacity/100 }});
+  }
+   .header-offcanvas .offcanvas-menu-nav > ul li ul li > a:hover {
+    color: rgba({{ module.style.child_menu_text_hover_color.color|convert_rgb }}, {{ module.style.child_menu_text_hover_color.opacity/100 }});
+  }
+    /* ===========================
+     CHANGE (OFFCANVAS BOOK NOW) - HubL COLORS (match Header button fields)
+     - Uses SAME style fields as Header button:
+       button_primary_background_color, button_primary_border_color, button_text_color
+       button_primary_hover_background_color, button_primary_hover_border_color, button_hover_text_color
+     - NOTE: This must stay in module.html (HubL), not module.css
+     =========================== */
+  .offcanvas-book-btn-wrapper .btn-primary {
+      background-color: rgba({{ module.style.button_primary_background_color.color|convert_rgb }}, {{ module.style.button_primary_background_color.opacity/100 }});
+      border-color: rgba({{ module.style.button_primary_border_color.color|convert_rgb }}, {{ module.style.button_primary_border_color.opacity/100 }});
+      color: rgba({{ module.style.button_text_color.color|convert_rgb }}, {{ module.style.button_text_color.opacity/100 }});
+    }
+  .offcanvas-book-btn-wrapper .btn-secondary-hover:hover {
+      background-color: rgba({{ module.style.button_primary_hover_background_color.color|convert_rgb }}, {{ module.style.button_primary_hover_background_color.opacity/100 }});
+      border-color: rgba({{ module.style.button_primary_hover_border_color.color|convert_rgb }}, {{ module.style.button_primary_hover_border_color.opacity/100 }});
+      color: rgba({{ module.style.button_hover_text_color.color|convert_rgb }}, {{ module.style.button_hover_text_color.opacity/100 }});
+    }
+  .offcanvas-book-btn-wrapper .btn-light-outline {
+      background-color: transparent;
+      border-color: rgba({{ module.style.button_light_outline_border_color.color|convert_rgb }}, {{ module.style.button_light_outline_border_color.opacity/100 }});
+      color: rgba({{ module.style.button_text_color.color|convert_rgb }}, {{ module.style.button_text_color.opacity/100 }});
+    }
+  .offcanvas-book-btn-wrapper .btn-primary-hover:hover {
+      background-color: rgba({{ module.style.button_light_outline_hover_background_color.color|convert_rgb }}, {{ module.style.button_light_outline_hover_background_color.opacity/100 }});
+      border-color: rgba({{ module.style.button_light_outline_hover_border_color.color|convert_rgb }}, {{ module.style.button_light_outline_hover_border_color.opacity/100 }});
+      color: rgba({{ module.style.button_outline_text_hover_color.color|convert_rgb }}, {{ module.style.button_outline_text_hover_color.opacity/100 }});
+    }
+</style>
+{% end_require_css %}
+
+
+{% macro defaultItemClasses() %}
+ {{
+ {
+   "class": "no-sub-menu"
+ }|xmlattr
+ }}
+{% endmacro %}
+
+{% macro childClasses() %}
+ {{
+ {
+   "class": "has-sub-menu"
+ }|xmlattr
+ }}
+{% endmacro %}
+
+{% macro activeNode() %}
+ {{
+ {"class": "menu-link active active-item",
+ "aria-current": "page"}|xmlattr
+
+ }}
+{% endmacro %}
+
+{% macro link(node) %}
+
+<li {{ childClasses() if node.children else defaultItemClasses() }}>
+  <a class="navs-link" href="{{ node.url }}" {{ activeNode() if node.activeNode }}>{{ node.label }}</a>
+
+  {# --------------------------------------------------------------------
+     ACCESSIBILITY:
+     This toggle is a <span> (structure retained to avoid JS changes).
+     Add role/tabindex/aria-label so it has an accessible name & is focusable.
+     SVG is marked aria-hidden so screen readers don't read path noise.
+  --------------------------------------------------------------------- #}
+  <span class="offcanvas-sub-menu-toggle" role="button" tabindex="0" aria-label="Toggle submenu">
+    <svg width="20" height="20" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                                <path d="M9.96001 4.47501L6.70001 7.73501C6.31501 8.12001 5.68501 8.12001 5.30001 7.73501L2.04001 4.47501" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+  </span>
+  {% if node.children %}
+
+  {{ renderNavigation(node) }}
+  {% endif %}
+</li>
+{% endmacro %}
+
+{% macro renderNavigation(menuTree) %}
+
+  {% set level = level + 1 %}
+
+  <ul class="navigation hs-menu-children-wrapper offcanvas-sub-menu-{{ level }}" aria-hidden="{{ level != 1 }}">
+    {% for node in menuTree.children %}
+      {{ link(node) }}
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+<div class="header-offcanvas">
+        <div class="header-offcanvas-head">
+            <div class="header-offcanvas-logo">
+                {% set loadingAttr = module.mobile_logo.loading != 'disabled' ? '{{ module.mobile_logo.loading }}' : '' %}
+
+                  {% logo
+                    override_inherited_src="{{ module.mobile_logo.override_inherited_src }}"
+                    src="{{ module.mobile_logo.src }}"
+                    alt="{{ module.mobile_logo.alt }}"
+                    width="{{ module.mobile_logo.width }}"
+                    height="{{ module.mobile_logo.height }}"
+                    loading="{{ loadingAttr }}"
+                    suppress_company_name="{{ module.mobile_logo.suppress_company_name }}"
+                  %}
+            </div>
+
+            {# --------------------------------------------------------------------
+               ACCESSIBILITY:
+               - type="submit" is incorrect here; keep it a button (no form submit)
+               - Provide accessible name via aria-label, keep visible text "close"
+            --------------------------------------------------------------------- #}
+            <button class="header-offcanvas-close" type="button" aria-label="Close menu">close</button>
+        </div>
+        <div class="header-offcanvas-body">
+                <!-- Offcanvas Book Now Button Start -->
+                {# ============================================
+                   CHANGE (OFFCANVAS BOOK NOW) - HTML (NO JS)
+                   - Adds the offcanvas Book Now button directly in the template
+                   - Same classes + same URL as your JS-injected version
+                   - Remove the JS injector after applying this to avoid duplicates
+                   ============================================ #}
+                {% set href = module.button_link.url.href %}
+                {% if module.button_link.url.type is equalto "EMAIL_ADDRESS" %}
+                  {% set href = "mailto:" + href %}
+                {% endif %}
+                <div class="offcanvas-book-btn-wrapper">
+                  <a class="btn {{ module.button_type }} {{ module.button_rounded }} {{ module.button_size }}"
+                     href="{{ href }}"
+                     {% if module.button_link.open_in_new_tab %}target="_blank"{% endif %}
+                     {% if module.button_link.rel %}rel="{{ module.button_link.rel }}"{% endif %}>
+                    {{ module.button_text }}
+                  </a>
+                </div>
+                <!-- Offcanvas Book Now Button End -->
+            <div class="offcanvas-menu">
+                <nav class="offcanvas-menu-nav">
+                  {{ renderNavigation(menu(module.mobile_menu)) }} 
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="backdrop"></div>

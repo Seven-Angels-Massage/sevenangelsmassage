@@ -1,0 +1,188 @@
+[ {
+  "id" : "5878fef6-b287-1d45-5619-37a7d302d35d",
+  "name" : "animation_direction",
+  "label" : "Animation Direction",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "fade-up", "Fade Up" ], [ "fade-down", "Fade Down" ], [ "fade-left", "Fade Left" ], [ "fade-right", "Fade Right" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "fade-up"
+}, {
+  "id" : "59cb4823-6300-5310-57ed-215bb6ebb443",
+  "name" : "extra_class",
+  "label" : "Extra Class",
+  "help_text" : "If you want to customize the style in your own way, then create an extra \"CLASS\" and style it based on that. ",
+  "required" : false,
+  "locked" : false,
+  "allow_new_line" : false,
+  "type" : "text",
+  "display_width" : null
+}, {
+  "id" : "e7181b41-e90b-4073-c99c-3b5fc52b2755",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "24762bfd-9f4a-64b8-d76e-4205f288dcad",
+    "name" : "color_field",
+    "label" : "Color Field",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "ce5dc2d6-0654-471b-b9b5-071a319dfeb2",
+      "name" : "logo_background_color",
+      "label" : "Logo Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "6dde95ce-eae5-d2c6-accf-0f1cb5079837",
+      "name" : "logo_background_hover_color",
+      "label" : "Logo Background Hover Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "logo_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "logo_background_hover_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }
+  }, {
+    "id" : "acb98210-ec30-5b80-6ef0-77373b62d96c",
+    "name" : "brand_logo_radius",
+    "label" : "Brand Logo Radius",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "d18a295a-0f89-bc0f-8d67-e1a2b8ad8914",
+      "name" : "overwrite",
+      "label" : "Overwrite",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "7f004236-82ab-026f-6456-f0b063915e7b",
+      "name" : "value",
+      "label" : "Value",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 1,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 5
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "overwrite" : false,
+      "value" : 5
+    }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "color_field" : {
+      "logo_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "logo_background_hover_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    },
+    "brand_logo_radius" : {
+      "overwrite" : false,
+      "value" : 5
+    }
+  }
+}, {
+  "id" : "b85a42ff-9244-5eea-9359-d5360f08b9e1",
+  "name" : "brand_logo_item",
+  "label" : "Brand Logo Item",
+  "required" : false,
+  "locked" : false,
+  "occurrence" : {
+    "min" : null,
+    "max" : null,
+    "sorting_label_field" : "5c31416d-2a27-f13b-1d72-557687c83554",
+    "default" : null
+  },
+  "children" : [ {
+    "id" : "5c31416d-2a27-f13b-1d72-557687c83554",
+    "name" : "brand_logo_image",
+    "label" : "Brand Logo Image",
+    "required" : false,
+    "locked" : false,
+    "responsive" : true,
+    "resizable" : true,
+    "show_loading" : false,
+    "type" : "image",
+    "display_width" : null,
+    "default" : {
+      "size_type" : "auto",
+      "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/brand-five.png",
+      "alt" : "brand-five",
+      "loading" : "lazy",
+      "width" : 101,
+      "height" : 100,
+      "max_width" : 101,
+      "max_height" : 100
+    }
+  } ],
+  "tab" : "CONTENT",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "brand_logo_image" : {
+      "size_type" : "auto",
+      "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/brand-five.png",
+      "alt" : "brand-five",
+      "loading" : "lazy",
+      "width" : 101,
+      "height" : 100,
+      "max_width" : 101,
+      "max_height" : 100
+    }
+  }
+} ]

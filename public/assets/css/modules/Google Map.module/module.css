@@ -1,0 +1,20 @@
+
+
+@media only screen and (min-width: 1200px) and (max-width: 1549px) {
+  .contact-map {
+    height: 500px;
+    width: 100%;
+  }
+}
+
+
+
+
+
+.iframe_wrapper {
+	padding-bottom: 100%;
+}
+
+.iframe_wrapper {
+	padding-bottom: inherit !important;
+}

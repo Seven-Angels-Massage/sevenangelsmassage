@@ -1,0 +1,131 @@
+/* Blog CSS */
+.blog-section {
+  background-color: #fff;
+  position: relative;
+  z-index: 1;
+}
+.blog-section .shape {
+  position: absolute;
+  z-index: -1;
+}
+.blog-section .shape.shape-1 {
+  top: 420px;
+  left: 170px;
+}
+@media only screen and (min-width: 1200px) and (max-width: 1549px), only screen and (min-width: 992px) and (max-width: 1199px) {
+  .blog-section .shape.shape-1 {
+    top: 150px;
+    left: 30px;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px), only screen and (max-width: 767px) {
+  .blog-section .shape.shape-1 {
+    top: 40px;
+    left: 30px;
+  }
+}
+.blog-section .shape.shape-2 {
+  bottom: 275px;
+  right: 130px;
+}
+@media only screen and (min-width: 1200px) and (max-width: 1549px), only screen and (min-width: 992px) and (max-width: 1199px) {
+  .blog-section .shape.shape-2 {
+    bottom: 100px;
+    right: 30px;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px), only screen and (max-width: 767px) {
+  .blog-section .shape.shape-2 {
+    bottom: 40px;
+    right: 30px;
+  }
+  .blog-section .shape.shape-2 img {
+    width: 70px;
+  }
+}
+
+.blog {
+  overflow: hidden;
+  height: 100%;
+  transition: var(--transition);
+}
+.blog .thumbnail {
+  position: relative;
+  overflow: hidden;
+}
+.blog .thumbnail .image {
+  display: block;
+}
+.blog .thumbnail .image img {
+  width: 100%;
+  transition: var(--transition);
+}
+.blog .thumbnail .category {
+  position: absolute;
+  top: 10px;
+  left: 8px;
+  padding: 5px 12px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 1.6px;
+}
+.blog .info {
+  position: relative;
+  padding-top: 20px;
+}
+.blog .info .meta {
+  font-size: var(--body-font-size);
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+  padding-left: 0;
+  list-style: none;
+}
+.blog .info .meta li {
+  margin-right: 28px;
+}
+.blog .info .meta li:last-child {
+  margin-right: 0;
+}
+.blog .info .meta li i {
+  margin-right: 10px;
+}
+.blog .info h3 a{
+  color: var(--secondary-color);
+}
+.blog .info h3 a:hover{
+  color: var(--primary-color);
+}
+@media only screen and (min-width: 992px) and (max-width: 1199px), only screen and (max-width: 575px) {
+  .blog .info h3 {
+    font-size: 24px;
+  }
+}
+.blog .info .link {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+.blog .info .link i {
+  margin-right: 10px;
+}
+.blog:hover .thumbnail .image img {
+  transform: scale(1.1);
+}
+
+/* --------------------------------------------------------------------
+   ACCESSIBILITY: visually hidden helper text (for descriptive link labels)
+   Used by Blog module links to keep UI text "Read More" while providing
+   a unique accessible name for Lighthouse / screen readers.
+--------------------------------------------------------------------- */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}

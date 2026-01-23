@@ -1,0 +1,114 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  .hero-item {
+    background-color: rgba({{ module.style.hero_slider_background_color_overlay.background_color.color|convert_rgb }}, {{ module.style.hero_slider_background_color_overlay.background_color.opacity/100 }});
+  }
+  
+  {% if module.style.hero_slider_background_color_overlay.enable %}
+  .hero-item::before {
+    background: {{ module.style.hero_slider_background_color_overlay.overlay_color.css }};
+  }
+  {% endif %}
+  
+  .hero-item-content {
+    {% if module.style.alignment.alignment =='left' %}text-align: left;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}text-align: center;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}text-align: right;{% endif %}
+  }
+  .hero-item-content p {
+    {% if module.style.alignment.alignment =='left' %}margin-left: 0;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}margin: 0 auto;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}margin-right: 0;{% endif %}
+  }
+  
+  .hero-item-buttons .btn-primary {
+      background-color: rgba({{ module.style.slider_button_color.button_primary_background_color.color|convert_rgb }}, {{ module.style.slider_button_color.button_primary_background_color.opacity/100 }});
+      border-color: rgba({{ module.style.slider_button_color.button_primary_border_color.color|convert_rgb }}, {{ module.style.slider_button_color.button_primary_border_color.opacity/100 }});
+      color: rgba({{ module.style.slider_button_color.button_text_color.color|convert_rgb }}, {{ module.style.slider_button_color.button_text_color.opacity/100 }});
+    }
+  .hero-item-buttons .btn-secondary-hover:hover {
+      background-color: rgba({{ module.style.slider_button_color.button_secondary_hover_background_color.color|convert_rgb }}, {{ module.style.slider_button_color.button_secondary_hover_background_color.opacity/100 }});
+      border-color: rgba({{ module.style.slider_button_color.button_secondary_hover_border_color.color|convert_rgb }}, {{ module.style.slider_button_color.button_secondary_hover_border_color.opacity/100 }});
+      color: rgba({{ module.style.slider_button_color.button_hover_text_color.color|convert_rgb }}, {{ module.style.slider_button_color.button_hover_text_color.opacity/100 }});
+    }
+  .hero-item-buttons .btn-primary-outline {
+      background-color: transparent;
+      border-color: rgba({{ module.style.slider_button_color.button_primary_outline_border_color.color|convert_rgb }}, {{ module.style.slider_button_color.button_primary_outline_border_color.opacity/100 }});
+      color: rgba({{ module.style.slider_button_color.button_text_color.color|convert_rgb }}, {{ module.style.slider_button_color.button_text_color.opacity/100 }});
+    }
+  .hero-item-buttons .btn-primary-hover:hover {
+      background-color: rgba({{ module.style.slider_button_color.button_primary_outline_hover_background_color.color|convert_rgb }}, {{ module.style.slider_button_color.button_primary_outline_hover_background_color.opacity/100 }});
+      border-color: rgba({{ module.style.slider_button_color.button_primary_outline_hover_border_color.color|convert_rgb }}, {{ module.style.slider_button_color.button_primary_outline_hover_border_color.opacity/100 }});
+      color: rgba({{ module.style.slider_button_color.button_outline_text_hover_color.color|convert_rgb }}, {{ module.style.slider_button_color.button_outline_text_hover_color.opacity/100 }});
+    }
+  
+  .hero-slider .main-slider-nav {
+    background: rgba({{ module.style.slider_button_color.icon_background_color.color|convert_rgb }}, {{ module.style.slider_button_color.icon_background_color.opacity/100 }});
+  }
+  .hero-slider .main-slider-nav svg {
+    color: rgba({{ module.style.slider_button_color.icon_color.color|convert_rgb }}, {{ module.style.slider_button_color.icon_color.opacity/100 }});
+  }
+  .hero-slider .main-slider-nav:hover {
+    background-color: rgba({{ module.style.slider_button_color.icon_background_hover_color.color|convert_rgb }}, {{ module.style.slider_button_color.icon_background_hover_color.opacity/100 }});
+  }
+  .hero-slider .main-slider-nav:hover svg {
+    color: rgba({{ module.style.slider_button_color.icon_hover_color.color|convert_rgb }}, {{ module.style.slider_button_color.icon_hover_color.opacity/100 }});
+  }
+  {% end_scope_css %}
+</style>
+{% end_require_css %}
+
+<!-- Hero Slider Section Start -->
+    <div class="hero-slider swiper {{ module.section_class }}">
+
+        <div class="swiper-wrapper">
+          {% for item in module.slider_item %}
+            <div class="swiper-slide">
+                <div class="hero-item" style="background-image: url({{ item.slider_background_image.src }});">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="hero-item-content">
+                                    {{ item.slider_title }}
+                                    {{ item.slider_excerpt }}
+                                    <div class="hero-item-buttons">
+                                      {% set href = item.button_link.url.href %}
+                                        {% if item.button_link.url.type is equalto "EMAIL_ADDRESS" %}
+                                          {% set href = "mailto:" + href %}
+                                        {% endif %}
+                                        <a class="btn {{ item.button_type }} {{ item.button_rounded }} {{ item.button_size }}" href="{{ href }}"
+                                          {% if item.button_link.open_in_new_tab %}target="_blank"{% endif %}
+                                          {% if item.button_link.rel %}rel="{{ item.button_link.rel }}"{% endif %}
+                                          >
+                                          {{ item.button_text }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="home-slider-prev swiper-button-prev main-slider-nav">
+          {% icon
+            name="{{ module.slider_prev_icon.name }}"
+            style="{{ module.slider_prev_icon.type }}"
+            unicode="{{ module.slider_prev_icon.unicode }}"
+            icon_set="{{ module.slider_prev_icon.icon_set }}"
+          %}
+        </div>
+        <div class="home-slider-next swiper-button-next main-slider-nav">
+          {% icon
+            name="{{ module.slider_next_icon.name }}"
+            style="{{ module.slider_next_icon.type }}"
+            unicode="{{ module.slider_next_icon.unicode }}"
+            icon_set="{{ module.slider_next_icon.icon_set }}"
+          %}
+        </div>
+
+    </div>
+    <!-- Hero Slider Section End -->

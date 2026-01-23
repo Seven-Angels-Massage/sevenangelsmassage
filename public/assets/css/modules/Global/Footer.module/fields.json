@@ -1,0 +1,368 @@
+[ {
+  "id" : "6e954806-6c68-e2ae-e836-7ff2ea7c5f98",
+  "name" : "section_class",
+  "label" : "Section Class",
+  "help_text" : "If you want to customize the style in your own way, then create an extra \"CLASS\" and style it based on that. ",
+  "required" : false,
+  "locked" : false,
+  "allow_new_line" : false,
+  "type" : "text",
+  "display_width" : null
+}, {
+  "id" : "18f42c78-335c-c527-3088-0127be364249",
+  "name" : "footer_logo",
+  "label" : "Footer Logo",
+  "required" : false,
+  "locked" : false,
+  "show_loading" : false,
+  "type" : "logo",
+  "display_width" : null,
+  "default" : {
+    "override_inherited_src" : true,
+    "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/footer-logo.png",
+    "alt" : "footer-logo",
+    "suppress_company_name" : true,
+    "width" : 165,
+    "height" : 43
+  }
+}, {
+  "id" : "e5f3ef02-4807-19ef-f181-ea14ebc9a120",
+  "name" : "footer_excerpt",
+  "label" : "Footer Excerpt",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "<p>Behind the word mountains, far <br>from countries Vokalia.</p>"
+}, {
+  "id" : "390d2955-9377-9ea3-ad5c-98f2778717bf",
+  "name" : "contact_info_item",
+  "label" : "Contact Info Item",
+  "required" : false,
+  "locked" : false,
+  "occurrence" : {
+    "min" : null,
+    "max" : null,
+    "sorting_label_field" : "7e61b8df-9a6c-459d-83a0-30305a7ac77e",
+    "default" : null
+  },
+  "children" : [ {
+    "id" : "6f20a9bd-65a1-b43a-c9ae-b4f371ae5936",
+    "name" : "contact_info_icon",
+    "label" : "Contact Info Icon",
+    "required" : false,
+    "locked" : false,
+    "icon_set" : "fontawesome-5.14.0",
+    "type" : "icon",
+    "display_width" : null,
+    "default" : {
+      "name" : "Alternate Map Marker",
+      "unicode" : "f3c5",
+      "type" : "SOLID"
+    }
+  }, {
+    "id" : "7e61b8df-9a6c-459d-83a0-30305a7ac77e",
+    "name" : "contact_info_text",
+    "label" : "Contact Info Text",
+    "required" : false,
+    "locked" : false,
+    "type" : "richtext",
+    "display_width" : null,
+    "default" : "<p>1810 King Street, New York</p>"
+  } ],
+  "tab" : "CONTENT",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : [ ]
+}, {
+  "id" : "e2886640-f0df-6d84-f0bb-74ac8133a2f2",
+  "name" : "footer_link_widget",
+  "label" : "Footer Link Widget",
+  "required" : false,
+  "locked" : false,
+  "occurrence" : {
+    "min" : null,
+    "max" : null,
+    "sorting_label_field" : "dbd05656-c55a-2cf3-87b5-f594c8ab4fa3",
+    "default" : null
+  },
+  "children" : [ {
+    "id" : "dbd05656-c55a-2cf3-87b5-f594c8ab4fa3",
+    "name" : "footer_title",
+    "label" : "Footer Title",
+    "required" : false,
+    "locked" : false,
+    "type" : "richtext",
+    "display_width" : null,
+    "default" : "<h3>QUICK LINK</h3>"
+  }, {
+    "id" : "131dd729-c1a0-dc9f-fcc9-5dad0bb24798",
+    "name" : "footer_menu",
+    "label" : "Footer Menu",
+    "required" : false,
+    "locked" : false,
+    "type" : "menu",
+    "display_width" : null,
+    "default" : 82009260564
+  } ],
+  "tab" : "CONTENT",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : [ ]
+}, {
+  "id" : "725de969-c468-1e9b-31a6-9ef96549ffb6",
+  "name" : "shape_image_item",
+  "label" : "Shape Image Item",
+  "required" : false,
+  "locked" : false,
+  "occurrence" : {
+    "min" : null,
+    "max" : null,
+    "sorting_label_field" : "8f20de1b-1797-c6de-90dc-59f56e6807ed",
+    "default" : null
+  },
+  "children" : [ {
+    "id" : "8f20de1b-1797-c6de-90dc-59f56e6807ed",
+    "name" : "shape_image_number_class",
+    "label" : "Shape Image Number Class",
+    "help_text" : "Please add an image shape number class like \"shape-1\"",
+    "required" : false,
+    "locked" : false,
+    "allow_new_line" : false,
+    "type" : "text",
+    "display_width" : null
+  }, {
+    "id" : "9793508b-b63e-0a1e-6de7-1759fc656967",
+    "name" : "image_move_animation",
+    "label" : "Image Move Animation",
+    "required" : false,
+    "locked" : false,
+    "display" : "select",
+    "choices" : [ [ "scene", "Add Animation" ], [ "null", "Off Animation" ] ],
+    "multiple" : false,
+    "reordering_enabled" : true,
+    "preset" : null,
+    "type" : "choice",
+    "display_width" : null,
+    "default" : "scene"
+  }, {
+    "id" : "a44b937b-e15b-4cbe-f9f3-b18c74487840",
+    "name" : "animation_depth",
+    "label" : "Animation Depth",
+    "required" : false,
+    "locked" : false,
+    "allow_new_line" : false,
+    "type" : "text",
+    "display_width" : null,
+    "default" : "3"
+  }, {
+    "id" : "fa88283f-62ae-e849-6b2e-8106ecdc2af0",
+    "name" : "shape_image",
+    "label" : "Shape Image",
+    "required" : false,
+    "locked" : false,
+    "responsive" : true,
+    "resizable" : true,
+    "show_loading" : false,
+    "type" : "image",
+    "display_width" : null,
+    "default" : {
+      "size_type" : "auto",
+      "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/footer1.png",
+      "alt" : "footer1",
+      "loading" : "lazy",
+      "width" : 102,
+      "height" : 98,
+      "max_width" : 102,
+      "max_height" : 98
+    }
+  } ],
+  "tab" : "CONTENT",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : [ ]
+}, {
+  "id" : "d11fa1ae-c6e0-b53b-e822-13f89fe68874",
+  "name" : "copyright_text",
+  "label" : "Copyright Text",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "(c) {{ year }} {{ site_settings.company_name }} All Rights Reserved."
+}, {
+  "id" : "28b45868-8263-cacb-d8ee-699cdf008ba2",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "2441877f-6d50-1496-cb20-7f5c9fbd9c31",
+    "name" : "color_field",
+    "label" : "Color Field",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "61852b5c-ce8e-b5b4-056d-4b3eaefe6659",
+      "name" : "contact_info_icon_color",
+      "label" : "Contact Info Icon Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "897e9504-b47f-ffa8-a313-5b781f67ace2",
+      "name" : "social_icon_color",
+      "label" : "Social Icon Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#b4b5b7",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "9641f1c2-a010-2bdd-865e-fa8ec8772df9",
+      "name" : "social_icon_hover_color",
+      "label" : "Social Icon Hover Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "contact_info_icon_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "social_icon_color" : {
+        "color" : "#b4b5b7",
+        "opacity" : 100
+      },
+      "social_icon_hover_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }
+  }, {
+    "id" : "f9f33f5b-2ec0-bf1b-f817-53f59f6c6c13",
+    "name" : "copyright_alignment",
+    "label" : "Copyright Alignment",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "a77bf86c-0490-d398-8a95-56179ab76343",
+      "name" : "alignment",
+      "label" : "Alignment",
+      "required" : false,
+      "locked" : false,
+      "display" : "select",
+      "choices" : [ [ "left", "Left" ], [ "center", "Center" ], [ "right", "Right" ] ],
+      "multiple" : false,
+      "reordering_enabled" : true,
+      "preset" : null,
+      "type" : "choice",
+      "display_width" : null
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : { }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "color_field" : {
+      "contact_info_icon_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "social_icon_color" : {
+        "color" : "#b4b5b7",
+        "opacity" : 100
+      },
+      "social_icon_hover_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    },
+    "copyright_alignment" : { }
+  }
+}, {
+  "id" : "a564da38-beff-572e-adf0-2c869c59b2e0",
+  "name" : "social_item",
+  "label" : "Social Item",
+  "required" : false,
+  "locked" : false,
+  "occurrence" : {
+    "min" : null,
+    "max" : null,
+    "sorting_label_field" : "fe61f6ac-c861-5cd5-ce8a-0514a591acc0",
+    "default" : null
+  },
+  "children" : [ {
+    "id" : "fe61f6ac-c861-5cd5-ce8a-0514a591acc0",
+    "name" : "social_link",
+    "label" : "Social Link",
+    "required" : false,
+    "locked" : false,
+    "supported_types" : [ "EXTERNAL", "CONTENT", "FILE", "EMAIL_ADDRESS", "BLOG" ],
+    "show_advanced_rel_options" : false,
+    "type" : "link",
+    "display_width" : null,
+    "default" : {
+      "url" : {
+        "content_id" : null,
+        "type" : "EXTERNAL",
+        "href" : ""
+      },
+      "open_in_new_tab" : false,
+      "no_follow" : false
+    }
+  }, {
+    "id" : "32517eef-dbf2-5ca0-9746-b3cfb1b73da0",
+    "name" : "social_icon",
+    "label" : "Social Icon",
+    "required" : false,
+    "locked" : false,
+    "icon_set" : "fontawesome-6.4.2",
+    "type" : "icon",
+    "display_width" : null,
+    "default" : {
+      "name" : "Facebook F",
+      "unicode" : "f39e",
+      "type" : "REGULAR"
+    }
+  } ],
+  "tab" : "CONTENT",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : [ ]
+} ]

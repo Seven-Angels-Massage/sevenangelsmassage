@@ -1,0 +1,60 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  .contact-info-box {
+    background-color: rgba({{ module.style.color_field.contact_info_background_color.color|convert_rgb }}, {{ module.style.color_field.contact_info_background_color.opacity/100 }});
+  }
+  .contact-info-box {
+    {% if module.style.alignment.alignment =='left' %}text-align: left;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}text-align: center;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}text-align: right;{% endif %}
+  }
+  
+  .contact-info-box .icon {
+    background-color: rgba({{ module.style.color_field.contact_info_icon_background_color.color|convert_rgb }}, {{ module.style.color_field.contact_info_icon_background_color.opacity/100 }});
+    color: rgba({{ module.style.color_field.contact_info_icon_color.color|convert_rgb }}, {{ module.style.color_field.contact_info_icon_color.opacity/100 }});
+  }
+  {% if module.style.contact_info_icon_radius.overwrite %}
+  .contact-info-box .icon {
+    border-radius: {{ module.style.contact_info_icon_radius.value }}px;
+  }
+  {% endif %}
+  
+  .contact-info-box .icon {
+    {% if module.style.alignment.alignment =='left' %}
+    margin-left: 0;
+    margin-bottom: 35px;
+    {% endif %}
+    {% if module.style.alignment.alignment =='center'%}margin: 0 auto 35px;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}
+    margin-right: 0;
+    margin-bottom: 35px;
+    {% endif %}
+  }
+  
+  {% if module.style.contact_info_radius.overwrite %}
+    .contact-info-box {
+      border-radius: {{ module.style.contact_info_radius.value }}px;
+    }
+  {% endif %}
+  
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+<!-- Contact Info Start -->
+<div class="contact-info-box" data-aos="{{ module.animation_direction }}">
+  <div class="icon">
+    {% icon
+      name="{{ module.contact_info_icon.name }}"
+      style="{{ module.contact_info_icon.type }}"
+      unicode="{{ module.contact_info_icon.unicode }}"
+      icon_set="{{ module.contact_info_icon.icon_set }}"
+    %}
+  </div>
+  <div class="info">
+    {{ module.info_title }}
+    {{ module.info_excerpt }}
+  </div>
+</div>
+<!-- Contact Info End -->

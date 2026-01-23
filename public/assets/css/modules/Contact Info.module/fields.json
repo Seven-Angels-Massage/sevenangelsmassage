@@ -1,0 +1,253 @@
+[ {
+  "id" : "938b96e9-fde2-3ff5-639b-711e00145bd7",
+  "name" : "animation_direction",
+  "label" : "Animation Direction",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "fade-up", "Fade Up" ], [ "fade-down", "Fade Down" ], [ "fade-left", "Fade Left" ], [ "fade-right", "Fade Right" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "fade-up"
+}, {
+  "id" : "aa786379-052f-4ddd-1f75-04dfecc0deb9",
+  "name" : "contact_info_icon",
+  "label" : "Contact Info Icon",
+  "required" : false,
+  "locked" : false,
+  "icon_set" : "fontawesome-5.14.0",
+  "type" : "icon",
+  "display_width" : null,
+  "default" : {
+    "name" : "Alternate Phone",
+    "unicode" : "f879",
+    "type" : "SOLID"
+  }
+}, {
+  "id" : "2e537910-5da3-b1d0-f92b-d61010ac7aa6",
+  "name" : "info_title",
+  "label" : "Info Title",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "<h3>Phone Number</h3>"
+}, {
+  "id" : "76942edb-1943-4f00-6253-a834edbd5b7f",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "8616da31-cd25-d600-a4b7-9ec93fe31aee",
+    "name" : "color_field",
+    "label" : "Color Field",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "2923c4ef-5743-3a15-efab-d5474ca0f56f",
+      "name" : "contact_info_background_color",
+      "label" : "Contact Info Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "15a59d89-a628-a7cf-ede0-4cace1eb5475",
+      "name" : "contact_info_icon_background_color",
+      "label" : "Contact Info Icon Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "b7c0c0cb-0e32-76b3-0b2a-660fd54439d8",
+      "name" : "contact_info_icon_color",
+      "label" : "Contact Info Icon Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "contact_info_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "contact_info_icon_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "contact_info_icon_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }
+  }, {
+    "id" : "70698be6-6b92-2b46-b862-9491e33cdad5",
+    "name" : "alignment",
+    "label" : "Alignment",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "302d634b-5517-07e0-5d90-e469de09dedd",
+      "name" : "alignment",
+      "label" : "Alignment",
+      "required" : false,
+      "locked" : false,
+      "display" : "select",
+      "choices" : [ [ "left", "Left" ], [ "center", "Center" ], [ "right", "Right" ] ],
+      "multiple" : false,
+      "reordering_enabled" : true,
+      "preset" : null,
+      "type" : "choice",
+      "display_width" : null,
+      "default" : "center"
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "alignment" : "center"
+    }
+  }, {
+    "id" : "b11b5dc6-22c9-1726-6dba-8a2ceccdc1d1",
+    "name" : "contact_info_radius",
+    "label" : "Contact Info Radius",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "6e6ec5d1-de42-6c56-e970-f47486586abe",
+      "name" : "overwrite",
+      "label" : "Overwrite",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "79624784-d6e6-a560-ea50-4e9e133ab21e",
+      "name" : "value",
+      "label" : "Value",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 1,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 5
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "overwrite" : false,
+      "value" : 5
+    }
+  }, {
+    "id" : "056cdfe5-38a1-3194-602e-accc72a11be7",
+    "name" : "contact_info_icon_radius",
+    "label" : "Contact Info Icon Radius",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "1851ede7-9e5b-3aff-9ded-81d64a4f9e95",
+      "name" : "overwrite",
+      "label" : "Overwrite",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "598d65a8-42d6-ae34-4bb1-288a40029d73",
+      "name" : "value",
+      "label" : "Value",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 1,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 5
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "overwrite" : false,
+      "value" : 5
+    }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "color_field" : {
+      "contact_info_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "contact_info_icon_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "contact_info_icon_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    },
+    "alignment" : {
+      "alignment" : "center"
+    },
+    "contact_info_radius" : {
+      "overwrite" : false,
+      "value" : 5
+    },
+    "contact_info_icon_radius" : {
+      "overwrite" : false,
+      "value" : 5
+    }
+  }
+}, {
+  "id" : "e3c58fa4-6b9e-46dd-561f-0063b2c096ac",
+  "name" : "info_excerpt",
+  "label" : "Info Excerpt",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "<p>+8340 - 3894 - 8938 <br>+0384 - 7488 - 6353</p>"
+} ]

@@ -1,0 +1,76 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  {% if module.style.image_border_radius.overwrite %}
+    .about-us-gallery .gallery-thumbnail .thumbnail img {
+      border-radius: {{ module.style.image_border_radius.value }}px;
+      box-shadow: 0 30px 90px 0 rgba(26, 46, 85, 0.1);
+    }
+  {% endif %}
+  
+  .about-us-gallery .gallery-thumbnail .thumbnail.thumbnail-1 {
+    {% if module.style.alignment.alignment =='left' %}text-align: left;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}text-align: center;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}text-align: right;{% endif %}
+  }
+  
+  {% if module.style.image_padding.overwrite %}
+  .about-us-gallery .gallery-thumbnail .thumbnail.thumbnail-2 img {
+    padding: {{ module.style.image_padding.value }}px;
+  }
+  {% endif %}
+  
+  .about-us-gallery .gallery-thumbnail .thumbnail.thumbnail-2 img {
+    background-color: rgba({{ module.style.image_background_color.color|convert_rgb }}, {{ module.style.image_background_color.opacity/100 }});
+  }
+  
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+<div class="about-us-gallery {{ module.custom_class }}" data-aos="{{ module.animation_direction }}">
+  <div class="gallery-thumbnail">
+    <div class="thumbnail thumbnail-1">
+      {% if module.about_image_one.src %}
+        {% set sizeAttrs = 'width="{{ module.about_image_one.width }}" height="{{ module.about_image_one.height }}"' %}
+        {% if module.about_image_one.size_type == 'auto' %}
+          {% set sizeAttrs = 'width="{{ module.about_image_one.width }}" height="{{ module.about_image_one.height }}" style="max-width: 100%; height: auto;"' %}
+        {% elif module.about_image_one.size_type == 'auto_custom_max' %}
+          {% set sizeAttrs = 'width="{{ module.about_image_one.max_width }}" height="{{ module.about_image_one.max_height }}" style="max-width: 100%; height: auto;"' %}
+        {% endif %}
+         {% set loadingAttr = module.about_image_one.loading != 'disabled' ? 'loading="{{ module.about_image_one.loading }}"' : '' %}
+        <img src="{{ module.about_image_one.src }}" alt="{{ module.about_image_one.alt }}" width="378" height="485" {{ loadingAttr }} {{ sizeAttrs }}>
+      {% endif %}
+    </div>
+    <div class="thumbnail thumbnail-2">
+      {% if module.about_image_two.src %}
+        {% set sizeAttrs = 'width="{{ module.about_image_two.width }}" height="{{ module.about_image_two.height }}"' %}
+        {% if module.about_image_two.size_type == 'auto' %}
+          {% set sizeAttrs = 'width="{{ module.about_image_two.width }}" height="{{ module.about_image_two.height }}" style="max-width: 100%; height: auto;"' %}
+        {% elif module.about_image_two.size_type == 'auto_custom_max' %}
+          {% set sizeAttrs = 'width="{{ module.about_image_two.max_width }}" height="{{ module.about_image_two.max_height }}" style="max-width: 100%; height: auto;"' %}
+        {% endif %}
+         {% set loadingAttr = module.about_image_two.loading != 'disabled' ? 'loading="{{ module.about_image_two.loading }}"' : '' %}
+        <img src="{{ module.about_image_two.src }}" alt="{{ module.about_image_two.alt }}" width="246" height="266" {{ loadingAttr }} {{ sizeAttrs }}>
+      {% endif %}
+    </div>
+  </div>
+  <div class="shape-group">
+    {% for item in module.shape_image_item %}
+    <div class="{{ item.shape_image_number_class }} {{ item.image_move_animation }}">
+      <span data-depth="{{ item.animation_depth }}">
+        {% if item.about_shape_image.src %}
+          {% set sizeAttrs = 'width="{{ item.about_shape_image.width }}" height="{{ item.about_shape_image.height }}"' %}
+          {% if item.about_shape_image.size_type == 'auto' %}
+            {% set sizeAttrs = 'width="{{ item.about_shape_image.width }}" height="{{ item.about_shape_image.height }}" style="max-width: 100%; height: auto;"' %}
+          {% elif item.about_shape_image.size_type == 'auto_custom_max' %}
+            {% set sizeAttrs = 'width="{{ item.about_shape_image.max_width }}" height="{{ item.about_shape_image.max_height }}" style="max-width: 100%; height: auto;"' %}
+          {% endif %}
+           {% set loadingAttr = item.about_shape_image.loading != 'disabled' ? 'loading="{{ item.about_shape_image.loading }}"' : '' %}
+          <img src="{{ item.about_shape_image.src }}" alt="{{ item.about_shape_image.alt }}" {{ loadingAttr }} {{ sizeAttrs }}>
+        {% endif %}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+</div>

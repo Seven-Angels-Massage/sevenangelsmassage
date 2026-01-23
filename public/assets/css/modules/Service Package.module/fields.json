@@ -1,0 +1,487 @@
+[ {
+  "id" : "f05da2e4-7308-b9f5-f969-c82ec54097c8",
+  "name" : "animation_direction",
+  "label" : "Animation Direction",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "fade-up", "Fade Up" ], [ "fade-down", "Fade Down" ], [ "fade-left", "Fade Left" ], [ "fade-right", "Fade Right" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "fade-up"
+}, {
+  "id" : "21eae13c-3259-a9a7-3cff-1994da8855d1",
+  "name" : "extra_class",
+  "label" : "Extra Class",
+  "help_text" : "If you want to customize the style in your own way, then create an extra \"CLASS\" and style it based on that. ",
+  "required" : false,
+  "locked" : false,
+  "allow_new_line" : false,
+  "type" : "text",
+  "display_width" : null
+}, {
+  "id" : "29bb16be-263d-db3a-dd5c-4f2b4b2a0e3f",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "84de83fd-270c-fb63-a54c-40b0b47f8a44",
+    "name" : "alignment",
+    "label" : "Alignment",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "ec088209-746e-3121-f1df-38dbfe0af4bf",
+      "name" : "alignment",
+      "label" : "Alignment",
+      "required" : false,
+      "locked" : false,
+      "display" : "select",
+      "choices" : [ [ "left", "Left" ], [ "center", "Center" ], [ "right", "Right" ] ],
+      "multiple" : false,
+      "reordering_enabled" : true,
+      "preset" : null,
+      "type" : "choice",
+      "display_width" : null,
+      "default" : "left"
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "alignment" : "left"
+    }
+  }, {
+    "id" : "773fdf20-2f2e-c246-4195-ea906ffac122",
+    "name" : "image_border_radius",
+    "label" : "Image Border Radius",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "3020ecf5-d2dc-9253-bc93-21c7ab419587",
+      "name" : "overwrite",
+      "label" : "Overwrite",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "674cf1c4-42c9-92ee-8c31-6b08c0a37f72",
+      "name" : "value_top_left",
+      "label" : "Value Top Left",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 1,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 5
+    }, {
+      "id" : "f4d347a3-48ea-31cd-46e4-a6d3328e0f61",
+      "name" : "value_top_right",
+      "label" : "Value Top right",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 1,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 5
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "overwrite" : false,
+      "value_top_left" : 5,
+      "value_top_right" : 5
+    }
+  }, {
+    "id" : "08089ff0-8fc8-b280-fa49-8e0e5b02ea70",
+    "name" : "content_border_radius",
+    "label" : "Content Border Radius",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "70cbf55d-c2e2-7aec-4fc8-e10314f7b66c",
+      "name" : "overwrite",
+      "label" : "Overwrite",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "b10aa781-5233-dfbd-6f9f-653e41d94aaa",
+      "name" : "value_bottom_left",
+      "label" : "Value Bottom Left",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 1,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 5
+    }, {
+      "id" : "0e396ef4-5522-ce2e-9bb6-a81dbcba5383",
+      "name" : "value_top_right",
+      "label" : "Value Bottom Right",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 1,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 5
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "overwrite" : false,
+      "value_bottom_left" : 5,
+      "value_top_right" : 5
+    }
+  }, {
+    "id" : "2adf7860-aff5-e574-375f-e5537bfe79fd",
+    "name" : "price_border_radius",
+    "label" : "Price Border Radius",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "19df6c76-e1fa-0c02-e7fb-c2f7dc5742c7",
+      "name" : "overwrite",
+      "label" : "Overwrite",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "f4eebbb0-1565-8a5e-9db0-091929af0dac",
+      "name" : "value",
+      "label" : "Value",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 1,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 50
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "overwrite" : false,
+      "value" : 50
+    }
+  }, {
+    "id" : "244d2636-38e0-89ab-e530-332fa2bbd5aa",
+    "name" : "color_field",
+    "label" : "Color Field",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "80af7569-ca67-6a47-4652-2409961177c0",
+      "name" : "price_label_background_color",
+      "label" : "Price Label Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "cc1675f7-7d58-4ac5-d368-627e5c77e416",
+      "name" : "price_label_text_color",
+      "label" : "Price Label Text Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "6d02906d-bace-cd1b-9bc6-5731e85c23ec",
+      "name" : "yoga_package_content_background_color",
+      "label" : "Yoga Package Content Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      }
+    }, {
+      "id" : "b42b8e60-63ca-3ab7-7a70-7ef8fa3d7c82",
+      "name" : "meta_icon_color",
+      "label" : "Meta Icon Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#808080",
+        "opacity" : 100
+      }
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "price_label_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "price_label_text_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "yoga_package_content_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "meta_icon_color" : {
+        "color" : "#808080",
+        "opacity" : 100
+      }
+    }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "alignment" : {
+      "alignment" : "left"
+    },
+    "image_border_radius" : {
+      "overwrite" : false,
+      "value_top_left" : 5,
+      "value_top_right" : 5
+    },
+    "content_border_radius" : {
+      "overwrite" : false,
+      "value_bottom_left" : 5,
+      "value_top_right" : 5
+    },
+    "price_border_radius" : {
+      "overwrite" : false,
+      "value" : 50
+    },
+    "color_field" : {
+      "price_label_background_color" : {
+        "color" : "#e38e6a",
+        "opacity" : 100
+      },
+      "price_label_text_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "yoga_package_content_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 100
+      },
+      "meta_icon_color" : {
+        "color" : "#808080",
+        "opacity" : 100
+      }
+    }
+  }
+}, {
+  "id" : "00ddef48-b726-6e5c-fc1a-e4e80be81d66",
+  "name" : "service_item",
+  "label" : "Service Item",
+  "required" : false,
+  "locked" : false,
+  "occurrence" : {
+    "min" : null,
+    "max" : null,
+    "sorting_label_field" : "6637759c-e97d-1857-5411-f82decdb80c6",
+    "default" : null
+  },
+  "children" : [ {
+    "id" : "a2b1e3aa-345a-8d4f-b5e7-8032562ebfaf",
+    "name" : "service_link",
+    "label" : "Service Link",
+    "required" : false,
+    "locked" : false,
+    "supported_types" : [ "EXTERNAL", "CONTENT", "FILE", "EMAIL_ADDRESS", "BLOG" ],
+    "show_advanced_rel_options" : false,
+    "type" : "link",
+    "display_width" : null,
+    "default" : {
+      "url" : {
+        "content_id" : null,
+        "type" : "EXTERNAL",
+        "href" : ""
+      },
+      "open_in_new_tab" : false,
+      "no_follow" : false
+    }
+  }, {
+    "id" : "af0bb131-7536-ed3c-aac8-e08a35d451b5",
+    "name" : "service_image",
+    "label" : "Service Image",
+    "required" : false,
+    "locked" : false,
+    "responsive" : true,
+    "resizable" : true,
+    "show_loading" : false,
+    "type" : "image",
+    "display_width" : null,
+    "default" : {
+      "size_type" : "auto",
+      "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/yoga-package-1.jpg",
+      "alt" : "yoga-package-1",
+      "loading" : "lazy",
+      "width" : 370,
+      "height" : 430,
+      "max_width" : 370,
+      "max_height" : 430
+    }
+  }, {
+    "id" : "0509e976-d838-517e-994e-b9fd7707018c",
+    "name" : "service_price",
+    "label" : "Service Price",
+    "required" : false,
+    "locked" : false,
+    "type" : "richtext",
+    "display_width" : null,
+    "default" : "$30"
+  }, {
+    "id" : "7b13bf8a-75f0-facc-3cbe-7ba526636606",
+    "name" : "course_name",
+    "label" : "Course Name",
+    "required" : false,
+    "locked" : false,
+    "type" : "richtext",
+    "display_width" : null,
+    "default" : "Meditation"
+  }, {
+    "id" : "6637759c-e97d-1857-5411-f82decdb80c6",
+    "name" : "service_title",
+    "label" : "Service Title",
+    "required" : false,
+    "locked" : false,
+    "type" : "richtext",
+    "display_width" : null,
+    "default" : "<h4 class=\"title\">200 Hour YTT Course</h4>"
+  }, {
+    "id" : "63f38f86-3123-1d51-f60d-3c263f6dbae9",
+    "name" : "service_meta_list",
+    "label" : "Service Meta List",
+    "required" : false,
+    "locked" : false,
+    "occurrence" : {
+      "min" : null,
+      "max" : null,
+      "sorting_label_field" : "d1f97610-e69a-41f2-5a32-c3f50eac5539",
+      "default" : null
+    },
+    "children" : [ {
+      "id" : "511904f0-a23b-0720-8461-508165506b22",
+      "name" : "service_meta_icon",
+      "label" : "Service Meta Icon",
+      "required" : false,
+      "locked" : false,
+      "icon_set" : "fontawesome-5.14.0",
+      "type" : "icon",
+      "display_width" : null,
+      "default" : {
+        "name" : "Alternate Calendar",
+        "unicode" : "f073",
+        "type" : "REGULAR"
+      }
+    }, {
+      "id" : "d1f97610-e69a-41f2-5a32-c3f50eac5539",
+      "name" : "service_meta_text",
+      "label" : "Service Meta Text",
+      "required" : false,
+      "locked" : false,
+      "type" : "richtext",
+      "display_width" : null,
+      "default" : "24.07.2022"
+    } ],
+    "tab" : "CONTENT",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "service_meta_icon" : {
+        "name" : "Alternate Calendar",
+        "unicode" : "f073",
+        "type" : "REGULAR"
+      },
+      "service_meta_text" : "24.07.2022"
+    }
+  } ],
+  "tab" : "CONTENT",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "service_link" : {
+      "url" : {
+        "content_id" : null,
+        "type" : "EXTERNAL",
+        "href" : ""
+      },
+      "open_in_new_tab" : false,
+      "no_follow" : false
+    },
+    "service_image" : {
+      "size_type" : "auto",
+      "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/yoga-package-1.jpg",
+      "alt" : "yoga-package-1",
+      "loading" : "lazy",
+      "width" : 370,
+      "height" : 430,
+      "max_width" : 370,
+      "max_height" : 430
+    },
+    "service_price" : "$30",
+    "course_name" : "Meditation",
+    "service_title" : "<h4 class=\"title\">200 Hour YTT Course</h4>",
+    "service_meta_list" : {
+      "service_meta_icon" : {
+        "name" : "Alternate Calendar",
+        "unicode" : "f073",
+        "type" : "REGULAR"
+      },
+      "service_meta_text" : "24.07.2022"
+    }
+  }
+} ]

@@ -1,0 +1,42 @@
+
+.features-list .features-box {
+  padding: 0;
+  background-color: transparent;
+  box-shadow: none;
+  display: flex;
+  text-align: left;
+  margin-bottom: 36px;
+  transition: var(--transition);
+}
+.features-list .features-box .icon {
+  height: 84px;
+  width: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  margin-right: 28px;
+  transition: var(--transition);
+}
+.features-list .features-box .icon svg{
+  width: 40px;
+  height: 40px;
+  transition: var(--transition);
+}
+.features-list .features-box .icon svg path{
+  stroke: currentColor;
+}
+@media only screen and (max-width: 575px) {
+  .features-list .features-box .icon {
+    margin-right: 15px;
+  }
+}
+.features-list .features-box .content {
+  flex: 1;
+}
+@media only screen and (max-width: 575px) {
+  .features-list .features-box .content h4 {
+    font-size: 20px;
+  }
+}
+

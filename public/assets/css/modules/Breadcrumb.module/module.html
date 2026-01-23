@@ -1,0 +1,68 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  .page-banner-content {
+    {% if module.style.alignment.alignment =='left' %}text-align: left;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}text-align: center;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}text-align: right;{% endif %}
+  }
+  
+  .page-banner-content ul {
+    {% if module.style.alignment.alignment =='left' %}justify-content: start;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}justify-content: center;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}text-align: end;{% endif %}
+  }
+  
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+
+{% if module.layout == 'with-out-image' %}
+<div class="page-banner-content {{ module.extra_class }}">
+  {{ module.page_title }}
+  <ul>
+    {% for item in module.breadcrumb_item %}
+    <li>
+      {% set href = item.breadcrumb_link.url.href %}
+      {% if item.breadcrumb_link.url.type is equalto "EMAIL_ADDRESS" %}
+      {% set href = "mailto:" + href %}
+      {% endif %}
+      <a href="{{ href }}"
+         {% if item.breadcrumb_link.open_in_new_tab %}target="_blank"{% endif %}
+         {% if item.breadcrumb_link.rel %}rel="{{ item.breadcrumb_link.rel }}"{% endif %}
+         >
+        {{ item.breadcrumb_text }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% else %}
+<!-- Page Banner Section Start -->
+    <div class="page-banner-section section {{ module.extra_class }}" style="background-image: url({{ module.style.section_background_image.src }}); background-color: rgba({{ module.style.section_background_color.color|convert_rgb }}, 
+{{ module.style.section_background_color.opacity/100 }})">
+        <div class="container">
+            <div class="page-banner-content">
+                {{ module.page_title }}
+                <ul>
+    {% for item in module.breadcrumb_item %}
+    <li>
+      {% set href = item.breadcrumb_link.url.href %}
+      {% if item.breadcrumb_link.url.type is equalto "EMAIL_ADDRESS" %}
+      {% set href = "mailto:" + href %}
+      {% endif %}
+      <a href="{{ href }}"
+         {% if item.breadcrumb_link.open_in_new_tab %}target="_blank"{% endif %}
+         {% if item.breadcrumb_link.rel %}rel="{{ item.breadcrumb_link.rel }}"{% endif %}
+         >
+        {{ item.breadcrumb_text }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Page Banner Section End -->
+{% endif %}

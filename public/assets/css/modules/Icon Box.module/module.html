@@ -1,0 +1,55 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  {% if module.style.icon_box_border_radius.overwrite %}
+  .feature-icon-box {
+    border-radius: {{ module.style.icon_box_border_radius.value }}px;
+  }
+  {% endif %}
+  .feature-icon-box {
+    {% if module.style.alignment.alignment =='left' %}text-align: left;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}text-align: center;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}text-align: right;{% endif %}
+    background-color: rgba({{ module.style.color_field.feature_icon_box_background_color.color|convert_rgb }}, {{ module.style.color_field.feature_icon_box_background_color.opacity/100 }});
+  }
+  .feature-icon-box:hover {
+    background-color: rgba({{ module.style.color_field.feature_icon_box_background_hover_color.color|convert_rgb }}, {{ module.style.color_field.feature_icon_box_background_hover_color.opacity/100 }});
+  }
+   .feature-icon-box .icon svg{
+      width: 56px;
+      height: 56px;
+      color: rgba({{ module.style.color_field.icon_color.color|convert_rgb }}, {{ module.style.color_field.icon_color.opacity/100 }});
+      
+    }
+    .feature-icon-box:hover .icon svg{
+      color: rgba({{ module.style.color_field.icon_hover_color.color|convert_rgb }}, {{ module.style.color_field.icon_hover_color.opacity/100 }});
+    }
+  .feature-icon-box:hover .content h4 {
+      color: rgba({{ module.style.color_field.title_hover_color.color|convert_rgb }}, {{ module.style.color_field.title_hover_color.opacity/100 }});
+    }
+    .feature-icon-box:hover .content p {
+      color: rgba({{ module.style.color_field.excerpt_hover_color.color|convert_rgb }}, {{ module.style.color_field.excerpt_hover_color.opacity/100 }});
+    }
+  
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+<div class="feature-icon-box" data-vivus-hover data-aos="{{ module.animation_direction }}">
+  <div class="icon">
+    {% if module.icon_image.src %}
+      {% set sizeAttrs = 'width="{{ module.icon_image.width }}" height="{{ module.icon_image.height }}"' %}
+      {% if module.icon_image.size_type == 'auto' %}
+        {% set sizeAttrs = 'width="{{ module.icon_image.width }}" height="{{ module.icon_image.height }}" style="max-width: 100%; height: auto;"' %}
+      {% elif module.icon_image.size_type == 'auto_custom_max' %}
+        {% set sizeAttrs = 'width="{{ module.icon_image.max_width }}" height="{{ module.icon_image.max_height }}" style="max-width: 100%; height: auto;"' %}
+      {% endif %}
+       {% set loadingAttr = module.icon_image.loading != 'disabled' ? 'loading="{{ module.icon_image.loading }}"' : '' %}
+      <img class="svgInject" src="{{ module.icon_image.src }}" alt="{{ module.icon_image.alt }}" {{ loadingAttr }} {{ sizeAttrs }}>
+    {% endif %}
+  </div>
+  <div class="content">
+    {{ module.box_title }}
+    {{ module.excerpt }}
+  </div>
+</div>

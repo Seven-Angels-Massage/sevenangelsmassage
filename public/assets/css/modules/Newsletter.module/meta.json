@@ -1,0 +1,9 @@
+{
+  "global" : false,
+  "content_types" : [ "LANDING_PAGE", "SITE_PAGE", "BLOG_LISTING", "BLOG_POST" ],
+  "host_template_types" : [ "PAGE", "BLOG_POST", "BLOG_LISTING" ],
+  "module_id" : 256575340252,
+  "label" : "Newsletter",
+  "icon" : "../../../Relxo%20child/images/module-icons/newsletter.svg",
+  "is_available_for_new_content" : true
+}

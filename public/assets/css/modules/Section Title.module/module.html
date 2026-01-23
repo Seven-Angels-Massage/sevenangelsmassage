@@ -1,0 +1,22 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  .section-heading{
+    {% if module.style.alignment.alignment =='left' %}text-align: left;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}text-align: center;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}text-align: right;{% endif %}
+  }
+  .section-heading p {
+    {% if module.style.alignment.alignment =='left' %} margin: auto; margin-left: 0;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}margin: auto;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}margin: auto;margin-right: 0;{% endif %}
+  }
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+
+<div class="section-heading" data-aos="{{ module.animation_direction }}">
+  {{ module.title }}
+  {{ module.excerpt }}
+</div>

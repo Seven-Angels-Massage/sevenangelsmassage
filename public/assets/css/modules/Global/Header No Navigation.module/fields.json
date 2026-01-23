@@ -1,0 +1,383 @@
+[ {
+  "id" : "39986df9-9293-072e-f7d2-58b678525a52",
+  "name" : "logo",
+  "label" : "Logo",
+  "required" : false,
+  "locked" : false,
+  "show_loading" : false,
+  "type" : "logo",
+  "display_width" : null,
+  "default" : {
+    "override_inherited_src" : true,
+    "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/logo.png",
+    "alt" : "logo",
+    "suppress_company_name" : true,
+    "width" : 165,
+    "height" : 43
+  }
+}, {
+  "id" : "86d409af-240e-e59a-24df-6d0ba9412dea",
+  "name" : "search_icon",
+  "label" : "Search Icon",
+  "required" : false,
+  "locked" : false,
+  "icon_set" : "fontawesome-5.14.0",
+  "type" : "icon",
+  "display_width" : null,
+  "default" : {
+    "name" : "Search",
+    "unicode" : "f002",
+    "type" : "SOLID"
+  }
+}, {
+  "id" : "3fc93cc9-1a73-d156-4232-7fafb8bdbb19",
+  "name" : "button_type",
+  "label" : "Button Type",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "btn-primary btn-secondary-hover", "Filled" ], [ "btn-light-outline btn-primary-hover", "Outline" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "btn-primary btn-secondary-hover"
+}, {
+  "id" : "5e8decec-4acd-8c25-6c14-e6c010dbeafe",
+  "name" : "button_rounded",
+  "label" : "Button Rounded",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "btn-radius", "Radius" ], [ "null", "With Out Radius" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "null"
+}, {
+  "id" : "ef5e8e07-2a11-1038-0545-4667edabbe7e",
+  "name" : "button_size",
+  "label" : "Button Size",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "btn-lg", "Large" ], [ "btn-md", "Medium" ], [ "btn-sm", "Small" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "btn-md"
+}, {
+  "id" : "2bd85e09-9671-f50e-d0e5-ed6eafaf2873",
+  "name" : "button_link",
+  "label" : "Button Link",
+  "required" : false,
+  "locked" : false,
+  "supported_types" : [ "EXTERNAL", "CONTENT", "FILE", "EMAIL_ADDRESS", "BLOG" ],
+  "show_advanced_rel_options" : false,
+  "type" : "link",
+  "display_width" : null,
+  "default" : {
+    "url" : {
+      "content_id" : null,
+      "type" : "EXTERNAL",
+      "href" : ""
+    },
+    "open_in_new_tab" : false,
+    "no_follow" : false
+  }
+}, {
+  "id" : "94840f1d-bf6c-56b6-3784-6702fb727095",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "42dbd573-0bc6-0cff-5cce-e625e47964d4",
+    "name" : "header_background_color",
+    "label" : "Header Background Color",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "de1af311-082b-87f5-075f-531c9f1a0c02",
+      "name" : "enable",
+      "label" : "Enable",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "a97840fd-8306-e50f-82c0-115e0edfe404",
+      "name" : "header_background_color",
+      "label" : "Header Background Color",
+      "required" : false,
+      "locked" : false,
+      "type" : "color",
+      "display_width" : null,
+      "default" : {
+        "color" : "#FFFFFF",
+        "opacity" : 0
+      }
+    }, {
+      "id" : "cf950411-1083-cc75-759f-2afcf96ca3bc",
+      "name" : "header_border",
+      "label" : "Header Border",
+      "required" : false,
+      "locked" : false,
+      "allow_custom_border_sides" : false,
+      "type" : "border",
+      "display_width" : null,
+      "default" : {
+        "bottom" : {
+          "style" : "solid",
+          "color" : "#FFFFFF",
+          "opacity" : 50,
+          "width" : {
+            "value" : 1,
+            "units" : "px"
+          }
+        }
+      }
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "enable" : false,
+      "header_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 0
+      },
+      "header_border" : {
+        "bottom" : {
+          "style" : "solid",
+          "color" : "#FFFFFF",
+          "opacity" : 50,
+          "width" : {
+            "value" : 1,
+            "units" : "px"
+          }
+        }
+      }
+    }
+  }, {
+    "id" : "73b8786f-cc7c-1129-bd23-a9caf59a4135",
+    "name" : "button_primary_background_color",
+    "label" : "Button Primary Background Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "f82cd418-e3c5-dbb0-d33b-556ca7cdc6b4",
+    "name" : "button_primary_hover_background_color",
+    "label" : "Button Primary Hover Background Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#151d28",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "89f9a995-1d7c-7532-fbbc-7a5892a50350",
+    "name" : "button_primary_border_color",
+    "label" : "Button Primary Border Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "c1793586-bcd7-8436-9858-26bb5a9d8bb8",
+    "name" : "button_primary_hover_border_color",
+    "label" : "Button Primary Hover Border Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#151d28",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "7edb0cd3-2489-3492-4741-0f016b71f175",
+    "name" : "button_light_outline_border_color",
+    "label" : "Button Light Outline Border Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "b3c863e5-41f7-894c-33b9-921d7fcef692",
+    "name" : "button_text_color",
+    "label" : "Button Text Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "233d34f7-b973-1503-d53e-8a52d758b505",
+    "name" : "button_hover_text_color",
+    "label" : "Button Hover Text Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "d5587a3d-372e-7cb0-0de4-ba5a3663f425",
+    "name" : "button_light_outline_background_color",
+    "label" : "Button Light Outline Background Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "5d550a60-f7f1-41f3-316e-72e4b04bc205",
+    "name" : "button_light_outline_hover_border_color",
+    "label" : "Button Light Outline Hover Border Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "84ebf567-fc95-1f2b-1cec-516c8b9e5fdd",
+    "name" : "button_light_outline_hover_background_color",
+    "label" : "Button Light Outline Hover Background Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    }
+  }, {
+    "id" : "158b500a-0ef2-2643-89dd-f74c7999d65b",
+    "name" : "button_outline_text_hover_color",
+    "label" : "Button Outline Text Hover Color",
+    "required" : false,
+    "locked" : false,
+    "type" : "color",
+    "display_width" : null,
+    "default" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "header_background_color" : {
+      "enable" : false,
+      "header_background_color" : {
+        "color" : "#FFFFFF",
+        "opacity" : 0
+      },
+      "header_border" : {
+        "bottom" : {
+          "style" : "solid",
+          "color" : "#FFFFFF",
+          "opacity" : 50,
+          "width" : {
+            "value" : 1,
+            "units" : "px"
+          }
+        }
+      }
+    },
+    "button_primary_background_color" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    },
+    "button_primary_hover_background_color" : {
+      "color" : "#151d28",
+      "opacity" : 100
+    },
+    "button_primary_border_color" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    },
+    "button_primary_hover_border_color" : {
+      "color" : "#151d28",
+      "opacity" : 100
+    },
+    "button_light_outline_border_color" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    },
+    "button_text_color" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    },
+    "button_hover_text_color" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    },
+    "button_light_outline_background_color" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    },
+    "button_light_outline_hover_border_color" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    },
+    "button_light_outline_hover_background_color" : {
+      "color" : "#e38e6a",
+      "opacity" : 100
+    },
+    "button_outline_text_hover_color" : {
+      "color" : "#FFFFFF",
+      "opacity" : 100
+    }
+  }
+}, {
+  "id" : "439709ed-51a7-624d-3b1b-0b9f01682826",
+  "name" : "button_text",
+  "label" : "Button Text",
+  "required" : false,
+  "locked" : false,
+  "allow_new_line" : false,
+  "type" : "text",
+  "display_width" : null,
+  "default" : "Get Free Consultancy"
+} ]

@@ -1,0 +1,27 @@
+
+.feature-icon-box {
+  padding: 30px 30px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+  transition: var(--transition);
+}
+@media only screen and (max-width: 767px) {
+  .feature-icon-box {
+    padding: 20px 20px;
+  }
+}
+
+
+
+.feature-icon-box .icon {
+  margin-bottom: 30px;
+}
+.feature-icon-box .icon svg path{
+  stroke: currentColor;
+}
+.feature-icon-box .content h4 {
+}
+.feature-icon-box .content p {
+}

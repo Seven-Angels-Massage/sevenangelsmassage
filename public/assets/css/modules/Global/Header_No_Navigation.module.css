@@ -1,0 +1,101 @@
+@-webkit-keyframes fadeInDown {
+    from {
+      transform: translate3d(0, -100%, 0);
+      opacity: 0;
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+    }
+  }
+  @keyframes fadeInDown {
+    from {
+      transform: translate3d(0, -100%, 0);
+      opacity: 0;
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+    }
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--header-height);
+    z-index: 111;
+    transition: var(--transition);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  }
+  @media only screen and (min-width: 992px) and (max-width: 1199px), only screen and (min-width: 768px) and (max-width: 991px), only screen and (max-width: 767px) {
+    .header {
+      padding: 15px 0;
+    }
+  }
+  .header-sticky.is-sticky {
+    position: -webkit-sticky;
+    position: fixed;
+    top: 0;
+    background-color: var(--header-background-color);
+    border: none;
+    -webkit-animation-name: fadeInDown;
+            animation-name: fadeInDown;
+    -webkit-animation-duration: 1s;
+            animation-duration: 1s;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+    -webkit-animation-fill-mode: both;
+            animation-fill-mode: both;
+  }
+  @media only screen and (min-width: 768px) and (max-width: 991px), only screen and (max-width: 767px) {
+    .header-left {
+      display: none;
+    }
+  }
+  .header-center {
+    max-width: 240px;
+  }
+  @media only screen and (min-width: 768px) and (max-width: 991px), only screen and (max-width: 767px) {
+    .header-center {
+      max-width: none;
+    }
+  }
+  @media only screen and (max-width: 767px) {
+    .header-center {
+      min-height: auto;
+    }
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  @media only screen and (min-width: 768px) and (max-width: 991px), only screen and (max-width: 767px) {
+    .header-right {
+      flex: 0 0 auto;
+      max-width: none;
+    }
+  }
+  .header-logo {
+    line-height: 1;
+    display: flex;
+  }
+  
+  
+
+
+@media only screen and (max-width: 575px) {
+  .header-right .btn {
+    display: block;
+    padding: 15px 15px;
+  }
+}
+@media only screen and (max-width: 479px) {
+  .header-right .btn {
+    display: none;
+  }
+}
+
+

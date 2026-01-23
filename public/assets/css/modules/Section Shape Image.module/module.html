@@ -1,0 +1,33 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  .row-fluid-wrapper{
+    position: relative;
+    z-index: 1;
+  }
+  .row-fluid-wrapper .shape {
+    position: absolute;
+    z-index: -1;
+  }
+  
+  
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+{% for item in module.shape_image_item %}
+<div class="shape {{ item.shape_image_number_class }} {{ item.image_move_animation }}">
+  <span data-depth="{{ item.animation_depth }}">
+    	{% if item.shape_image.src %}
+        {% set sizeAttrs = 'width="{{ item.shape_image.width }}" height="{{ item.shape_image.height }}"' %}
+        {% if item.shape_image.size_type == 'auto' %}
+          {% set sizeAttrs = 'width="{{ item.shape_image.width }}" height="{{ item.shape_image.height }}" style="max-width: 100%; height: auto;"' %}
+        {% elif item.shape_image.size_type == 'auto_custom_max' %}
+          {% set sizeAttrs = 'width="{{ item.shape_image.max_width }}" height="{{ item.shape_image.max_height }}" style="max-width: 100%; height: auto;"' %}
+        {% endif %}
+         {% set loadingAttr = item.shape_image.loading != 'disabled' ? 'loading="{{ item.shape_image.loading }}"' : '' %}
+        <img src="{{ item.shape_image.src }}" alt="{{ item.shape_image.alt }}" {{ loadingAttr }} {{ sizeAttrs }}>
+      {% endif %}
+  </span>
+</div>
+{% endfor %}

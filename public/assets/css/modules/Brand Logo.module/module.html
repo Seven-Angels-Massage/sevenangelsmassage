@@ -1,0 +1,38 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  {% if module.style.brand_logo_radius.overwrite %}
+  .brand-grid-wrap .single-brand {
+    border-radius: {{ module.style.brand_logo_radius.value }}px;
+  }
+  {% endif %}
+  
+  .brand-grid-wrap .single-brand {
+    background-color: rgba({{ module.style.color_field.logo_background_color.color|convert_rgb }}, {{ module.style.color_field.logo_background_color.opacity/100 }});
+  }
+  .brand-grid-wrap .single-brand:hover {
+    background-color: rgba({{ module.style.color_field.logo_background_hover_color.color|convert_rgb }}, {{ module.style.color_field.logo_background_hover_color.opacity/100 }});
+  }
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+
+<div class="brand-grid-wrap {{ module.extra_class }}">
+  {% for item in module.brand_logo_item %}
+  <!-- Single Brand Start -->
+  <div class="single-brand" data-aos="{{ module.animation_direction }}">
+    {% if item.brand_logo_image.src %}
+      {% set sizeAttrs = 'width="{{ item.brand_logo_image.width }}" height="{{ item.brand_logo_image.height }}"' %}
+      {% if item.brand_logo_image.size_type == 'auto' %}
+        {% set sizeAttrs = 'width="{{ item.brand_logo_image.width }}" height="{{ item.brand_logo_image.height }}" style="max-width: 100%; height: auto;"' %}
+      {% elif item.brand_logo_image.size_type == 'auto_custom_max' %}
+        {% set sizeAttrs = 'width="{{ item.brand_logo_image.max_width }}" height="{{ item.brand_logo_image.max_height }}" style="max-width: 100%; height: auto;"' %}
+      {% endif %}
+       {% set loadingAttr = item.brand_logo_image.loading != 'disabled' ? 'loading="{{ item.brand_logo_image.loading }}"' : '' %}
+      <img src="{{ item.brand_logo_image.src }}" alt="{{ item.brand_logo_image.alt }}" {{ loadingAttr }} {{ sizeAttrs }}>
+    {% endif %}
+  </div>
+  <!-- Single Brand End -->
+  {% endfor %}
+</div>

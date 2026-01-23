@@ -1,0 +1,209 @@
+[ {
+  "id" : "e5438cf4-6e21-1035-a5fb-ad02d970507d",
+  "name" : "animation_direction",
+  "label" : "Animation Direction",
+  "required" : false,
+  "locked" : false,
+  "display" : "select",
+  "choices" : [ [ "fade-up", "Fade Up" ], [ "fade-down", "Fade Down" ], [ "fade-left", "Fade Left" ], [ "fade-right", "Fade Right" ] ],
+  "multiple" : false,
+  "reordering_enabled" : true,
+  "preset" : null,
+  "type" : "choice",
+  "display_width" : null,
+  "default" : "fade-up"
+}, {
+  "id" : "f98b3cd1-e36b-6761-c9be-530667bc489f",
+  "name" : "extra_class",
+  "label" : "Extra Class",
+  "help_text" : "If you want to customize the style in your own way, then create an extra \"CLASS\" and style it based on that. ",
+  "required" : false,
+  "locked" : false,
+  "allow_new_line" : false,
+  "type" : "text",
+  "display_width" : null
+}, {
+  "id" : "95f0d1a2-6aba-dfa4-5bd3-16a2d1e53814",
+  "name" : "service_image",
+  "label" : "Service Image",
+  "required" : false,
+  "locked" : false,
+  "responsive" : true,
+  "resizable" : true,
+  "show_loading" : false,
+  "type" : "image",
+  "display_width" : null,
+  "default" : {
+    "size_type" : "auto",
+    "src" : "https://22271054.fs1.hubspotusercontent-na1.net/hubfs/22271054/service-details.jpg",
+    "alt" : "service-details",
+    "loading" : "lazy",
+    "width" : 970,
+    "height" : 570,
+    "max_width" : 970,
+    "max_height" : 570
+  }
+}, {
+  "id" : "b7b77bda-d11f-7fad-a051-10a46973e72c",
+  "name" : "service_title",
+  "label" : "Service Title",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "<h2>Yoga Is A Process, Not A Pose.</h2>"
+}, {
+  "id" : "62cfe1d3-c8a8-8e5c-4a08-9edf7c8cbc9d",
+  "name" : "service_excerpt_one",
+  "label" : "Service Excerpt One",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point using lorem ipsum is that it has a more less normal distribution opposed to making it look like readable english lorem Ipsum is simpl dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 150 took a galley of type and scrambled it to make a type specimen book.</p>"
+}, {
+  "id" : "fcc74dc3-452c-660b-9ac2-090a4743edd0",
+  "name" : "service_excerpt_two",
+  "label" : "Service Excerpt Two",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point using lorem ipsum is that it has a more less normal distribution opposed to making it look like readable english lorem Ipsum is simpl dummy text of the printing and typesetting industry.</p>"
+}, {
+  "id" : "fc45ce4e-684d-0153-d5c5-ad14e7770b6f",
+  "name" : "service_subtitle",
+  "label" : "Service Subtitle",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "<h3>How oil therapy works?</h3>"
+}, {
+  "id" : "18ef88a3-b7f5-9223-e29c-095908a0338c",
+  "name" : "service_excerpt_three",
+  "label" : "Service Excerpt Three",
+  "required" : false,
+  "locked" : false,
+  "type" : "richtext",
+  "display_width" : null,
+  "default" : "<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point using lorem ipsum is that it has a more less normal distribution opposed to making it look like readable english lorem Ipsum is simpl dummy text of the printing and typesetting industry.</p>"
+}, {
+  "id" : "f4d633ca-9ed5-3221-d694-0b1ce6e80848",
+  "name" : "style",
+  "label" : "Style",
+  "required" : false,
+  "locked" : false,
+  "children" : [ {
+    "id" : "8d76105a-bc58-559b-fd6e-7f0a8a4aae59",
+    "name" : "alignment",
+    "label" : "Alignment",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "9dbf11ba-61de-6c3b-78f2-c498a04ac322",
+      "name" : "alignment",
+      "label" : "Alignment",
+      "required" : false,
+      "locked" : false,
+      "display" : "select",
+      "choices" : [ [ "left", "Left" ], [ "center", "Center" ], [ "right", "Right" ] ],
+      "multiple" : false,
+      "reordering_enabled" : true,
+      "preset" : null,
+      "type" : "choice",
+      "display_width" : null,
+      "default" : "left"
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "alignment" : "left"
+    }
+  }, {
+    "id" : "223fcf89-7408-4b13-dae4-2068e4d1765f",
+    "name" : "service_image_radius",
+    "label" : "Service Image Radius",
+    "required" : false,
+    "locked" : false,
+    "children" : [ {
+      "id" : "da2c0d27-1d69-889f-a015-c398d49ce525",
+      "name" : "overwrite",
+      "label" : "Overwrite",
+      "required" : false,
+      "locked" : false,
+      "display" : "toggle",
+      "type" : "boolean",
+      "display_width" : null,
+      "default" : false
+    }, {
+      "id" : "76880565-9e94-4d5f-ade7-24e2bd69f535",
+      "name" : "value",
+      "label" : "Value",
+      "required" : false,
+      "locked" : false,
+      "display" : "text",
+      "min" : 1,
+      "step" : 1,
+      "type" : "number",
+      "display_width" : null,
+      "default" : 5
+    } ],
+    "tab" : "STYLE",
+    "expanded" : false,
+    "group_occurrence_meta" : null,
+    "type" : "group",
+    "display_width" : null,
+    "default" : {
+      "overwrite" : false,
+      "value" : 5
+    }
+  } ],
+  "tab" : "STYLE",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "alignment" : {
+      "alignment" : "left"
+    },
+    "service_image_radius" : {
+      "overwrite" : false,
+      "value" : 5
+    }
+  }
+}, {
+  "id" : "daeafa2b-a3df-6f8d-c491-69e26b37fc5d",
+  "name" : "service_list",
+  "label" : "Service List",
+  "required" : false,
+  "locked" : false,
+  "occurrence" : {
+    "min" : null,
+    "max" : null,
+    "sorting_label_field" : "1881d02c-105a-8b15-b393-090505759385",
+    "default" : null
+  },
+  "children" : [ {
+    "id" : "1881d02c-105a-8b15-b393-090505759385",
+    "name" : "list_text",
+    "label" : "List Text",
+    "required" : false,
+    "locked" : false,
+    "type" : "richtext",
+    "display_width" : null,
+    "default" : "Each moment is an opportunity to be kind to yourself and your body"
+  } ],
+  "tab" : "CONTENT",
+  "expanded" : false,
+  "group_occurrence_meta" : null,
+  "type" : "group",
+  "display_width" : null,
+  "default" : {
+    "list_text" : "Each moment is an opportunity to be kind to yourself and your body"
+  }
+} ]

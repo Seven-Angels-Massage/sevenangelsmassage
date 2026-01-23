@@ -1,0 +1,135 @@
+{% require_css %}
+<style>
+  .footer-widget .contact-info li svg {
+    color: rgba({{ module.style.color_field.contact_info_icon_color.color|convert_rgb }}, {{ module.style.color_field.contact_info_icon_color.opacity/100 }});
+  }
+  
+  .footer-copyright {
+    {% if module.style.copyright_alignment.alignment =='left' %}text-align: left;{% endif %}
+    {% if module.style.copyright_alignment.alignment =='center'%}text-align: center;{% endif %}
+    {% if module.style.copyright_alignment.alignment =='right'%}text-align: right;{% endif %}
+  }
+  
+  .social-item li a svg {
+    color: rgba({{ module.style.color_field.social_icon_color.color|convert_rgb }}, {{ module.style.color_field.social_icon_color.opacity/100 }});
+  }
+  .social-item li a:hover svg {
+    color: rgba({{ module.style.color_field.social_icon_hover_color.color|convert_rgb }}, {{ module.style.color_field.social_icon_hover_color.opacity/100 }});
+  }
+  
+ </style>
+{% end_require_css %}
+
+<footer>
+  <div class="footer-top-section section {{ module.section_class }}">
+        <div class="container">
+            <div class="footer-widget-wrapper"> 
+                <div class="col">
+                    <div class="footer-widget">
+                        <div class="footer-logo">
+                            {% set loadingAttr = module.footer_logo.loading != 'disabled' ? '{{ module.footer_logo.loading }}' : '' %}
+
+                            {% logo
+                              override_inherited_src="{{ module.footer_logo.override_inherited_src }}"
+                              src="{{ module.footer_logo.src }}"
+                              alt="{{ module.footer_logo.alt }}"
+                              width="{{ module.footer_logo.width }}"
+                              height="{{ module.footer_logo.height }}"
+                              loading="{{ loadingAttr }}"
+                              suppress_company_name="{{ module.footer_logo.suppress_company_name }}"
+                            %}
+                        </div>
+                        {{ module.footer_excerpt }}
+                        <ul class="contact-info">
+                          {% for item in module.contact_info_item %}
+                            <li>
+                                {% icon
+                                    name="{{ item.contact_info_icon.name }}"
+                                    style="{{ item.contact_info_icon.type }}"
+                                    unicode="{{ item.contact_info_icon.unicode }}"
+                                    icon_set="{{ item.contact_info_icon.icon_set }}"
+                                  %}
+                               {{ item.contact_info_text }}
+                            </li>
+                          {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+              {% for item in module.footer_link_widget %}
+                <div class="col">
+                    <div class="footer-widget about-widget">
+                        {{ item.footer_title }}
+                        {% menu id="{{ item.footer_menu }}" %}
+                    </div>
+                </div>
+              {% endfor %}
+            </div>
+        </div>
+    
+        {% for item in module.shape_image_item %}
+        <div class="shape {{ item.shape_image_number_class }} {{ item.image_move_animation }}">
+          <span data-depth="{{ item.animation_depth }}">
+              {% if item.shape_image.src %}
+                {% set sizeAttrs = 'width="{{ item.shape_image.width }}" height="{{ item.shape_image.height }}"' %}
+                {% if item.shape_image.size_type == 'auto' %}
+                  {% set sizeAttrs = 'width="{{ item.shape_image.width }}" height="{{ item.shape_image.height }}" style="max-width: 100%; height: auto;"' %}
+                {% elif item.shape_image.size_type == 'auto_custom_max' %}
+                  {% set sizeAttrs = 'width="{{ item.shape_image.max_width }}" height="{{ item.shape_image.max_height }}" style="max-width: 100%; height: auto;"' %}
+                {% endif %}
+                 {% set loadingAttr = item.shape_image.loading != 'disabled' ? 'loading="{{ item.shape_image.loading }}"' : '' %}
+                <img src="{{ item.shape_image.src }}" alt="{{ item.shape_image.alt }}" {{ loadingAttr }} {{ sizeAttrs }}>
+              {% endif %}
+          </span>
+        </div>
+        {% endfor %}
+    
+    </div>
+  
+   <div class="footer-bottom-section section ">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 col-auto">
+                    <div class="footer-copyright">
+                        <p>{{ module.copyright_text }}</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-auto">
+                    <div class="footer-social">
+                        <ul class="social-item">
+                          {% for item in module.social_item %}
+                          <li>
+                          {% set href = item.social_link.url.href %}
+                            {% if item.social_link.url.type is equalto "EMAIL_ADDRESS" %}
+                              {% set href = "mailto:" + href %}
+                            {% endif %}
+
+                            {# ----------------------------------------------------------------
+                               ACCESSIBILITY:
+                               Social icon links need a discernible name.
+                               Add aria-label/title based on icon name.
+                               Keeps UI unchanged.
+                            ----------------------------------------------------------------- #}
+                            {% set socialLabel = item.social_icon.name|default('Social link') %}
+
+                            <a href="{{ href }}"
+                              aria-label="{{ socialLabel }}"
+                              title="{{ socialLabel }}"
+                              {% if item.social_link.open_in_new_tab %}target="_blank"{% endif %}
+                              {% if item.social_link.rel %}rel="{{ item.social_link.rel }}"{% endif %}
+                              >
+                              {% icon
+                                  name="{{ item.social_icon.name }}"
+                                  style="{{ item.social_icon.type }}"
+                                  unicode="{{ item.social_icon.unicode }}"
+                                  icon_set="{{ item.social_icon.icon_set }}"
+                                %}
+                            </a>
+                          </li>
+                          {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

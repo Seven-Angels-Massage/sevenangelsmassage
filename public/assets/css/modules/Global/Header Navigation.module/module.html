@@ -1,0 +1,211 @@
+{% require_css %}
+<style>
+  .header {
+    background-color: var(--header-background-color);
+    {% if module.style.header_background_color.enable %}
+    background-color: rgba({{ module.style.header_background_color.header_background_color.color|convert_rgb }}, {{ module.style.header_background_color.header_background_color.opacity/100 }});
+    {{ module.style.header_background_color.header_border.css }};
+    {% endif %}
+  }
+  
+  .header-right .btn-primary {
+      background-color: rgba({{ module.style.button_primary_background_color.color|convert_rgb }}, {{ module.style.button_primary_background_color.opacity/100 }});
+      border-color: rgba({{ module.style.button_primary_border_color.color|convert_rgb }}, {{ module.style.button_primary_border_color.opacity/100 }});
+      color: rgba({{ module.style.button_text_color.color|convert_rgb }}, {{ module.style.button_text_color.opacity/100 }});
+    }
+  .header-right .btn-secondary-hover:hover {
+      background-color: rgba({{ module.style.button_primary_hover_background_color.color|convert_rgb }}, {{ module.style.button_primary_hover_background_color.opacity/100 }});
+      border-color: rgba({{ module.style.button_primary_hover_border_color.color|convert_rgb }}, {{ module.style.button_primary_hover_border_color.opacity/100 }});
+      color: rgba({{ module.style.button_hover_text_color.color|convert_rgb }}, {{ module.style.button_hover_text_color.opacity/100 }});
+    }
+  .header-right .btn-light-outline {
+      background-color: transparent;
+      border-color: rgba({{ module.style.button_light_outline_border_color.color|convert_rgb }}, {{ module.style.button_light_outline_border_color.opacity/100 }});
+      color: rgba({{ module.style.button_text_color.color|convert_rgb }}, {{ module.style.button_text_color.opacity/100 }});
+    }
+  .header-right .btn-primary-hover:hover {
+      background-color: rgba({{ module.style.button_light_outline_hover_background_color.color|convert_rgb }}, {{ module.style.button_light_outline_hover_background_color.opacity/100 }});
+      border-color: rgba({{ module.style.button_light_outline_hover_border_color.color|convert_rgb }}, {{ module.style.button_light_outline_hover_border_color.opacity/100 }});
+      color: rgba({{ module.style.button_outline_text_hover_color.color|convert_rgb }}, {{ module.style.button_outline_text_hover_color.opacity/100 }});
+    }
+</style>
+{% end_require_css %}
+
+
+{% macro defaultItemClasses() %}
+ {{
+ {
+   "class": "no-sub-menu"
+ }|xmlattr
+ }}
+{% endmacro %}
+
+{% macro childClasses() %}
+ {{
+ {
+   "class": "has-sub-menu"
+ }|xmlattr
+ }}
+{% endmacro %}
+
+{% macro activeNode() %}
+ {{
+ {"class": "menu-link active active-item",
+ "aria-current": "page"}|xmlattr
+ }}
+{% endmacro %}
+
+{% macro link(node) %}
+<li {{ childClasses() if node.children else defaultItemClasses() }}>
+  <a class="navs-link" href="{{ node.url }}" {{ activeNode() if node.activeNode }}>{{ node.label }}</a>
+  {% if node.children %}
+    {{ renderNavigation(node) }}
+  {% endif %}
+</li>
+{% endmacro %}
+
+{% macro renderNavigation(menuTree) %}
+  {% set level = level + 1 %}
+  <ul class="navigation hs-menu-children-wrapper header-sub-menu-{{ level }}" aria-hidden="{{ level != 1 }}">
+    {% for node in menuTree.children %}
+      {{ link(node) }}
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+{# ============================================
+   CHANGE (NAV SPLIT) - NEW MACRO
+   - Render only a portion of the top-level items
+   - start_index is inclusive; end_index is exclusive
+   - uses link(node) so dropdown behavior remains
+   ============================================ #}
+{% macro renderNavigationRange(menuTree, start_index, end_index, level_override=1) %}
+  {% set forced_level = level_override %}
+  <ul class="navigation hs-menu-children-wrapper header-sub-menu-{{ forced_level }}"
+      aria-hidden="{{ forced_level != 1 }}">
+    {% for node in menuTree.children %}
+      {% if loop.index0 >= start_index and loop.index0 < end_index %}
+        {{ link(node) }}
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+<div class="header header-fluid header-sticky">
+  <div class="container-fluid">
+    <div class="row justify-content-between align-items-center">
+
+      <div class="col-xl-5 d-none d-xl-block">
+        <!-- Header Center Start -->
+        <div class="header-left">
+          <div class="header-main-menu">
+            {# ============================================
+               CHANGE (NAV SPLIT)
+               - define menuTree once and reuse for left/right
+               ============================================ #}
+            {% set menuTree = menu(module.navigation) %}
+
+            <nav class="header-main-menu-nav nav-left">
+              {# ============================================
+                 CHANGE (NAV SPLIT)
+                 - left side: FIRST 4 menu items
+                 ============================================ #}
+              {{ renderNavigationRange(menuTree, 0, 4, 1) }}
+            </nav>
+
+            {# NOTE: replaced old call:
+               {{ renderNavigation(menu(module.navigation)) }}
+               ============================================ #}
+          </div>
+        </div>
+        <!-- Header Center End -->
+      </div>
+
+      <div class="col-xl-2 col-auto d-flex justify-content-center">
+        <!-- Header Left Start -->
+        <div class="header-center">
+          <div class="header-logo">
+            {% set loadingAttr = module.logo.loading != 'disabled' ? '{{ module.logo.loading }}' : '' %}
+            {% logo
+              override_inherited_src="{{ module.logo.override_inherited_src }}"
+              src="{{ module.logo.src }}"
+              alt="{{ module.logo.alt }}"
+              width="{{ module.logo.width }}"
+              height="{{ module.logo.height }}"
+              loading="{{ loadingAttr }}"
+              suppress_company_name="{{ module.logo.suppress_company_name }}"
+            %}
+          </div>
+        </div>
+        <!-- Header Left End -->
+      </div>
+
+      <div class="col-xl-5 col-auto d-flex justify-content-end">
+        <!-- Header Right Start -->
+        <div class="header-right">
+
+          <!-- Header language Start -->
+          <div class="header-language">
+            <div class="language language-white">
+              {% if content.translated_content.values()|selectattr('published')|length || is_listing_view && group.translations %}
+                <div class="header__language-switcher header--element">
+                  {% language_switcher label='Language switcher', display_mode='localized', no_wrapper=True %}
+                  <div class="header__language-switcher--label-current">{{ locale_name(locale) }}</div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          <!-- Header language End -->
+
+          {# ============================================
+             CHANGE (NAV SPLIT)
+             - right side: remaining menu items (5th+)
+             - desktop-only to match xl layout
+             ============================================ #}
+          <nav class="header-main-menu-nav nav-right d-none d-xl-block">
+            {{ renderNavigationRange(menuTree, 4, 999, 1) }}
+          </nav>
+
+          <!-- Header Button Start -->
+          {% set href = module.button_link.url.href %}
+          {% if module.button_link.url.type is equalto "EMAIL_ADDRESS" %}
+            {% set href = "mailto:" + href %}
+          {% endif %}
+          <a class="btn {{ module.button_type }} {{ module.button_rounded }} {{ module.button_size }}"
+             href="{{ href }}"
+             {% if module.button_link.open_in_new_tab %}target="_blank"{% endif %}
+             {% if module.button_link.rel %}rel="{{ module.button_link.rel }}"{% endif %}>
+            {{ module.button_text }}
+          </a>
+          <!-- Header Button End -->
+
+          <!-- Header Offcanvas/Mobile Menu Start -->
+          {# --------------------------------------------------------------------
+             ACCESSIBILITY (Lighthouse):
+             Fix "Buttons do not have an accessible name" for the hamburger button.
+             - Adds aria-label so screen readers announce it properly
+             - type="button" prevents accidental form-submit behavior
+             - aria-controls is a harmless reference to the offcanvas container ID
+             - aria-expanded default false (JS may toggle later if desired)
+             NOTE: No JS behavior changes.
+          --------------------------------------------------------------------- #}
+          <button
+            class="header-offcanvas-open"
+            type="button"
+            aria-label="Open menu"
+            aria-controls="header-offcanvas"
+            aria-expanded="false"
+          >
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </button>
+          <!-- Header Offcanvas/Mobile Menu End -->
+
+        </div>
+        <!-- Header Right End -->
+      </div>
+
+    </div>
+  </div>
+</div>

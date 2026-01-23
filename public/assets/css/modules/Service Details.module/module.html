@@ -1,0 +1,49 @@
+{% require_css %}
+<style>
+  {% scope_css %}
+  
+  .service {
+    {% if module.style.alignment.alignment =='left' %}text-align: left;{% endif %}
+    {% if module.style.alignment.alignment =='center'%}text-align: center;{% endif %}
+    {% if module.style.alignment.alignment =='right'%}text-align: right;{% endif %}
+  }
+  
+  {% if module.style.service_image_radius.overwrite %}
+  .service .thumb {
+    border-radius: {{ module.style.service_image_radius.value }}px;
+  }
+  .service .thumb img {
+    border-radius: {{ module.style.service_image_radius.value }}px;
+  }
+  {% endif %}
+  
+  {% end_scope_css %}
+ </style>
+{% end_require_css %}
+
+<div class="service {{ module.extra_class }}">
+  <div class="thumb" data-aos="{{ module.animation_direction }}">
+    {% if module.service_image.src %}
+      {% set sizeAttrs = 'width="{{ module.service_image.width }}" height="{{ module.service_image.height }}"' %}
+      {% if module.service_image.size_type == 'auto' %}
+        {% set sizeAttrs = 'width="{{ module.service_image.width }}" height="{{ module.service_image.height }}" style="max-width: 100%; height: auto;"' %}
+      {% elif module.service_image.size_type == 'auto_custom_max' %}
+        {% set sizeAttrs = 'width="{{ module.service_image.max_width }}" height="{{ module.service_image.max_height }}" style="max-width: 100%; height: auto;"' %}
+      {% endif %}
+       {% set loadingAttr = module.service_image.loading != 'disabled' ? 'loading="{{ module.service_image.loading }}"' : '' %}
+      <img src="{{ module.service_image.src }}" alt="{{ module.service_image.alt }}" width="968" height="568" {{ loadingAttr }} {{ sizeAttrs }}>
+    {% endif %}
+  </div>
+  <div class="content" data-aos="{{ module.animation_direction }}">
+    {{ module.service_title }}
+    {{ module.service_excerpt_one }}
+    {{ module.service_excerpt_two }}
+    {{ module.service_subtitle }}
+    {{ module.service_excerpt_three }}
+    <ul class="service-list">
+      {% for item in module.service_list %}
+        <li>{{ item.list_text }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>

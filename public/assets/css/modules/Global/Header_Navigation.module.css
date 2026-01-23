@@ -1,0 +1,223 @@
+@-webkit-keyframes fadeInDown {
+    from {
+      transform: translate3d(0, -100%, 0);
+      opacity: 0;
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+    }
+  }
+  @keyframes fadeInDown {
+    from {
+      transform: translate3d(0, -100%, 0);
+      opacity: 0;
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+    }
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--header-height);
+    z-index: 111;
+    transition: var(--transition);
+  }
+  @media only screen and (min-width: 992px) and (max-width: 1199px), only screen and (min-width: 768px) and (max-width: 991px), only screen and (max-width: 767px) {
+    .header {
+      padding: 15px 0;
+    }
+  }
+  .header-sticky.is-sticky {
+    position: -webkit-sticky;
+    position: fixed;
+    top: 0;
+    background-color: var(--header-background-color);
+    border: none;
+    -webkit-animation-name: fadeInDown;
+            animation-name: fadeInDown;
+    -webkit-animation-duration: 1s;
+            animation-duration: 1s;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+    -webkit-animation-fill-mode: both;
+            animation-fill-mode: both;
+  }
+  @media only screen and (min-width: 768px) and (max-width: 991px), only screen and (max-width: 767px) {
+    .header-left {
+      display: none;
+    }
+  }
+  .header-center {
+    max-width: 240px;
+  }
+  @media only screen and (min-width: 768px) and (max-width: 991px), only screen and (max-width: 767px) {
+    .header-center {
+      max-width: none;
+    }
+  }
+  @media only screen and (max-width: 767px) {
+    .header-center {
+      min-height: auto;
+    }
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  @media only screen and (min-width: 768px) and (max-width: 991px), only screen and (max-width: 767px) {
+    .header-right {
+      flex: 0 0 auto;
+      max-width: none;
+    }
+  }
+  .header-logo {
+    line-height: 1;
+    display: flex;
+  }
+  .header-main-menu-nav ul.header-sub-menu-1 {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .header-main-menu-nav > ul.header-sub-menu-1 {
+    gap: 0 44px;
+  }
+  @media only screen and (min-width: 1200px) and (max-width: 1549px) {
+    .header-main-menu-nav > ul.header-sub-menu-1 {
+      gap: 0 20px;
+    }
+  }
+  @media only screen and (min-width: 992px) and (max-width: 1199px) {
+    .header-main-menu-nav > ul.header-sub-menu-1 {
+      gap: 0 32px;
+    }
+  }
+  .header-main-menu-nav > ul.header-sub-menu-1 > li {
+    position: relative;
+  }
+  .header-main-menu-nav > ul.header-sub-menu-1 > li > a {
+    font-size: var(--body-font-size);
+    font-weight: 500;
+    line-height: 25px;
+    display: flex;
+    padding: 36px 0;
+    text-transform: capitalize;
+    color: var(--menu-link-color);
+    gap: 7px;
+  }
+  .header-main-menu-nav > ul.header-sub-menu-1 > li > a .sub-menu-toggle {
+    display: flex;
+    align-self: center;
+  }
+  .header-main-menu-nav > ul.header-sub-menu-1 > li:hover > a {
+    color: var(--menu-link-hover-color);
+  }
+  .header-main-menu-nav > ul.header-sub-menu-1 > li:hover > ul {
+    visibility: visible;
+    margin-top: 0;
+    opacity: 1;
+  }
+  .header-main-menu-nav > ul.header-sub-menu-1 ul {
+    position: absolute;
+    z-index: 99;
+    top: 100%;
+    left: -25px;
+    visibility: hidden;
+    flex-direction: column;
+    width: 280px;
+    margin-top: 20px;
+    padding: 20px 25px;
+    transition: var(--transition);
+    opacity: 0;
+    background-color: var(--dropdown-bg-color);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  }
+
+.header-main-menu-nav > ul.header-sub-menu-1 > li:last-child ul ul ul {
+  left: 100%;
+  right: auto;
+}
+.header-main-menu-nav > ul.header-sub-menu-1 li:last-child ul ul ul ul {
+  left: auto;
+  right: 100%;
+}
+.header-main-menu-nav > ul.header-sub-menu-1 li:nth-last-child(-n+3) ul ul {
+  left: auto;
+  right: 100%;
+}
+.header-main-menu-nav > ul.header-sub-menu-1 li:nth-last-child(-n+3) ul ul ul {
+  left: 100%;
+  right: auto;
+}
+
+.header-main-menu-nav > ul.header-sub-menu-1 ul li ul {
+  left: 100%;
+  top: 0;
+  margin-left: 0;
+}
+
+.header-main-menu-nav > ul.header-sub-menu-1 ul li:hover > ul {
+  margin-bottom: 10px;
+  opacity: 1;
+  visibility: visible;
+}
+
+
+.header-main-menu-nav > ul.header-sub-menu-1 ul > li ul ul ul {
+  left: 100%;
+  right: auto;
+}
+
+  .header-main-menu-nav ul.header-sub-menu-1 ul li a {
+    font-size: var(--body-font-size);
+    display: flex;
+    padding: 5px 0;
+    color: var(--child-menu-link-color);
+  }
+  .header-main-menu-nav ul.header-sub-menu-1 ul li a:hover {
+    padding-left: 5px;
+    color: var(--child-menu-link-hover-color);
+  }
+
+@media only screen and (max-width: 575px) {
+  .header-right .btn {
+    display: block;
+    padding: 15px 15px;
+    font-size: 12px;
+  }
+}
+
+/* ===========================
+   CHANGE (NAV SPLIT) - CSS
+   - header-right is the FLEX CONTAINER
+   - gap here controls spacing BETWEEN:
+     [language] [right-nav] [Book Now] [hamburger]
+   =========================== */
+.header-right{
+  display:flex;
+  align-items:center;
+  gap: clamp(12px, 2vw, 36px); /* space between nav block and Book Now button */
+}
+/* ===========================
+   CHANGE (NAV SPLIT) - CSS
+   - These gaps control spacing BETWEEN MENU LINKS ONLY
+   - They do NOT affect the Book Now button
+   =========================== */
+.header-right .nav-right .navigation,
+.header-left  .nav-left  .navigation{
+  display:flex;
+  align-items:center;
+  gap: clamp(24px, 3vw, 60px); /* spacing between individual menu items */
+  list-style:none;
+  margin:0;
+  padding:0;
+}

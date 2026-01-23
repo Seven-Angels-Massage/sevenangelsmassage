@@ -1,0 +1,188 @@
+/* Hero Banner CSS */
+.hero-item {
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 900px;
+  padding: 50px 0;
+  z-index: 9;
+}
+.hero-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  
+}
+@media only screen and (min-width: 1200px) and (max-width: 1549px) {
+  .hero-item {
+    height: 680px;
+  }
+}
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+  .hero-item {
+    height: 600px;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .hero-item {
+    height: 550px;
+  }
+}
+@media only screen and (max-width: 767px) {
+  .hero-item {
+    height: 510px;
+  }
+}
+
+.hero-item-content {
+  max-width: 970px;
+  margin: 0 auto;
+  margin-top: 50px;
+}
+.hero-item-content h1 {
+  color: var(--light-color);
+  margin-bottom: 30px;
+}
+@media only screen and (min-width: 1200px) and (max-width: 1549px) {
+  .hero-item-content h1 {
+    font-size: 64px !important;
+  }
+}
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+  .hero-item-content h1 {
+    font-size: 54px !important;
+    margin-bottom: 20px;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .hero-item-content h1 {
+    font-size: 46px !important;
+    margin-bottom: 15px;
+  }
+}
+@media only screen and (max-width: 767px) {
+  .hero-item-content h1 {
+    font-size: 36px !important;
+    margin-bottom: 15px;
+  }
+}
+@media only screen and (max-width: 479px) {
+  .hero-item-content h1 {
+    font-size: 32px !important;
+  }
+}
+.hero-item-content p {
+  max-width: 770px;
+  color: var(--light-color);
+  font-size: var(--body-font-size);
+  line-height: 1.6;
+}
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+  .hero-item-content p {
+    font-size: 18px !important;
+    max-width: 670px;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .hero-item-content p {
+    font-size: 16px !important;
+    max-width: 550px;
+  }
+}
+@media only screen and (max-width: 767px) {
+  .hero-item-content p {
+    font-size: 16px !important;
+    max-width: 430px;
+  }
+}
+.hero-item-content .hero-item-buttons {
+  margin-top: 50px;
+}
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+  .hero-item-content .hero-item-buttons {
+    margin-top: 30px;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px), only screen and (max-width: 767px) {
+  .hero-item-content .hero-item-buttons {
+    margin-top: 30px;
+  }
+}
+
+.hero-slider .main-slider-nav {
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  display: block;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+  border-radius: 50%;
+}
+.hero-slider .main-slider-nav::after {
+  display: none;
+}
+.hero-slider .main-slider-nav svg {
+  width: 18px;
+  height: 18px;
+}
+.hero-slider .main-slider-nav svg path{
+    fill: currentColor;
+    stroke: currentColor;
+  }
+
+
+.hero-slider .home-slider-prev {
+  left: 30px;
+}
+.hero-slider .home-slider-next {
+  right: 30px;
+}
+.hero-slider .home-slider-next::after {
+  display: none;
+}
+.hero-slider:hover .main-slider-nav {
+  opacity: 1;
+  visibility: visible;
+}
+@media only screen and (max-width: 479px) {
+  .hero-slider:hover .main-slider-nav {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Hero Slide Animation */
+.swiper-slide .hero-item-content > * {
+  visibility: hidden;
+  transition: var(--transition);
+  transform: translateY(50px);
+  opacity: 0;
+}
+.swiper-slide-active .hero-item-content > * {
+  visibility: visible;
+  transform: translateY(0);
+  opacity: 1;
+}
+.swiper-slide-active .hero-item-content > *:nth-child(1) {
+  transition-delay: 0.6s;
+}
+.swiper-slide-active .hero-item-content > *:nth-child(2) {
+  transition-delay: 0.9s;
+}
+.swiper-slide-active .hero-item-content > *:nth-child(3) {
+  transition-delay: 1.2s;
+}
+.swiper-slide-active .hero-item-content > *:nth-child(4) {
+  transition-delay: 1.5s;
+}
