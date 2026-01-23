@@ -50,3 +50,275 @@
     text-align: left;
   }
 }
+
+
+/* =========================================================
+   HubSpot Forms "BaseStyle" (injected into LIVE DOM)
+   Paste into child.css
+   ========================================================= */
+
+:root{
+  --hsf-default-row__horizontal-spacing: 30px;
+  --hsf-default-row__vertical-spacing: 20px;
+  --hsf-default-module__vertical-spacing: 10px;
+  --hsf-default-navigationrow-buttons__justify-content: space-between;
+  --hsf-default-navigationrow-buttons-single__justify-content: end;
+  --hsf-default-button__font-family: Helvetica;
+  --hsf-default-button__font-size: 1em;
+  --hsf-default-button__color: rgba(255, 255, 255, 1);
+  --hsf-default-button__background-color: rgba(255, 92, 53, 1);
+  --hsf-default-button__background-image: none;
+  --hsf-default-button__border-radius: 3px;
+  --hsf-default-button__border-width: 0px 0px 0px 0px;
+  --hsf-default-button__border-style: none;
+  --hsf-default-button__border-color: initial;
+  --hsf-default-button__padding: 12px 24px;
+  --hsf-default-button__box-shadow: none;
+  --hsf-default-button__font-weight: 700;
+
+  --hsf-default-richtext__font-family: Helvetica;
+  --hsf-default-richtext__font-size: 1em;
+  --hsf-default-richtext__color: rgb(33, 45, 58);
+
+  --hsf-default-heading__font-family: Helvetica;
+  --hsf-default-heading__color: rgb(33, 45, 58);
+  --hsf-default-heading__text-shadow: none;
+
+  --hsf-default-background__padding: 40px;
+  --hsf-default-background__border-style: none;
+  --hsf-default-background__border-color: rgba(255, 255, 255, 1);
+  --hsf-default-background__border-radius: 0px;
+  --hsf-default-background__border-width: 1px 1px 1px 1px;
+
+  --hsf-default-progressbar-text__font-family: Helvetica;
+  --hsf-default-progressbar-text__font-size: 1em;
+  --hsf-default-progressbar-text__color: rgb(33, 45, 58);
+  --hsf-default-progressbar-progressLine__background-color: rgba(1, 129, 132, 1);
+  --hsf-default-progressbar-progressLine__background-image: none;
+  --hsf-default-progressbar-progressLine__border-color: rgb(149, 148, 148);
+  --hsf-default-progressbar-progressLine__border-style: none;
+  --hsf-default-progressbar-progressLine__border-width: 0px 0px 0px 0px;
+  --hsf-default-progressbar-trackLine__background-color: rgba(217, 217, 217, 1);
+
+  --hsf-default-erroralert__font-family: Helvetica;
+  --hsf-default-erroralert__font-size: 1em;
+  --hsf-default-erroralert__color: rgb(229, 21, 32);
+
+  --hsf-default-infoalert__font-family: Helvetica;
+  --hsf-default-infoalert__font-size: 1em;
+  --hsf-default-infoalert__color: rgb(37, 51, 66);
+
+  --hsf-default-field-label__font-family: Helvetica;
+  --hsf-default-field-label__font-size: 1em;
+  --hsf-default-field-label__color: rgb(33, 45, 58);
+
+  --hsf-default-field-description__font-family: Helvetica;
+  --hsf-default-field-description__font-size: .8em;
+  --hsf-default-field-description__color: rgba(81, 99, 131, .87);
+
+  --hsf-default-field-footer__font-family: Helvetica;
+  --hsf-default-field-footer__font-size: .8em;
+  --hsf-default-field-footer__color: rgba(81, 99, 131, .87);
+
+  --hsf-default-field-input__font-family: Helvetica;
+  --hsf-default-field-input__font-size: 1em;
+  --hsf-default-field-input__color: rgb(33, 45, 58);
+  --hsf-default-field-input__background-color: rgb(245, 248, 250);
+  --hsf-default-field-input__placeholder-color: rgb(37, 51, 66);
+  --hsf-default-field-input__border-color: rgb(149, 148, 148);
+  --hsf-default-field-input__border-width: 1px 1px 1px 1px;
+  --hsf-default-field-input__border-style: solid;
+  --hsf-default-field-input__border-radius: 3px;
+  --hsf-default-field-input__padding: 10px;
+
+  --hsf-default-field-textarea__font-family: Helvetica;
+  --hsf-default-field-textarea__font-size: 1em;
+  --hsf-default-field-textarea__color: rgb(33, 45, 58);
+  --hsf-default-field-textarea__background-color: rgb(245, 248, 250);
+  --hsf-default-field-textarea__placeholder-color: rgb(37, 51, 66);
+  --hsf-default-field-textarea__border-color: rgb(149, 148, 148);
+  /* (HubSpot note converted from // comment so CSS won’t break) */
+  --hsf-default-field-textarea__border-width: 1px 1px 1px 1px;
+  --hsf-default-field-textarea__border-style: solid;
+  --hsf-default-field-textarea__border-radius: 3px;
+  --hsf-default-field-textarea__padding: 10px;
+
+  --hsf-default-field-checkbox__padding: 8px;
+  --hsf-default-field-checkbox__background-color: rgb(245, 248, 250);
+  --hsf-default-field-checkbox__color: rgb(33, 45, 58);
+  --hsf-default-field-checkbox__border-color: rgb(149, 148, 148);
+  /* (HubSpot note converted from // comment so CSS won’t break) */
+  --hsf-default-field-checkbox__border-width: 1px 1px 1px 1px;
+  --hsf-default-field-checkbox__border-style: solid;
+
+  --hsf-default-field-radio__padding: 8px;
+  --hsf-default-field-radio__background-color: rgb(245, 248, 250);
+  --hsf-default-field-radio__color: rgb(33, 45, 58);
+  --hsf-default-field-radio__border-color: rgb(149, 148, 148);
+  /* (HubSpot note converted from // comment so CSS won’t break) */
+  --hsf-default-field-radio__border-width: 1px 1px 1px 1px;
+  --hsf-default-field-radio__border-style: solid
+}
+
+[data-hsfc-id=Renderer] .hsfc-Button{border-width:var(--hsf-button__border-width, var(--hsf-default-button__border-width))}
+[data-hsfc-id=Renderer] .hsfc-Button{
+  width:var(--hsf-button__width, auto);
+  font-family:var(--hsf-button__font-family, var(--hsf-global__font-family, var(--hsf-default-button__font-family)));
+  font-size:var(--hsf-button__font-size, var(--hsf-global__font-size, var(--hsf-default-button__font-size)));
+  color:var(--hsf-button__color, var(--hsf-default-button__color));
+  padding:var(--hsf-button__padding, var(--hsf-default-button__padding));
+  border-radius:var(--hsf-button__border-radius, var(--hsf-default-button__border-radius));
+  border-style:var(--hsf-button__border-style, var(--hsf-default-button__border-style));
+  border-color:var(--hsf-button__border-color, var(--hsf-default-button__border-color));
+  background-color:var(--hsf-button__background-color, var(--hsf-default-button__background-color));
+  background-image:var(--hsf-button__background-image, var(--hsf-default-button__background-image));
+  box-shadow:var(--hsf-button__box-shadow, var(--hsf-default-button__box-shadow));
+  font-weight:var(--hsf-button__font-weight, var(--hsf-default-button__font-weight));
+  display:block;
+  position:relative;
+  text-align:center;
+  transition:transform .2s ease-out,background-color .2s linear,box-shadow .2s;
+  cursor:pointer;
+  margin:0;
+  word-break:break-word;
+  overflow-wrap:break-word
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+[data-hsfc-id=Renderer] .hsfc-Button:not([disabled]):hover{
+  transform:translateY(-1px);
+  color:var(--hsf-button--hover__color, var(--hsf-button__color, var(--hsf-default-button__color)));
+  background-color:var(--hsf-button--hover__background-color, var(--hsf-button__background-color, var(--hsf-default-button--hover__background-color)));
+  border-color:var(--hsf-button--hover__border-color, var(--hsf-button__border-color, var(--hsf-default-button__border-color)))
+}
+[data-hsfc-id=Renderer] .hsfc-Button:not([disabled]):active{transform:translateY(1px);box-shadow:none}
+[data-hsfc-id=Renderer] .hsfc-Button:not([disabled]):focus{
+  color:var(--hsf-button--focus__color, var(--hsf-button__color, var(--hsf-default-button__color)));
+  background-color:var(--hsf-button--focus__background-color, var(--hsf-button__background-color, var(--hsf-default-button__background-color)));
+  border-color:var(--hsf-button--focus__border-color, var(--hsf-button__border-color, var(--hsf-default-button__border-color)))
+}
+[data-hsfc-id=Renderer] .hsfc-Button[disabled]{cursor:not-allowed;filter:brightness(90%)}
+[data-hsfc-id=Renderer] .hsfc-Button--loading{color:transparent!important}
+[data-hsfc-id=Renderer] .hsfc-Button--loading:after{
+  position:absolute;
+  left:calc(50% - .5em);
+  top:calc(50% - .5em);
+  height:1em;width:1em;
+  transform-origin:center;
+  animation:spin .75s infinite linear;
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z' opacity='.25' /%3E%3Cpath d='M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z' opacity='0.6' /%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z' opacity='.25' /%3E%3Cpath d='M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z' opacity='0.6' /%3E%3C/svg%3E");
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-position:center;mask-position:center;
+  -webkit-mask-size:1em;mask-size:1em;
+  content:"";
+  background-color:var(--hsf-button__color, var(--hsf-default-button__color))
+}
+
+/* --- the rest of HubSpot BaseStyle you pasted continues ---
+   You can keep using your pasted content as-is AFTER this point,
+   as long as the two // comments were fixed (done above).
+   ========================================================= */
+
+/* =========================================================
+   HubSpot "namespace" style (the SECOND injected <style>)
+   This is the form-instance variable skin.
+   ========================================================= */
+[id="hs_form_target_form_725511019-r"][data-hsfc-id="Renderer"]{
+  --hsf-default-heading__font-family: Helvetica;
+  --hsf-default-heading__color: rgba(51,71,91,1.0);
+  --hsf-default-richtext__font-family: Helvetica;
+  --hsf-default-richtext__font-size: 1.0em;
+  --hsf-default-richtext__color: rgba(51,71,91,1.0);
+  --hsf-default-button__font-family: helvetica;
+  --hsf-default-button__font-size: 1.0em;
+  --hsf-default-button__color: rgba(255,255,255,1.0);
+  --hsf-default-button__background-color: rgba(255,105,180,1.0);
+  --hsf-default-button__border-radius: 3.0px 3.0px 3.0px 3.0px;
+  --hsf-default-button__padding: 12.0px 24.0px 12.0px 24.0px;
+  --hsf-default-button--hover__background-color: rgba(255, 116, 198, 1);
+
+  --hsf-default-field-label__font-family: Helvetica;
+  --hsf-default-field-label__font-size: 1.0em;
+  --hsf-default-field-label__color: rgba(33,45,58,1.0);
+
+  --hsf-default-field-input__placeholder-color: rgba(81,99,131,0.64);
+
+  --hsf-default-field-description__font-family: Helvetica;
+  --hsf-default-field-description__color: rgba(81,99,131,0.89);
+
+  --hsf-default-erroralert__font-family: Helvetica;
+  --hsf-default-erroralert__color: rgba(229,21,32,1.0);
+
+  --hsf-default-infoalert__font-family: Helvetica;
+
+  --hsf-default-background__border-style: none;
+  --hsf-default-background__border-color: rgba(255,255,255,1.0);
+  --hsf-default-background__border-radius: 0.0px 0.0px 0.0px 0.0px;
+  --hsf-default-background__border-width: 1.0px 1.0px 1.0px 1.0px;
+  --hsf-default-background-banner__border-bottom-left-radius: 0px;
+  --hsf-default-background-banner__border-bottom-right-radius: 0px;
+  --hsf-default-background-banner__border-top-left-radius: 0px;
+  --hsf-default-background-banner__border-top-right-radius: 0px;
+
+  --hsf-default-field-input__font-family: helvetica;
+  --hsf-default-field-input__background-color: rgba(245,248,250,1.0);
+  --hsf-default-field-input__border-color: rgba(149,148,148,1.0);
+  --hsf-default-field-input__border-style: solid;
+  --hsf-default-field-input__border-width: 1.0px 1.0px 1.0px 1.0px;
+  --hsf-default-field-input__border-radius: 3.0px 3.0px 3.0px 3.0px;
+  --hsf-default-field-input__padding: 10.0px 10.0px 10.0px 10.0px;
+
+  --hsf-default-field-textarea__font-family: helvetica;
+  --hsf-default-field-textarea__background-color: rgba(245,248,250,1.0);
+  --hsf-default-field-textarea__border-color: rgba(149,148,148,1.0);
+  --hsf-default-field-textarea__border-style: solid;
+  --hsf-default-field-textarea__border-width: 1.0px 1.0px 1.0px 1.0px;
+  --hsf-default-field-textarea__border-radius: 3.0px 3.0px 3.0px 3.0px;
+  --hsf-default-field-textarea__padding: 10.0px 10.0px 10.0px 10.0px;
+  --hsf-default-field-textarea__placeholder-color: rgba(81,99,131,0.64);
+
+  --hsf-default-field-checkbox__background-color: rgba(245,248,250,1.0);
+  --hsf-default-field-checkbox__border-color: rgba(149,148,148,1.0);
+  --hsf-default-field-checkbox__border-style: solid;
+  --hsf-default-field-checkbox__border-width: 1.0px 1.0px 1.0px 1.0px;
+
+  --hsf-default-field-radio__background-color: rgba(245,248,250,1.0);
+  --hsf-default-field-radio__border-color: rgba(149,148,148,1.0);
+  --hsf-default-field-radio__border-style: solid;
+  --hsf-default-field-radio__border-width: 1.0px 1.0px 1.0px 1.0px;
+
+  --hsf-default-field-dropdown-options__border-radius: 3px 3px 3px 3px;
+}
+
+/* =========================================================
+   SAFE “match screenshot #1” overrides (scoped)
+   (No renaming. Just stronger layout + checkbox visibility.)
+   ========================================================= */
+.newsletter-form [data-hsfc-id="Renderer"] .hsfc-Row{
+  display:grid !important; /* ensures 2-col row comes back */
+  grid-template-columns:repeat(auto-fit,minmax(0,1fr)) !important;
+  gap:var(--hsf-row__horizontal-spacing, 30px) !important;
+  margin-bottom:var(--hsf-row__vertical-spacing, 20px) !important;
+}
+
+.newsletter-form [data-hsfc-id="Renderer"] .hsfc-FieldLabel{
+  display:block !important;           /* bring labels back if anything hid them */
+  margin:0 0 8px 0 !important;
+  line-height:1.2 !important;
+}
+
+.newsletter-form [data-hsfc-id="Renderer"] .hsfc-NavigationRow__Buttons{
+  justify-content:flex-end !important; /* puts “Get Updates” to the right like screenshot #1 */
+}
+
+.newsletter-form [data-hsfc-id="Renderer"] .hsfc-CheckboxField label{
+  justify-content:flex-start !important; /* better matches screenshot #1 */
+}
+
+.newsletter-form [data-hsfc-id="Renderer"] .hsfc-CheckboxInput{
+  width:18px;
+  height:18px;
+  min-width:18px;
+  min-height:18px;
+  display:inline-block;
+}
