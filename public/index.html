@@ -4667,32 +4667,17 @@ var hsVars = hsVars || {}; hsVars['language'] = 'en-ph';
 <script src="/assets/js/modules/Newsletter.module.js"></script>
 
 
-  <script data-hs-allowed="true">
-    ((d=document,q='querySelectorAll',l='hs-form-html',m='script',b='/_hcms/forms/embed/v4/render-definition/ssr',u='https://js-na2.hsforms.net/forms/embed/243726556.js') => {
-      const a = (t,i) => t.replace(/{{hs_form_instance_id_placeholder}}/g,i);
-      const i = (f,o) => {f.innerHTML=o;for(const s of f[q](m)){const n=d.createElement(m);for(const{name:e,value:t}of s.attributes)n.setAttribute(e,t);n.appendChild(d.createTextNode(s.innerHTML)),s.parentNode.replaceChild(n,s)}};
-      const j = (e,f) => {try{if(e.status === 404)return;}catch(_){}const n=f.cloneNode(true);n.classList.replace(l,'hs-form-frame');i(f,'<'+m+' src="'+u+'"></'+m+'>'+n.outerHTML);};
-      const r = (el,c=el.dataset) => {if(c.fetched)return;c.fetched=Date.now();fetch(`${b}/${c.portalId}/${c.formId}`).then((r) => r.text().then((t) => {i(el,a(t,el.id));c.loaded=Date.now();})).catch((e) => j(e,el));};
-      d[q]('.'+l).forEach((el) => r(el));
-    })();
-  </script>
-
-
-  <script data-hs-allowed="true">
-    ((el) => {
-      el && el.addEventListener('hs-form-event:on-ready', (e) => {
-      window.HubSpotFormsV4.getFormFromEvent(e).setExtraSubmissionMetadata({
-        
-        
-        
-        
-        
-        
-        
-      });
+<script src="https://js-na2.hsforms.net/forms/v2.js" charset="utf-8"></script>
+<script>
+  if (window.hbspt && window.hbspt.forms) {
+    window.hbspt.forms.create({
+      region: "na2",
+      portalId: "243726556",
+      formId: "a8e00675-911e-492c-807c-4e00fdfff76a",
+      target: "#hs_form_target_form_725511019"
     });
-    })(document.getElementById('hs_form_target_form_725511019'));
-  </script>
+  }
+</script>
 
 
 
