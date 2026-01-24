@@ -406,18 +406,8 @@
     padding:15px 0px 30px !important;
   }
 }
-@media (min-width: 768px) {
-  .hsfc-Step .hsfc-Step__Content {
-    width: 700px !important;
-    padding:15px 0px 30px !important;
-}
 @media (max-width: 767px) {
   [data-hsfc-id=Renderer] .hsfc-Step .hsfc-Step__Content {
-    padding:15px 5px 30px !important;
-  }
-}
-@media (max-width: 767px) {
-  .hsfc-Step .hsfc-Step__Content {
     padding:15px 5px 30px !important;
   }
 }
