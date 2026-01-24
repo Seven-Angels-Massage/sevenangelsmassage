@@ -1,380 +1,526 @@
-function getCookie(name) {
-  const m = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-  return m ? decodeURIComponent(m[2]) : "";
-}
-
-function buildHsContext() {
-  const urlParams = {};
-  for (const [k, v] of new URLSearchParams(window.location.search).entries()) urlParams[k] = v;
-
-  const hutk = getCookie("hubspotutk");
-
-  const ctx = {
-    source: "forms-embed-static",
-    sourceName: "forms-embed",
-    sourceVersion: "1.0",
-    sourceVersionMajor: "1",
-    sourceVersionMinor: "0",
-    referrer: document.referrer || "",
-    userAgent: navigator.userAgent,
-    urlParams,
-    canonicalUrl: window.location.origin,
-    contentType: "standard-page",
-    locale: "en",
-    pageUrl: window.location.href,
-    pageTitle: document.title || "",
-  };
-
-  if (hutk) ctx.hutk = hutk;
-
-  return ctx;
-}
-
-function setError(alertsEl, message) {
-  if (!alertsEl) return;
-  alertsEl.innerHTML = `<div data-hsfc-id="ErrorAlert" class="hsfc-ErrorAlert">${message}</div>`;
-}
-
-function clearError(alertsEl) {
-  if (!alertsEl) return;
-  alertsEl.innerHTML = "";
-}
-
-function closeDropdown(dropdownOptions, comboboxInput) {
-  if (!dropdownOptions) return;
-  dropdownOptions.style.display = "none";
-  dropdownOptions.style.top = "";
-  dropdownOptions.style.left = "";
-  dropdownOptions.style.right = "";
-  dropdownOptions.style.width = "";
-  if (comboboxInput) comboboxInput.setAttribute("aria-expanded", "false");
-
-  // clear search + reset filter
-  const search = dropdownOptions.querySelector('.hsfc-DropdownOptions__Search input');
-  if (search) search.value = "";
-
-  const items = dropdownOptions.querySelectorAll(".hsfc-DropdownOptions__List__ListItem");
-  items.forEach((li) => (li.style.display = ""));
-}
-
-function openDropdown(dropdownOptions, comboboxInput, positionFn) {
-  if (!dropdownOptions) return;
-  dropdownOptions.style.display = "flex";
-  if (comboboxInput) comboboxInput.setAttribute("aria-expanded", "true");
-
-  if (typeof positionFn === "function") positionFn(dropdownOptions);
-
-  const search = dropdownOptions.querySelector('.hsfc-DropdownOptions__Search input');
-  if (search) search.focus();
-}
-
-function filterDropdown(dropdownOptions, query) {
-  const q = (query || "").trim().toLowerCase();
-  const items = dropdownOptions.querySelectorAll(".hsfc-DropdownOptions__List__ListItem");
-  items.forEach((li) => {
-    const text = (li.textContent || "").toLowerCase();
-    li.style.display = text.includes(q) ? "" : "none";
-  });
-}
-
-function selectListItem(listRoot, selectedLi) {
-  const items = listRoot.querySelectorAll(".hsfc-DropdownOptions__List__ListItem");
-  items.forEach((li) => {
-    li.classList.remove("hsfc-DropdownOptions__List__ListItem--selected");
-    li.setAttribute("aria-selected", "false");
-  });
-
-  selectedLi.classList.add("hsfc-DropdownOptions__List__ListItem--selected");
-  selectedLi.setAttribute("aria-selected", "true");
-}
-
-function setupCityDropdown(formRoot) {
-  const field = formRoot.querySelector("#hs_form_target_form_725511019-2089118563845");
-  if (!field) return;
-
-  const comboboxInput = field.querySelector("#hs_form_target_form_725511019-2089118563845-input");
-  const hiddenInput = field.querySelector('input[type="hidden"][name="0-1/location_"]');
-  const caret = field.querySelector(".hsfc-DropdownInput__Caret");
-  const dropdownOptions = field.querySelector('.hsfc-DropdownOptions');
-  const searchInput = dropdownOptions?.querySelector('.hsfc-DropdownOptions__Search input');
-  const list = dropdownOptions?.querySelector(".hsfc-DropdownOptions__List");
-
-  if (!comboboxInput || !hiddenInput || !dropdownOptions || !list) return;
-
-  const positionOptions = (opts) => {
-    const wrap = field.querySelector(".hsfc-DropdownInput");
-    if (!wrap) return;
-    opts.style.left = "0";
-    opts.style.top = (wrap.offsetHeight + 4) + "px";
-  };
-
-  const toggle = () => {
-    const isOpen = dropdownOptions.style.display !== "none";
-    if (isOpen) closeDropdown(dropdownOptions, comboboxInput);
-    else openDropdown(dropdownOptions, comboboxInput, positionOptions);
-  };
-
-  comboboxInput.addEventListener("click", toggle);
-  caret?.addEventListener("click", toggle);
-
-  searchInput?.addEventListener("input", (e) => {
-    filterDropdown(dropdownOptions, e.target.value);
-  });
-
-  list.addEventListener("click", (e) => {
-    const li = e.target.closest(".hsfc-DropdownOptions__List__ListItem");
-    if (!li) return;
-
-    selectListItem(list, li);
-    comboboxInput.value = (li.textContent || "").trim();
-    hiddenInput.value = (li.textContent || "").trim();
-    closeDropdown(dropdownOptions, comboboxInput);
-    comboboxInput.focus();
-  });
-
-  // keyboard support (basic)
-  comboboxInput.addEventListener("keydown", (e) => {
-    const isOpen = dropdownOptions.style.display !== "none";
-
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      if (!isOpen) openDropdown(dropdownOptions, comboboxInput, positionOptions);
-      const first = Array.from(list.querySelectorAll(".hsfc-DropdownOptions__List__ListItem")).find(li => li.style.display !== "none");
-      first?.focus();
-    }
-
-    if (e.key === "Escape") {
-      e.preventDefault();
-      closeDropdown(dropdownOptions, comboboxInput);
-    }
-
-    if (e.key === "Enter") {
-      e.preventDefault();
-      if (!isOpen) openDropdown(dropdownOptions, comboboxInput, positionOptions);
-    }
-  });
-
-  list.addEventListener("keydown", (e) => {
-    const items = Array.from(list.querySelectorAll(".hsfc-DropdownOptions__List__ListItem")).filter(li => li.style.display !== "none");
-    const idx = items.indexOf(document.activeElement);
-
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      items[Math.min(idx + 1, items.length - 1)]?.focus();
-    }
-
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      items[Math.max(idx - 1, 0)]?.focus();
-    }
-
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const li = document.activeElement?.closest(".hsfc-DropdownOptions__List__ListItem");
-      if (li) {
-        selectListItem(list, li);
-        comboboxInput.value = (li.textContent || "").trim();
-        hiddenInput.value = (li.textContent || "").trim();
-        closeDropdown(dropdownOptions, comboboxInput);
-        comboboxInput.focus();
-      }
-    }
-
-    if (e.key === "Escape") {
-      e.preventDefault();
-      closeDropdown(dropdownOptions, comboboxInput);
-      comboboxInput.focus();
-    }
-  });
-
-  // click outside closes
-  document.addEventListener("click", (e) => {
-    if (!field.contains(e.target)) closeDropdown(dropdownOptions, comboboxInput);
-  });
-}
-
-function setupPhoneDropdown(formRoot) {
-  const field = formRoot.querySelector("#hs_form_target_form_725511019-2232189162782");
-  if (!field) return;
-
-  const phoneWrap = field.querySelector(".hsfc-PhoneInput");
-  const flagCaretBtn = field.querySelector(".hsfc-PhoneInput__FlagAndCaret");
-  const flagSpan = field.querySelector(".hsfc-PhoneInput__FlagAndCaret__Flag");
-  const phoneInput = field.querySelector("#hs_form_target_form_725511019-2232189162782-input");
-  const hiddenPhone = field.querySelector('input[type="hidden"][name="0-1/phone"]');
-  const dropdownOptions = field.querySelector('.hsfc-PhoneInput .hsfc-DropdownOptions');
-  const searchInput = dropdownOptions?.querySelector('.hsfc-DropdownOptions__Search input');
-  const list = dropdownOptions?.querySelector(".hsfc-DropdownOptions__List");
-
-  if (!phoneWrap || !flagCaretBtn || !flagSpan || !phoneInput || !hiddenPhone || !dropdownOptions || !list) return;
-
-  const positionOptions = (opts) => {
-    const fieldRect = field.getBoundingClientRect();
-    const wrapRect = phoneWrap.getBoundingClientRect();
-
-    opts.style.left = (wrapRect.left - fieldRect.left) + "px";
-    opts.style.top = (wrapRect.bottom - fieldRect.top + 4) + "px";
-    opts.style.width = wrapRect.width + "px";
-  };
-
-  const toggle = () => {
-    const isOpen = dropdownOptions.style.display !== "none";
-    if (isOpen) closeDropdown(dropdownOptions);
-    else openDropdown(dropdownOptions, null, positionOptions);
-  };
-
-  flagCaretBtn.addEventListener("click", toggle);
-  flagCaretBtn.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      toggle();
-    }
-    if (e.key === "Escape") {
-      e.preventDefault();
-      closeDropdown(dropdownOptions);
-    }
-  });
-
-  searchInput?.addEventListener("input", (e) => {
-    filterDropdown(dropdownOptions, e.target.value);
-  });
-
-  list.addEventListener("click", (e) => {
-    const li = e.target.closest(".hsfc-DropdownOptions__List__ListItem");
-    if (!li) return;
-
-    selectListItem(list, li);
-
-    const text = (li.textContent || "").trim();
-    const flag = text.split(" ")[0] || "🏳️";
-    const m = text.match(/\+(\d+)\s*$/);
-    const code = m ? m[1] : "";
-
-    flagSpan.textContent = flag;
-
-    if (code) {
-      // replace existing +digits prefix, or set a new one
-      const current = phoneInput.value || "";
-      if (/^\+\d+/.test(current)) {
-        phoneInput.value = current.replace(/^\+\d+/, `+${code}`);
-      } else {
-        phoneInput.value = `+${code}`;
-      }
-    }
-
-    // keep hidden value synced
-    hiddenPhone.value = phoneInput.value;
-
-    closeDropdown(dropdownOptions);
-    phoneInput.focus();
-  });
-
-  phoneInput.addEventListener("input", () => {
-    hiddenPhone.value = phoneInput.value;
-  });
-
-  // click outside closes
-  document.addEventListener("click", (e) => {
-    if (!field.contains(e.target)) closeDropdown(dropdownOptions);
-  });
-}
-
-function setupCheckboxSync(formRoot) {
-  const cb = formRoot.querySelector('#hs_form_target_form_725511019-2228651451587-input');
-  if (!cb) return;
-
-  const sync = () => {
-    cb.value = cb.checked ? "true" : "false";
-  };
-
-  cb.addEventListener("change", sync);
-  sync();
-}
-
-function setupSubmitFlow(formRoot) {
-  const form = formRoot.querySelector('#hs_form_target_form_725511019-a8e00675-911e-492c-807c-4e00fdfff76a');
-  if (!form) return;
-
-  const alerts = form.querySelector("#hs_form_target_form_725511019-37-a");
-  const submitBtn = form.querySelector("#hs_form_target_form_725511019-15");
-  const iframe = form.querySelector('iframe[name^="submission_handler_hs_form_target_form_725511019"]');
-
-  const firstName = form.querySelector("#hs_form_target_form_725511019-6-input");
-  const cityHidden = form.querySelector('input[type="hidden"][name="0-1/location_"]');
-  const cityVisible = form.querySelector("#hs_form_target_form_725511019-2089118563845-input");
-  const phoneVisible = form.querySelector("#hs_form_target_form_725511019-2232189162782-input");
-  const phoneHidden = form.querySelector('input[type="hidden"][name="0-1/phone"]');
-  const email = form.querySelector("#hs_form_target_form_725511019-3-input");
-  const checkbox = form.querySelector("#hs_form_target_form_725511019-2228651451587-input");
-  const hsContext = form.querySelector('input[name="hs_context"]');
-
-  const postSubmit = document.getElementById("hs_form_target_form_725511019-postsubmit");
-  const formWrapper = formRoot.querySelector(".hsfc-FormWrapper");
-
-  // fill hs_context once
-  if (hsContext) {
-    hsContext.value = JSON.stringify(buildHsContext());
-  }
-
-  let submitted = false;
-
-  iframe?.addEventListener("load", () => {
-    if (!submitted) return;
-    submitted = false;
-
-    // stop loading state
-    if (submitBtn) {
-      submitBtn.classList.remove("hsfc-Button--loading");
-      submitBtn.setAttribute("aria-busy", "false");
-      submitBtn.disabled = false;
-    }
-
-    clearError(alerts);
-
-    // show post submit
-    if (formWrapper) formWrapper.style.display = "none";
-    if (postSubmit) postSubmit.style.display = "block";
-  });
-
-  form.addEventListener("submit", (e) => {
-    clearError(alerts);
-
-    // sync hidden values before submit
-    if (phoneHidden && phoneVisible) phoneHidden.value = phoneVisible.value;
-    if (checkbox) checkbox.value = checkbox.checked ? "true" : "false";
-
-    const problems = [];
-
-    if (!firstName || !firstName.value.trim()) problems.push("Please complete this required field: First Name.");
-    if (!cityHidden || !cityHidden.value.trim()) problems.push("Please complete this required field: City / Location.");
-    if (!phoneVisible || !phoneVisible.value.trim() || phoneVisible.value.trim() === "+") problems.push("Please complete this required field: Mobile Number.");
-    if (!email || !email.value.trim() || !email.checkValidity()) problems.push("Please enter a valid email address.");
-    if (!checkbox || !checkbox.checked) problems.push("Please confirm: Yes, send me updates…");
-
-    if (problems.length) {
-      e.preventDefault();
-      setError(alerts, problems.join("<br>"));
-      return;
-    }
-
-    // loading state
-    if (submitBtn) {
-      submitBtn.classList.add("hsfc-Button--loading");
-      submitBtn.setAttribute("aria-busy", "true");
-      submitBtn.disabled = true;
-    }
-
-    submitted = true;
-  });
-}
+// /assets/js/modules/Newsletter.module.js
 
 document.addEventListener("DOMContentLoaded", () => {
-  const formRoot = document.getElementById("hs_form_target_form_725511019-r") || document;
+  const ROOT = document.querySelector(".newsletter-form");
+  if (!ROOT) return;
 
-  setupCityDropdown(formRoot);
-  setupPhoneDropdown(formRoot);
-  setupCheckboxSync(formRoot);
-  setupSubmitFlow(formRoot);
+  const form = ROOT.querySelector("form.hsfc-Form");
+  if (!form) return;
+
+  const REQUIRED_MSG = "Please complete this required field.";
+  const EMAIL_INVALID_MSG = "Email must be formatted correctly.";
+  const PHONE_INVALID_CHARS_MSG =
+    "Must start with an extension and contain only numbers, +()-. and x.";
+
+  const openDropdowns = new Set();
+  const toArray = (x) => Array.prototype.slice.call(x || []);
+  const norm = (s) => (s || "").toString().trim().toLowerCase();
+
+  function ensureErrorEl(fieldEl) {
+    if (!fieldEl) return null;
+    let el = fieldEl.querySelector(
+      '.hsfc-ErrorAlert[data-newsletter-error="1"]'
+    );
+    if (!el) {
+      el = document.createElement("div");
+      el.className = "hsfc-ErrorAlert";
+      el.dataset.newsletterError = "1";
+      el.setAttribute("role", "alert");
+      el.hidden = true;
+      fieldEl.appendChild(el);
+    }
+    return el;
+  }
+
+  function showError(fieldEl, inputEl, message) {
+    const el = ensureErrorEl(fieldEl);
+    if (el) {
+      el.textContent = message;
+      el.hidden = false;
+    }
+    if (inputEl) inputEl.setAttribute("aria-invalid", "true");
+  }
+
+  function clearError(fieldEl, inputEl) {
+    const el = fieldEl?.querySelector?.(
+      '.hsfc-ErrorAlert[data-newsletter-error="1"]'
+    );
+    if (el) el.hidden = true;
+    if (inputEl) inputEl.setAttribute("aria-invalid", "false");
+  }
+
+  function setListMaxHeight(listEl, px = 260) {
+    if (!listEl) return;
+    listEl.style.maxHeight = `${px}px`;
+    listEl.style.overflowY = "auto";
+  }
+
+  function filterItems(items, q) {
+    const query = norm(q);
+    items.forEach((li) => {
+      const hit = !query || norm(li.textContent).includes(query);
+      li.style.display = hit ? "" : "none";
+    });
+  }
+
+  function closeAllDropdowns(except) {
+    [...openDropdowns].forEach((dd) => {
+      if (dd !== except) dd.close();
+    });
+    openDropdowns.clear();
+    if (except) openDropdowns.add(except);
+  }
+
+  function createDropdown({
+    toggleEl,
+    optionsEl,
+    searchEl,
+    listEl,
+    items,
+    ariaExpandedEl,
+    onSelect,
+  }) {
+    let isOpen = false;
+
+    const api = {
+      open() {
+        if (isOpen) return;
+        isOpen = true;
+
+        closeAllDropdowns(api);
+
+        optionsEl.style.display = "flex";
+        if (ariaExpandedEl) ariaExpandedEl.setAttribute("aria-expanded", "true");
+        if (toggleEl) toggleEl.setAttribute("aria-expanded", "true");
+
+        // Force HubSpot-like scrollbar behavior
+        setListMaxHeight(listEl, 260);
+
+        if (searchEl) {
+          searchEl.value = "";
+          filterItems(items, "");
+          setTimeout(() => searchEl.focus(), 0);
+        }
+      },
+      close() {
+        if (!isOpen) return;
+        isOpen = false;
+
+        optionsEl.style.display = "none";
+        if (ariaExpandedEl) ariaExpandedEl.setAttribute("aria-expanded", "false");
+        if (toggleEl) toggleEl.setAttribute("aria-expanded", "false");
+
+        if (searchEl) {
+          searchEl.value = "";
+          filterItems(items, "");
+        }
+
+        openDropdowns.delete(api);
+      },
+      toggle() {
+        isOpen ? api.close() : api.open();
+      },
+      contains(target) {
+        return toggleEl.contains(target) || optionsEl.contains(target);
+      },
+    };
+
+    toggleEl.addEventListener("click", (e) => {
+      e.preventDefault();
+      api.toggle();
+    });
+
+    toggleEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        api.toggle();
+      }
+      if (e.key === "Escape") api.close();
+    });
+
+    if (searchEl) {
+      searchEl.addEventListener("input", () =>
+        filterItems(items, searchEl.value)
+      );
+      searchEl.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          api.close();
+          toggleEl.focus();
+        }
+      });
+    }
+
+    items.forEach((li) => {
+      li.addEventListener("click", (e) => {
+        e.preventDefault();
+        onSelect(li);
+        api.close();
+      });
+
+      li.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect(li);
+          api.close();
+        }
+      });
+    });
+
+    return api;
+  }
+
+  // Close dropdowns on outside click/tap
+  document.addEventListener("pointerdown", (e) => {
+    if (!openDropdowns.size) return;
+    for (const dd of openDropdowns) {
+      if (dd.contains(e.target)) return;
+    }
+    closeAllDropdowns(null);
+  });
+
+  // Close dropdowns on Escape anywhere
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeAllDropdowns(null);
+  });
+
+  // -------------------------
+  // City dropdown
+  // -------------------------
+  const cityHidden = form.querySelector('input[type="hidden"][name="0-1/location_"]');
+  if (cityHidden) {
+    const cityField = cityHidden.closest(".hsfc-DropdownField");
+    const cityCombobox = cityField.querySelector("input.hsfc-TextInput--button");
+    const cityOptions = cityField.querySelector(".hsfc-DropdownOptions");
+    const citySearch = cityOptions.querySelector('input[role="searchbox"]');
+    const cityList = cityOptions.querySelector('ul[role="listbox"]');
+    const cityItems = toArray(cityList.querySelectorAll('li[role="option"]'));
+    const cityCaret = cityField.querySelector(".hsfc-DropdownInput__Caret");
+
+    function setCitySelected(li) {
+      const value = (li.textContent || "").trim();
+      cityCombobox.value = value;
+      cityHidden.value = value;
+
+      cityItems.forEach((item) => {
+        const selected = item === li;
+        item.setAttribute("aria-selected", selected ? "true" : "false");
+        item.classList.toggle(
+          "hsfc-DropdownOptions__List__ListItem--selected",
+          selected
+        );
+      });
+
+      clearError(cityField, cityCombobox);
+    }
+
+    const cityDropdown = createDropdown({
+      toggleEl: cityCombobox,
+      optionsEl: cityOptions,
+      searchEl: citySearch,
+      listEl: cityList,
+      items: cityItems,
+      ariaExpandedEl: cityCombobox,
+      onSelect: setCitySelected,
+    });
+
+    if (cityCaret) {
+      cityCaret.addEventListener("click", (e) => {
+        e.preventDefault();
+        cityDropdown.toggle();
+      });
+    }
+
+    cityCombobox.addEventListener("blur", () => {
+      if (!cityHidden.value.trim()) showError(cityField, cityCombobox, REQUIRED_MSG);
+    });
+  }
+
+  // -------------------------
+  // Phone (country + dial code)
+  // -------------------------
+  const phoneHidden = form.querySelector('input[type="hidden"][name="0-1/phone"]');
+  if (phoneHidden) {
+    const phoneField = phoneHidden.closest(".hsfc-PhoneField");
+    const phoneInput = phoneField.querySelector('input[type="tel"]');
+    const phoneUI = phoneField.querySelector(".hsfc-PhoneInput");
+    const flagAndCaret = phoneUI.querySelector(".hsfc-PhoneInput__FlagAndCaret");
+    const flagSpan = phoneUI.querySelector(".hsfc-PhoneInput__FlagAndCaret__Flag");
+    const phoneOptions = phoneUI.querySelector(".hsfc-DropdownOptions");
+    const phoneSearch = phoneOptions.querySelector('input[role="searchbox"]');
+    const phoneList = phoneOptions.querySelector('ul[role="listbox"]');
+    const countryLis = toArray(phoneList.querySelectorAll('li[role="option"]'));
+
+    function parseDialCode(text) {
+      const m = (text || "").trim().match(/\+[\d]+$/);
+      return m ? m[0] : "";
+    }
+
+    // Map countries from LI text
+    const countries = countryLis
+      .map((li) => {
+        const text = (li.textContent || "").trim();
+        const dialCode = parseDialCode(text);
+        const flag = text.split(/\s+/)[0] || "";
+        return { li, text, dialCode, flag };
+      })
+      .filter((c) => c.dialCode);
+
+    const dialCodesSortedDesc = [...new Set(countries.map((c) => c.dialCode))].sort(
+      (a, b) => b.length - a.length
+    );
+
+    const countryByDial = new Map();
+    countries.forEach((c) => {
+      if (!countryByDial.has(c.dialCode)) countryByDial.set(c.dialCode, c);
+    });
+
+    // initial selected
+    let selectedCountry =
+      countries.find(
+        (c) =>
+          c.li.getAttribute("aria-selected") === "true" ||
+          c.li.classList.contains("hsfc-DropdownOptions__List__ListItem--selected")
+      ) || countries[0];
+
+    function updateCountrySelectionUI(country) {
+      if (!country) return;
+
+      countries.forEach((c) => {
+        const selected = c === country;
+        c.li.setAttribute("aria-selected", selected ? "true" : "false");
+        c.li.classList.toggle(
+          "hsfc-DropdownOptions__List__ListItem--selected",
+          selected
+        );
+      });
+
+      if (flagSpan) flagSpan.textContent = country.flag || "";
+    }
+
+    function splitDialAndRest(rawValue) {
+      const v = (rawValue || "").trim();
+      if (!v) return { dialCode: "", rest: "" };
+
+      const normalized = v.startsWith("+") ? v : `+${v}`;
+      const match = dialCodesSortedDesc.find((dc) => normalized.startsWith(dc));
+      if (match) return { dialCode: match, rest: normalized.slice(match.length) };
+
+      const m = normalized.match(/^\+\d{1,4}/);
+      if (m) return { dialCode: m[0], rest: normalized.slice(m[0].length) };
+
+      return { dialCode: "", rest: normalized };
+    }
+
+    function syncHiddenPhone() {
+      phoneHidden.value = (phoneInput.value || "").trim();
+    }
+
+    function setSelectedCountry(country, rewriteInputPrefix) {
+      if (!country) return;
+      selectedCountry = country;
+      updateCountrySelectionUI(country);
+
+      if (rewriteInputPrefix) {
+        const current = phoneInput.value || "";
+        const { rest } = splitDialAndRest(current);
+
+        if (!current.trim()) {
+          phoneInput.value = country.dialCode;
+        } else {
+          phoneInput.value = `${country.dialCode}${rest}`;
+        }
+      }
+
+      syncHiddenPhone();
+      clearError(phoneField, phoneInput);
+    }
+
+    // initial sync
+    setSelectedCountry(selectedCountry, false);
+    syncHiddenPhone();
+
+    // dropdown setup
+    createDropdown({
+      toggleEl: flagAndCaret,
+      optionsEl: phoneOptions,
+      searchEl: phoneSearch,
+      listEl: phoneList,
+      items: countryLis,
+      ariaExpandedEl: flagAndCaret,
+      onSelect: (li) => {
+        const dc = parseDialCode(li.textContent);
+        setSelectedCountry(countryByDial.get(dc), true);
+      },
+    });
+
+    // typing dial code auto-selects country
+    phoneInput.addEventListener("input", () => {
+      const raw = (phoneInput.value || "").trim();
+
+      // clear lone "+"
+      if (raw === "+") {
+        phoneInput.value = "";
+        syncHiddenPhone();
+        return;
+      }
+
+      syncHiddenPhone();
+
+      // auto-prefix +
+      if (raw && !raw.startsWith("+") && /^\d/.test(raw)) {
+        const pos = phoneInput.selectionStart;
+        phoneInput.value = `+${raw}`;
+        if (typeof pos === "number") phoneInput.setSelectionRange(pos + 1, pos + 1);
+      }
+
+      const { dialCode } = splitDialAndRest(phoneInput.value);
+      if (dialCode) {
+        const found = countryByDial.get(dialCode);
+        if (found && found !== selectedCountry) {
+          // do not rewrite input while typing (avoid cursor jump)
+          setSelectedCountry(found, false);
+        }
+      }
+
+      if ((phoneInput.value || "").trim()) clearError(phoneField, phoneInput);
+    });
+
+    phoneInput.addEventListener("blur", () => {
+      const v = (phoneInput.value || "").trim();
+
+      if (v && !/^[+\d().\-\sx]+$/i.test(v)) {
+        showError(phoneField, phoneInput, PHONE_INVALID_CHARS_MSG);
+        return;
+      }
+
+      const digits = v.replace(/\D/g, "");
+      const dialDigits = (selectedCountry?.dialCode || "").replace(/\D/g, "");
+      const nationalDigits = dialDigits
+        ? Math.max(0, digits.length - dialDigits.length)
+        : digits.length;
+
+      if (!v || nationalDigits < 4) {
+        showError(phoneField, phoneInput, REQUIRED_MSG);
+      }
+    });
+  }
+
+  // -------------------------
+  // First name + Email + Checkbox
+  // -------------------------
+  const firstNameInput = form.querySelector('input[name="0-1/firstname"]');
+  if (firstNameInput) {
+    const field = firstNameInput.closest(".hsfc-TextField");
+    firstNameInput.addEventListener("input", () => {
+      if (firstNameInput.value.trim()) clearError(field, firstNameInput);
+    });
+    firstNameInput.addEventListener("blur", () => {
+      if (!firstNameInput.value.trim()) showError(field, firstNameInput, REQUIRED_MSG);
+    });
+  }
+
+  const emailInput = form.querySelector('input[name="0-1/email"]');
+  if (emailInput) {
+    const field = emailInput.closest(".hsfc-EmailField");
+    emailInput.addEventListener("input", () => {
+      if (emailInput.value.trim()) clearError(field, emailInput);
+    });
+    emailInput.addEventListener("blur", () => {
+      const v = emailInput.value.trim();
+      if (!v) showError(field, emailInput, REQUIRED_MSG);
+      else if (!emailInput.checkValidity()) showError(field, emailInput, EMAIL_INVALID_MSG);
+    });
+  }
+
+  const checkboxInput = form.querySelector('input[type="checkbox"][name="0-1/confirmation_checkbox"]');
+  if (checkboxInput) {
+    const field = checkboxInput.closest(".hsfc-CheckboxField");
+
+    // Make checkbox submit "true" when checked
+    checkboxInput.value = checkboxInput.checked ? "true" : "false";
+
+    checkboxInput.addEventListener("change", () => {
+      checkboxInput.value = checkboxInput.checked ? "true" : "false";
+      if (checkboxInput.checked) clearError(field, checkboxInput);
+    });
+  }
+
+  // -------------------------
+  // Submit validation (required text in red)
+  // -------------------------
+  form.addEventListener("submit", (e) => {
+    const invalidTargets = [];
+
+    // First Name
+    if (firstNameInput) {
+      const field = firstNameInput.closest(".hsfc-TextField");
+      if (!firstNameInput.value.trim()) {
+        showError(field, firstNameInput, REQUIRED_MSG);
+        invalidTargets.push(firstNameInput);
+      }
+    }
+
+    // City (uses hidden value)
+    const cityHidden2 = form.querySelector('input[type="hidden"][name="0-1/location_"]');
+    if (cityHidden2) {
+      const cityField = cityHidden2.closest(".hsfc-DropdownField");
+      const cityCombobox = cityField.querySelector("input.hsfc-TextInput--button");
+      if (!cityHidden2.value.trim()) {
+        showError(cityField, cityCombobox, REQUIRED_MSG);
+        invalidTargets.push(cityCombobox);
+      }
+    }
+
+    // Phone (hidden is synced; validate visible)
+    const phoneHidden2 = form.querySelector('input[type="hidden"][name="0-1/phone"]');
+    if (phoneHidden2) {
+      const phoneField = phoneHidden2.closest(".hsfc-PhoneField");
+      const phoneInput = phoneField.querySelector('input[type="tel"]');
+      const v = (phoneInput.value || "").trim();
+
+      const digits = v.replace(/\D/g, "");
+      const possibleDial = ((v.startsWith("+") ? v : `+${v}`).match(/^\+\d{1,4}/) || [])[0] || "";
+      const dialDigits = possibleDial.replace(/\D/g, "");
+      const nationalDigits = dialDigits
+        ? Math.max(0, digits.length - dialDigits.length)
+        : digits.length;
+
+      if (!v || v === "+" || nationalDigits < 4) {
+        showError(phoneField, phoneInput, REQUIRED_MSG);
+        invalidTargets.push(phoneInput);
+      }
+    }
+
+    // Email
+    if (emailInput) {
+      const field = emailInput.closest(".hsfc-EmailField");
+      const v = emailInput.value.trim();
+      if (!v) {
+        showError(field, emailInput, REQUIRED_MSG);
+        invalidTargets.push(emailInput);
+      } else if (!emailInput.checkValidity()) {
+        showError(field, emailInput, EMAIL_INVALID_MSG);
+        invalidTargets.push(emailInput);
+      }
+    }
+
+    // Checkbox
+    if (checkboxInput) {
+      const field = checkboxInput.closest(".hsfc-CheckboxField");
+      if (!checkboxInput.checked) {
+        showError(field, checkboxInput, REQUIRED_MSG);
+        invalidTargets.push(checkboxInput);
+      }
+    }
+
+    if (invalidTargets.length) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeAllDropdowns(null);
+      invalidTargets[0].focus();
+    }
+  });
 });
 
 
