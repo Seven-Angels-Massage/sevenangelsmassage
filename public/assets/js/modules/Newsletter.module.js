@@ -56,20 +56,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // Dropdown positioning + scrollbar
+  // Dropdown logic (NO styling)
   // -------------------------
-  function setListScrollbar(listEl, px = 260) {
-    // This is the ONLY styling we force (scrollbar visibility)
-    if (!listEl) return;
-    listEl.style.maxHeight = `${px}px`;
-    listEl.style.overflowY = "auto";
-  }
-
   function filterItems(items, q) {
     const query = norm(q);
     items.forEach((li) => {
       const hit = !query || norm(li.textContent).includes(query);
-      li.style.display = hit ? "" : "none";
+      li.hidden = !hit; // attribute-based visibility (no inline styles)
     });
   }
 
@@ -81,72 +74,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (except) openDropdowns.add(except);
   }
 
-  /**
-   * Positions `.hsfc-DropdownOptions` so it doesn't cover the anchor field.
-   * Chooses drop-down vs drop-up based on available viewport space.
-   */
-  function positionDropdownOptions(optionsEl, anchorEl, offsetParentEl, gap = 6) {
-    if (!optionsEl || !anchorEl) return;
-
-    const parent = offsetParentEl || optionsEl.offsetParent || anchorEl.offsetParent;
-    if (!parent) return;
-
-    // Ensure we can measure
-    const prevDisplay = optionsEl.style.display;
-    const prevVisibility = optionsEl.style.visibility;
-
-    // Must be displayed to measure size; keep hidden to avoid flicker
-    optionsEl.style.display = "flex";
-    optionsEl.style.visibility = "hidden";
-
-    // Make sure list scroll rules are applied BEFORE measuring
-    const listEl =
-      optionsEl.querySelector(".hsfc-DropdownOptions__List") ||
-      optionsEl.querySelector('ul[role="listbox"]');
-    setListScrollbar(listEl, 260);
-
-    const anchorRect = anchorEl.getBoundingClientRect();
-    const parentRect = parent.getBoundingClientRect();
-    const optionsRect = optionsEl.getBoundingClientRect();
-    const optionsHeight = optionsRect.height;
-
-    const availableBelow = window.innerHeight - anchorRect.bottom - gap;
-    const availableAbove = anchorRect.top - gap;
-
-    const shouldDropDown =
-      availableBelow >= Math.min(optionsHeight, 280) || availableBelow >= availableAbove;
-
-    // Reset both so we don't accumulate stale rules
-    optionsEl.style.top = "";
-    optionsEl.style.bottom = "";
-
-    if (shouldDropDown) {
-      // Place below anchor
-      const topPx = anchorRect.bottom - parentRect.top + gap;
-      optionsEl.style.top = `${Math.max(0, topPx)}px`;
-    } else {
-      // Place above anchor
-      const bottomPx = parentRect.bottom - anchorRect.top + gap;
-      optionsEl.style.bottom = `${Math.max(0, bottomPx)}px`;
-    }
-
-    // Restore visibility, keep display as-is
-    optionsEl.style.visibility = prevVisibility || "";
-    optionsEl.style.display = prevDisplay || "flex";
-  }
-
   function createDropdown({
     toggleEl,
     optionsEl,
     searchEl,
-    listEl,
     items,
     ariaExpandedEl,
     onSelect,
-    anchorElForPosition, // the element whose bottom/top we align to
-    offsetParentEl,      // positioned container (usually the field wrapper)
   }) {
     let isOpen = false;
+
+    // Ensure a consistent baseline without touching styles
+    if (optionsEl) optionsEl.hidden = true;
 
     const api = {
       open() {
@@ -155,20 +94,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         closeAllDropdowns(api);
 
-        // Show first (needed for measuring), then position, then focus
-        optionsEl.style.display = "flex";
+        // Attribute-only open/close
+        if (optionsEl) optionsEl.hidden = false;
+
         if (ariaExpandedEl) ariaExpandedEl.setAttribute("aria-expanded", "true");
         if (toggleEl) toggleEl.setAttribute("aria-expanded", "true");
-
-        // Scrollbar (only forced CSS behavior)
-        setListScrollbar(listEl, 260);
-
-        // Dropup/dropdown positioning (prevents covering the field)
-        positionDropdownOptions(
-          optionsEl,
-          anchorElForPosition || toggleEl,
-          offsetParentEl
-        );
 
         if (searchEl) {
           searchEl.value = "";
@@ -180,7 +110,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!isOpen) return;
         isOpen = false;
 
-        optionsEl.style.display = "none";
+        if (optionsEl) optionsEl.hidden = true;
+
         if (ariaExpandedEl) ariaExpandedEl.setAttribute("aria-expanded", "false");
         if (toggleEl) toggleEl.setAttribute("aria-expanded", "false");
 
@@ -196,14 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       contains(target) {
         return toggleEl.contains(target) || optionsEl.contains(target);
-      },
-      reposition() {
-        if (!isOpen) return;
-        positionDropdownOptions(
-          optionsEl,
-          anchorElForPosition || toggleEl,
-          offsetParentEl
-        );
       },
     };
 
@@ -266,20 +189,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape") closeAllDropdowns(null);
   });
 
-  // Reposition open dropdowns on resize/scroll (keeps alignment stable)
-  window.addEventListener("resize", () => {
-    for (const dd of openDropdowns) dd.reposition();
-  });
-
-  // Capture scroll from any scroll container
-  window.addEventListener(
-    "scroll",
-    () => {
-      for (const dd of openDropdowns) dd.reposition();
-    },
-    true
-  );
-
   // -------------------------
   // City dropdown
   // -------------------------
@@ -294,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const cityList = cityOptions.querySelector('ul[role="listbox"]');
     const cityItems = toArray(cityList.querySelectorAll('li[role="option"]'));
     const cityCaret = cityField.querySelector(".hsfc-DropdownInput__Caret");
-    const cityAnchor = cityField.querySelector(".hsfc-DropdownInput"); // align menu to this box
 
     function setCitySelected(li) {
       const value = (li.textContent || "").trim();
@@ -317,12 +225,9 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleEl: cityCombobox,
       optionsEl: cityOptions,
       searchEl: citySearch,
-      listEl: cityList,
       items: cityItems,
       ariaExpandedEl: cityCombobox,
       onSelect: setCitySelected,
-      anchorElForPosition: cityAnchor || cityCombobox,
-      offsetParentEl: cityField, // `.hsfc-DropdownField` is position:relative in your DOM CSS
     });
 
     if (cityCaret) {
@@ -512,37 +417,30 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       function formatPhoneDisplay(normalized) {
-        // normalized is like: +63XXXXXXXXXX (no guaranteed spaces)
         if (!normalized) return "";
 
         const dialCode = findDialMatch(normalized);
-        if (!dialCode) return normalized; // don't guess spacing without a real match
+        if (!dialCode) return normalized;
 
         const digitsAll = normalized.replace(/\D/g, "");
         const dialDigits = dialCode.replace(/\D/g, "");
         let national = digitsAll.slice(dialDigits.length);
 
-        // Format rules by dial
         if (dialCode === "+63") {
-          // PH: +63 9XX XXX XXXX (best effort)
-          // if user hasn't typed enough, still add grouping progressively
           const g = national.length <= 3 ? [national.length] : [3, 3, 4];
           return `+63 ${groupDigits(national, g)}`.trim();
         }
 
         if (dialCode === "+1") {
-          // +1 XXX XXX XXXX
           const g = national.length <= 3 ? [national.length] : [3, 3, 4];
           return `+1 ${groupDigits(national, g)}`.trim();
         }
 
         if (dialCode === "+65" || dialCode === "+852") {
-          // +65 XXXX XXXX, +852 XXXX XXXX
           const g = national.length <= 4 ? [national.length] : [4, 4];
           return `${dialCode} ${groupDigits(national, g)}`.trim();
         }
 
-        // Fallback: chunk by 3s (progressive)
         const groups = [];
         while (national.length - groups.reduce((a, b) => a + b, 0) > 3) groups.push(3);
         groups.push(Math.max(0, national.length - groups.reduce((a, b) => a + b, 0)));
@@ -557,7 +455,6 @@ document.addEventListener("DOMContentLoaded", () => {
           const normalized = normalizePhone(phoneInput.value || "");
           const dialCode = findDialMatch(normalized) || selectedCountry.dialCode;
 
-          // Extract national digits from current input (digits after any dial code)
           const digitsAll = normalized.replace(/\D/g, "");
           const dialDigits = dialCode.replace(/\D/g, "");
           const national = digitsAll.slice(dialDigits.length);
@@ -565,7 +462,6 @@ document.addEventListener("DOMContentLoaded", () => {
           const next = `${selectedCountry.dialCode}${national ? national : ""}`;
           phoneInput.value = formatPhoneDisplay(next);
 
-          // Keep caret at end after selection (matches HubSpot feel)
           try {
             phoneInput.setSelectionRange(phoneInput.value.length, phoneInput.value.length);
           } catch (_) {}
@@ -593,7 +489,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (!selectedCountry || selectedCountry.dialCode !== found.dialCode) {
-          // Don't rewrite while typing (avoid cursor jump)
           selectedCountry = found;
           updateCountrySelectionUI(selectedCountry);
         } else {
@@ -601,7 +496,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Expose for submit validation
       phoneCtx = {
         field: phoneField,
         input: phoneInput,
@@ -610,28 +504,21 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       };
 
-      // initial sync (based on prefilled input)
       syncHiddenPhone();
       syncCountryFromInput();
 
-      // dropdown setup (Country list)
       const phoneDropdown = createDropdown({
         toggleEl: flagAndCaret,
         optionsEl: phoneOptions,
         searchEl: phoneSearch,
-        listEl: phoneList,
         items: countryLis,
         ariaExpandedEl: flagAndCaret,
         onSelect: (li) => {
           const dc = parseDialCode(li.textContent);
           setSelectedCountry(countryByDial.get(dc) || null, true);
         },
-        // Align dropdown to the whole phone input row (so it doesn't cover it)
-        anchorElForPosition: phoneUI,
-        offsetParentEl: phoneField, // `.hsfc-PhoneField` is position:relative in your DOM CSS
       });
 
-      // Hard block unwanted characters: only digits, spaces, and "+" (only at the start)
       phoneInput.addEventListener("keydown", (e) => {
         if (e.ctrlKey || e.metaKey) return;
 
@@ -677,7 +564,6 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
       });
 
-      // Sanitize on paste too
       phoneInput.addEventListener("paste", (e) => {
         if (!e.clipboardData) return;
         e.preventDefault();
@@ -717,7 +603,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       phoneInput.addEventListener("input", () => {
-        // Clear while editing (errors on blur/submit)
         clearError(phoneField, phoneInput);
 
         const raw = phoneInput.value || "";
@@ -726,7 +611,6 @@ document.addEventListener("DOMContentLoaded", () => {
             ? phoneInput.selectionStart
             : null;
 
-        // Sanitize while preserving caret reasonably well
         if (caret !== null) {
           const before = raw.slice(0, caret);
           const sanitizedAll = sanitizePhoneRaw(raw);
@@ -742,7 +626,6 @@ document.addEventListener("DOMContentLoaded", () => {
           phoneInput.value = sanitizePhoneRaw(raw);
         }
 
-        // Auto-prefix +
         if (
           phoneInput.value &&
           !phoneInput.value.startsWith("+") &&
@@ -758,7 +641,6 @@ document.addEventListener("DOMContentLoaded", () => {
           } catch (_) {}
         }
 
-        // No spaces directly after "+"
         phoneInput.value = phoneInput.value.replace(/^\+\s+/, "+");
 
         syncHiddenPhone();
@@ -770,7 +652,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       phoneInput.addEventListener("blur", () => {
-        // Apply spacing format on blur (matches your screenshot expectation)
         const normalized = normalizePhone(phoneInput.value || "");
         if (normalized) {
           phoneInput.value = formatPhoneDisplay(normalized);
@@ -782,9 +663,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!res.ok) showError(phoneField, phoneInput, res.message);
       });
 
-      // If the dropdown is open and user scrolls inside it, keep it aligned (optional but helpful)
-      phoneOptions.addEventListener("wheel", () => {
-        phoneDropdown.reposition();
+      flagAndCaret.addEventListener("click", (e) => {
+        e.preventDefault();
+        phoneDropdown.toggle();
       });
     }
   }
@@ -804,11 +685,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Stricter email check (requires dot + TLD >= 2)
   function isEmailStrict(v) {
     const s = (v || "").trim();
     if (!s) return false;
-    // local@domain.tld (tld >=2). Keep it practical, not insane.
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     return re.test(s);
   }
@@ -854,14 +733,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // Submit validation (required text in red)
+  // Submit validation
   // -------------------------
   form.addEventListener(
     "submit",
     (e) => {
       const invalidTargets = [];
 
-      // First Name
       if (firstNameInput) {
         const field = firstNameInput.closest(".hsfc-TextField");
         if (!firstNameInput.value.trim()) {
@@ -870,7 +748,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // City
       const cityHidden2 = form.querySelector(
         'input[type="hidden"][name="0-1/location_"]'
       );
@@ -883,7 +760,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Phone
       if (phoneCtx?.field && phoneCtx?.input && typeof phoneCtx.validate === "function") {
         const res = phoneCtx.validate();
         if (!res.ok) {
@@ -892,7 +768,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Email (strict)
       if (emailInput) {
         const field = emailInput.closest(".hsfc-EmailField");
         const v = emailInput.value.trim();
@@ -905,7 +780,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Checkbox
       if (checkboxInput) {
         const field = checkboxInput.closest(".hsfc-CheckboxField");
         if (!checkboxInput.checked) {
