@@ -19,6 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Keep a handle to phone validation for submit
   let phoneCtx = null;
 
+  // -------------------------
+  // Error helpers
+  // -------------------------
   function ensureErrorEl(fieldEl) {
     if (!fieldEl) return null;
     let el = fieldEl.querySelector(
@@ -52,7 +55,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (inputEl) inputEl.setAttribute("aria-invalid", "false");
   }
 
-  function setListMaxHeight(listEl, px = 260) {
+  // -------------------------
+  // Dropdown positioning + scrollbar
+  // -------------------------
+  function setListScrollbar(listEl, px = 260) {
+    // This is the ONLY styling we force (scrollbar visibility)
     if (!listEl) return;
     listEl.style.maxHeight = `${px}px`;
     listEl.style.overflowY = "auto";
@@ -74,6 +81,60 @@ document.addEventListener("DOMContentLoaded", () => {
     if (except) openDropdowns.add(except);
   }
 
+  /**
+   * Positions `.hsfc-DropdownOptions` so it doesn't cover the anchor field.
+   * Chooses drop-down vs drop-up based on available viewport space.
+   */
+  function positionDropdownOptions(optionsEl, anchorEl, offsetParentEl, gap = 6) {
+    if (!optionsEl || !anchorEl) return;
+
+    const parent = offsetParentEl || optionsEl.offsetParent || anchorEl.offsetParent;
+    if (!parent) return;
+
+    // Ensure we can measure
+    const prevDisplay = optionsEl.style.display;
+    const prevVisibility = optionsEl.style.visibility;
+
+    // Must be displayed to measure size; keep hidden to avoid flicker
+    optionsEl.style.display = "flex";
+    optionsEl.style.visibility = "hidden";
+
+    // Make sure list scroll rules are applied BEFORE measuring
+    const listEl =
+      optionsEl.querySelector(".hsfc-DropdownOptions__List") ||
+      optionsEl.querySelector('ul[role="listbox"]');
+    setListScrollbar(listEl, 260);
+
+    const anchorRect = anchorEl.getBoundingClientRect();
+    const parentRect = parent.getBoundingClientRect();
+    const optionsRect = optionsEl.getBoundingClientRect();
+    const optionsHeight = optionsRect.height;
+
+    const availableBelow = window.innerHeight - anchorRect.bottom - gap;
+    const availableAbove = anchorRect.top - gap;
+
+    const shouldDropDown =
+      availableBelow >= Math.min(optionsHeight, 280) || availableBelow >= availableAbove;
+
+    // Reset both so we don't accumulate stale rules
+    optionsEl.style.top = "";
+    optionsEl.style.bottom = "";
+
+    if (shouldDropDown) {
+      // Place below anchor
+      const topPx = anchorRect.bottom - parentRect.top + gap;
+      optionsEl.style.top = `${Math.max(0, topPx)}px`;
+    } else {
+      // Place above anchor
+      const bottomPx = parentRect.bottom - anchorRect.top + gap;
+      optionsEl.style.bottom = `${Math.max(0, bottomPx)}px`;
+    }
+
+    // Restore visibility, keep display as-is
+    optionsEl.style.visibility = prevVisibility || "";
+    optionsEl.style.display = prevDisplay || "flex";
+  }
+
   function createDropdown({
     toggleEl,
     optionsEl,
@@ -82,6 +143,8 @@ document.addEventListener("DOMContentLoaded", () => {
     items,
     ariaExpandedEl,
     onSelect,
+    anchorElForPosition, // the element whose bottom/top we align to
+    offsetParentEl,      // positioned container (usually the field wrapper)
   }) {
     let isOpen = false;
 
@@ -92,12 +155,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
         closeAllDropdowns(api);
 
+        // Show first (needed for measuring), then position, then focus
         optionsEl.style.display = "flex";
         if (ariaExpandedEl) ariaExpandedEl.setAttribute("aria-expanded", "true");
         if (toggleEl) toggleEl.setAttribute("aria-expanded", "true");
 
-        // Force HubSpot-like scrollbar behavior
-        setListMaxHeight(listEl, 260);
+        // Scrollbar (only forced CSS behavior)
+        setListScrollbar(listEl, 260);
+
+        // Dropup/dropdown positioning (prevents covering the field)
+        positionDropdownOptions(
+          optionsEl,
+          anchorElForPosition || toggleEl,
+          offsetParentEl
+        );
 
         if (searchEl) {
           searchEl.value = "";
@@ -125,6 +196,14 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       contains(target) {
         return toggleEl.contains(target) || optionsEl.contains(target);
+      },
+      reposition() {
+        if (!isOpen) return;
+        positionDropdownOptions(
+          optionsEl,
+          anchorElForPosition || toggleEl,
+          offsetParentEl
+        );
       },
     };
 
@@ -187,6 +266,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape") closeAllDropdowns(null);
   });
 
+  // Reposition open dropdowns on resize/scroll (keeps alignment stable)
+  window.addEventListener("resize", () => {
+    for (const dd of openDropdowns) dd.reposition();
+  });
+
+  // Capture scroll from any scroll container
+  window.addEventListener(
+    "scroll",
+    () => {
+      for (const dd of openDropdowns) dd.reposition();
+    },
+    true
+  );
+
   // -------------------------
   // City dropdown
   // -------------------------
@@ -195,14 +288,13 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   if (cityHidden) {
     const cityField = cityHidden.closest(".hsfc-DropdownField");
-    const cityCombobox = cityField.querySelector(
-      "input.hsfc-TextInput--button"
-    );
+    const cityCombobox = cityField.querySelector("input.hsfc-TextInput--button");
     const cityOptions = cityField.querySelector(".hsfc-DropdownOptions");
     const citySearch = cityOptions.querySelector('input[role="searchbox"]');
     const cityList = cityOptions.querySelector('ul[role="listbox"]');
     const cityItems = toArray(cityList.querySelectorAll('li[role="option"]'));
     const cityCaret = cityField.querySelector(".hsfc-DropdownInput__Caret");
+    const cityAnchor = cityField.querySelector(".hsfc-DropdownInput"); // align menu to this box
 
     function setCitySelected(li) {
       const value = (li.textContent || "").trim();
@@ -229,6 +321,8 @@ document.addEventListener("DOMContentLoaded", () => {
       items: cityItems,
       ariaExpandedEl: cityCombobox,
       onSelect: setCitySelected,
+      anchorElForPosition: cityAnchor || cityCombobox,
+      offsetParentEl: cityField, // `.hsfc-DropdownField` is position:relative in your DOM CSS
     });
 
     if (cityCaret) {
@@ -249,7 +343,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // Phone (country + dial code)
+  // Phone (country + dial code + spacing)
   // -------------------------
   const phoneHidden = form.querySelector(
     'input[type="hidden"][name="0-1/phone"]'
@@ -258,18 +352,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const phoneField = phoneHidden.closest(".hsfc-PhoneField");
     const phoneInput = phoneField?.querySelector?.('input[type="tel"]');
     const phoneUI = phoneField?.querySelector?.(".hsfc-PhoneInput");
-    const flagAndCaret = phoneUI?.querySelector?.(
-      ".hsfc-PhoneInput__FlagAndCaret"
-    );
-    const flagSpan = phoneUI?.querySelector?.(
-      ".hsfc-PhoneInput__FlagAndCaret__Flag"
-    );
+    const flagAndCaret = phoneUI?.querySelector?.(".hsfc-PhoneInput__FlagAndCaret");
+    const flagSpan = phoneUI?.querySelector?.(".hsfc-PhoneInput__FlagAndCaret__Flag");
     const phoneOptions = phoneUI?.querySelector?.(".hsfc-DropdownOptions");
     const phoneSearch = phoneOptions?.querySelector?.('input[role="searchbox"]');
     const phoneList = phoneOptions?.querySelector?.('ul[role="listbox"]');
-    const countryLis = toArray(
-      phoneList?.querySelectorAll?.('li[role="option"]')
-    );
+    const countryLis = toArray(phoneList?.querySelectorAll?.('li[role="option"]'));
 
     if (
       phoneField &&
@@ -300,24 +388,16 @@ document.addEventListener("DOMContentLoaded", () => {
       function sanitizePhoneRaw(raw) {
         let v = (raw || "").toString();
 
-        // Strip anything except digits, whitespace, and "+"
-        v = v.replace(/[^\d+\s]/g, "");
+        v = v.replace(/[^\d+\s]/g, ""); // keep digits, +, spaces
+        v = v.replace(/^\s+/, "");      // trim left
+        v = v.replace(/\s{2,}/g, " ");  // collapse spaces
 
-        // Remove leading whitespace
-        v = v.replace(/^\s+/, "");
-
-        // If it starts with "+", keep only that leading "+"
         if (v.startsWith("+")) {
           v = "+" + v.slice(1).replace(/\+/g, "");
-          // No spaces directly after "+"
-          v = v.replace(/^\+\s+/, "+");
+          v = v.replace(/^\+\s+/, "+"); // no spaces right after +
         } else {
-          // No "+" allowed anywhere else
           v = v.replace(/\+/g, "");
         }
-
-        // Collapse consecutive spaces
-        v = v.replace(/\s{2,}/g, " ");
 
         return v;
       }
@@ -328,23 +408,23 @@ document.addEventListener("DOMContentLoaded", () => {
         // Auto-prefix "+" if user starts with a number
         if (v && !v.startsWith("+") && /^\d/.test(v)) v = `+${v}`;
 
-        // Treat lone "+" as empty (for validation + hidden sync)
+        // Treat lone "+" as empty
         if (v === "+") return "";
+
+        // No spaces directly after "+"
+        v = v.replace(/^\+\s+/, "+");
 
         return v;
       }
 
-      // Map countries from LI text
+      // Countries mapped from LI text
       const countries = countryLis
         .map((li) => {
           const text = (li.textContent || "").trim();
           const dialCode = parseDialCode(text);
-
-          // The first token in HubSpot's list is the flag emoji
           const flagEmoji = text.split(/\s+/)[0] || "";
           const iso2 = flagEmojiToISO2(flagEmoji);
           const display = iso2 || flagEmoji || "";
-
           return { li, text, dialCode, flagEmoji, iso2, display };
         })
         .filter((c) => c.dialCode);
@@ -358,11 +438,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!countryByDial.has(c.dialCode)) countryByDial.set(c.dialCode, c);
       });
 
-      // Small/targeted min-length map (default applies to everything else)
+      // Targeted minimum-length rules (keep your existing validation intent)
       const MIN_NATIONAL_DIGITS_BY_DIAL = {
-        "+63": 10, // PH mobile (international format, no leading 0)
+        "+63": 10, // PH mobile without leading 0 (e.g., 9XXXXXXXXX)
         "+1": 10,  // NANP
-        "+7": 10,  // RU/KZ
+        "+7": 10,  // RU/KZ (common)
         "+65": 8,  // SG
         "+852": 8, // HK
       };
@@ -388,21 +468,85 @@ document.addEventListener("DOMContentLoaded", () => {
         return dialCodesSortedDesc.find((dc) => v.startsWith(dc)) || "";
       }
 
-      function splitDialAndRest(rawValue) {
-        const v = sanitizePhoneRaw(rawValue).trim();
-        if (!v) return { dialCode: "", rest: "" };
-
-        const normalized = v.startsWith("+") ? v : `+${v}`;
-        const match = findDialMatch(normalized);
-        if (match) return { dialCode: match, rest: normalized.slice(match.length) };
-
-        // No exact match (yet)
-        return { dialCode: "", rest: normalized };
-      }
-
       function syncHiddenPhone() {
         const v = normalizePhone(phoneInput.value || "");
         phoneHidden.value = v;
+      }
+
+      function getMinNationalDigits(dialCode) {
+        return MIN_NATIONAL_DIGITS_BY_DIAL[dialCode] || DEFAULT_MIN_NATIONAL_DIGITS;
+      }
+
+      function validatePhoneValue(rawValue) {
+        const normalized = normalizePhone(rawValue);
+
+        if (!normalized) return { ok: false, message: REQUIRED_MSG };
+
+        const dialCode = findDialMatch(normalized);
+        if (!dialCode) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
+
+        const digits = normalized.replace(/\D/g, "");
+        const dialDigits = dialCode.replace(/\D/g, "");
+        const nationalDigits = Math.max(0, digits.length - dialDigits.length);
+
+        if (nationalDigits === 0) return { ok: false, message: REQUIRED_MSG };
+        if (digits.length > 15) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
+
+        const minNat = getMinNationalDigits(dialCode);
+        if (nationalDigits < minNat) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
+
+        return { ok: true, message: "" };
+      }
+
+      // Display formatting with spaces (applied on blur / after country selection)
+      function groupDigits(digits, groups) {
+        const out = [];
+        let i = 0;
+        for (const g of groups) {
+          if (i >= digits.length) break;
+          out.push(digits.slice(i, i + g));
+          i += g;
+        }
+        if (i < digits.length) out.push(digits.slice(i));
+        return out.filter(Boolean).join(" ");
+      }
+
+      function formatPhoneDisplay(normalized) {
+        // normalized is like: +63XXXXXXXXXX (no guaranteed spaces)
+        if (!normalized) return "";
+
+        const dialCode = findDialMatch(normalized);
+        if (!dialCode) return normalized; // don't guess spacing without a real match
+
+        const digitsAll = normalized.replace(/\D/g, "");
+        const dialDigits = dialCode.replace(/\D/g, "");
+        let national = digitsAll.slice(dialDigits.length);
+
+        // Format rules by dial
+        if (dialCode === "+63") {
+          // PH: +63 9XX XXX XXXX (best effort)
+          // if user hasn't typed enough, still add grouping progressively
+          const g = national.length <= 3 ? [national.length] : [3, 3, 4];
+          return `+63 ${groupDigits(national, g)}`.trim();
+        }
+
+        if (dialCode === "+1") {
+          // +1 XXX XXX XXXX
+          const g = national.length <= 3 ? [national.length] : [3, 3, 4];
+          return `+1 ${groupDigits(national, g)}`.trim();
+        }
+
+        if (dialCode === "+65" || dialCode === "+852") {
+          // +65 XXXX XXXX, +852 XXXX XXXX
+          const g = national.length <= 4 ? [national.length] : [4, 4];
+          return `${dialCode} ${groupDigits(national, g)}`.trim();
+        }
+
+        // Fallback: chunk by 3s (progressive)
+        const groups = [];
+        while (national.length - groups.reduce((a, b) => a + b, 0) > 3) groups.push(3);
+        groups.push(Math.max(0, national.length - groups.reduce((a, b) => a + b, 0)));
+        return `${dialCode} ${groupDigits(national, groups)}`.trim();
       }
 
       function setSelectedCountry(country, rewriteInputPrefix) {
@@ -410,17 +554,21 @@ document.addEventListener("DOMContentLoaded", () => {
         updateCountrySelectionUI(selectedCountry);
 
         if (rewriteInputPrefix && selectedCountry) {
-          const current = sanitizePhoneRaw(phoneInput.value || "");
-          const { rest } = splitDialAndRest(current);
+          const normalized = normalizePhone(phoneInput.value || "");
+          const dialCode = findDialMatch(normalized) || selectedCountry.dialCode;
 
-          if (!current.trim()) {
-            phoneInput.value = selectedCountry.dialCode;
-          } else {
-            phoneInput.value = `${selectedCountry.dialCode}${rest}`;
-          }
+          // Extract national digits from current input (digits after any dial code)
+          const digitsAll = normalized.replace(/\D/g, "");
+          const dialDigits = dialCode.replace(/\D/g, "");
+          const national = digitsAll.slice(dialDigits.length);
 
-          // No spaces directly after "+"
-          phoneInput.value = phoneInput.value.replace(/^\+\s+/, "+");
+          const next = `${selectedCountry.dialCode}${national ? national : ""}`;
+          phoneInput.value = formatPhoneDisplay(next);
+
+          // Keep caret at end after selection (matches HubSpot feel)
+          try {
+            phoneInput.setSelectionRange(phoneInput.value.length, phoneInput.value.length);
+          } catch (_) {}
         }
 
         syncHiddenPhone();
@@ -445,41 +593,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (!selectedCountry || selectedCountry.dialCode !== found.dialCode) {
-          // do not rewrite input while typing (avoid cursor jump)
-          setSelectedCountry(found, false);
+          // Don't rewrite while typing (avoid cursor jump)
+          selectedCountry = found;
+          updateCountrySelectionUI(selectedCountry);
         } else {
           updateCountrySelectionUI(selectedCountry);
         }
-      }
-
-      function getMinNationalDigits(dialCode) {
-        return MIN_NATIONAL_DIGITS_BY_DIAL[dialCode] || DEFAULT_MIN_NATIONAL_DIGITS;
-      }
-
-      function validatePhoneValue(rawValue) {
-        const normalized = normalizePhone(rawValue);
-
-        // Empty => required
-        if (!normalized) return { ok: false, message: REQUIRED_MSG };
-
-        // Must have a *full* recognized dial code
-        const dialCode = findDialMatch(normalized);
-        if (!dialCode) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
-
-        const digits = normalized.replace(/\D/g, "");
-        const dialDigits = dialCode.replace(/\D/g, "");
-        const nationalDigits = Math.max(0, digits.length - dialDigits.length);
-
-        // Dial code selected but no actual number yet => required
-        if (nationalDigits === 0) return { ok: false, message: REQUIRED_MSG };
-
-        // E.164 max length guardrail
-        if (digits.length > 15) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
-
-        const minNat = getMinNationalDigits(dialCode);
-        if (nationalDigits < minNat) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
-
-        return { ok: true, message: "" };
       }
 
       // Expose for submit validation
@@ -496,7 +615,7 @@ document.addEventListener("DOMContentLoaded", () => {
       syncCountryFromInput();
 
       // dropdown setup (Country list)
-      createDropdown({
+      const phoneDropdown = createDropdown({
         toggleEl: flagAndCaret,
         optionsEl: phoneOptions,
         searchEl: phoneSearch,
@@ -507,16 +626,16 @@ document.addEventListener("DOMContentLoaded", () => {
           const dc = parseDialCode(li.textContent);
           setSelectedCountry(countryByDial.get(dc) || null, true);
         },
+        // Align dropdown to the whole phone input row (so it doesn't cover it)
+        anchorElForPosition: phoneUI,
+        offsetParentEl: phoneField, // `.hsfc-PhoneField` is position:relative in your DOM CSS
       });
 
       // Hard block unwanted characters: only digits, spaces, and "+" (only at the start)
       phoneInput.addEventListener("keydown", (e) => {
-        // Allow shortcuts (copy/paste/select all/etc.)
         if (e.ctrlKey || e.metaKey) return;
 
         const k = e.key;
-
-        // Navigation / editing keys
         const okKeys = [
           "Backspace",
           "Delete",
@@ -532,13 +651,9 @@ document.addEventListener("DOMContentLoaded", () => {
         ];
         if (okKeys.includes(k)) return;
 
-        // Digits
         if (k >= "0" && k <= "9") return;
-
-        // Spaces (allowed)
         if (k === " ") return;
 
-        // Plus is allowed ONLY at the very start
         if (k === "+") {
           const v = phoneInput.value || "";
           const start =
@@ -559,7 +674,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Block everything else: letters, punctuation, symbols
         e.preventDefault();
       });
 
@@ -584,7 +698,6 @@ document.addEventListener("DOMContentLoaded", () => {
         let next = current.slice(0, start) + insert + current.slice(end);
         next = sanitizePhoneRaw(next);
 
-        // Auto-prefix "+" if it starts with a number
         if (next && !next.startsWith("+") && /^\d/.test(next)) next = `+${next}`;
         next = next.replace(/^\+\s+/, "+");
 
@@ -603,9 +716,8 @@ document.addEventListener("DOMContentLoaded", () => {
         syncCountryFromInput();
       });
 
-      // typing dial code auto-selects country, clears when empty/no exact match
       phoneInput.addEventListener("input", () => {
-        // Always clear while editing (only show errors on blur/submit)
+        // Clear while editing (errors on blur/submit)
         clearError(phoneField, phoneInput);
 
         const raw = phoneInput.value || "";
@@ -658,8 +770,21 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       phoneInput.addEventListener("blur", () => {
+        // Apply spacing format on blur (matches your screenshot expectation)
+        const normalized = normalizePhone(phoneInput.value || "");
+        if (normalized) {
+          phoneInput.value = formatPhoneDisplay(normalized);
+          syncHiddenPhone();
+          syncCountryFromInput();
+        }
+
         const res = validatePhoneValue(phoneInput.value || "");
         if (!res.ok) showError(phoneField, phoneInput, res.message);
+      });
+
+      // If the dropdown is open and user scrolls inside it, keep it aligned (optional but helpful)
+      phoneOptions.addEventListener("wheel", () => {
+        phoneDropdown.reposition();
       });
     }
   }
@@ -679,17 +804,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Stricter email check (requires dot + TLD >= 2)
+  function isEmailStrict(v) {
+    const s = (v || "").trim();
+    if (!s) return false;
+    // local@domain.tld (tld >=2). Keep it practical, not insane.
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    return re.test(s);
+  }
+
   const emailInput = form.querySelector('input[name="0-1/email"]');
   if (emailInput) {
     const field = emailInput.closest(".hsfc-EmailField");
+
     emailInput.addEventListener("input", () => {
       clearError(field, emailInput);
     });
+
     emailInput.addEventListener("blur", () => {
       const v = emailInput.value.trim();
-      if (!v) showError(field, emailInput, REQUIRED_MSG);
-      else if (!emailInput.checkValidity())
+      if (!v) {
+        showError(field, emailInput, REQUIRED_MSG);
+      } else if (!isEmailStrict(v)) {
         showError(field, emailInput, EMAIL_INVALID_MSG);
+      }
     });
   }
 
@@ -699,7 +837,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (checkboxInput) {
     const field = checkboxInput.closest(".hsfc-CheckboxField");
 
-    // Make checkbox submit "true" when checked
     checkboxInput.value = checkboxInput.checked ? "true" : "false";
 
     checkboxInput.addEventListener("change", () => {
@@ -707,7 +844,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (checkboxInput.checked) clearError(field, checkboxInput);
     });
 
-    // Show required red message if user leaves it unchecked
     checkboxInput.addEventListener("blur", () => {
       if (!checkboxInput.checked) showError(field, checkboxInput, REQUIRED_MSG);
     });
@@ -734,22 +870,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // City (uses hidden value)
+      // City
       const cityHidden2 = form.querySelector(
         'input[type="hidden"][name="0-1/location_"]'
       );
       if (cityHidden2) {
         const cityField = cityHidden2.closest(".hsfc-DropdownField");
-        const cityCombobox = cityField.querySelector(
-          "input.hsfc-TextInput--button"
-        );
+        const cityCombobox = cityField.querySelector("input.hsfc-TextInput--button");
         if (!cityHidden2.value.trim()) {
           showError(cityField, cityCombobox, REQUIRED_MSG);
           invalidTargets.push(cityCombobox);
         }
       }
 
-      // Phone (same validation rules as blur)
+      // Phone
       if (phoneCtx?.field && phoneCtx?.input && typeof phoneCtx.validate === "function") {
         const res = phoneCtx.validate();
         if (!res.ok) {
@@ -758,14 +892,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Email
+      // Email (strict)
       if (emailInput) {
         const field = emailInput.closest(".hsfc-EmailField");
         const v = emailInput.value.trim();
         if (!v) {
           showError(field, emailInput, REQUIRED_MSG);
           invalidTargets.push(emailInput);
-        } else if (!emailInput.checkValidity()) {
+        } else if (!isEmailStrict(v)) {
           showError(field, emailInput, EMAIL_INVALID_MSG);
           invalidTargets.push(emailInput);
         }
@@ -787,7 +921,7 @@ document.addEventListener("DOMContentLoaded", () => {
         invalidTargets[0].focus();
       }
     },
-    true // capture: run before other submit handlers
+    true
   );
 });
 
