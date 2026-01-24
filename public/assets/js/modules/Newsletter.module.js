@@ -7,10 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = ROOT.querySelector("form.hsfc-Form");
   if (!form) return;
 
+  // Required strings (keep these exactly)
   const REQUIRED_MSG = "Please complete this required field.";
   const EMAIL_INVALID_MSG = "Email must be formatted correctly.";
-  const PHONE_INVALID_CHARS_MSG =
-    "Must start with an extension and contain only numbers, +()-. and x.";
+
+  // Per your instruction: ONLY this 2nd phone error message (override DOM wording)
+  const PHONE_INVALID_FORMAT_MSG =
+    "This phone number is either invalid or is in the wrong format.";
 
   const openDropdowns = new Set();
   const toArray = (x) => Array.prototype.slice.call(x || []);
@@ -18,9 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function ensureErrorEl(fieldEl) {
     if (!fieldEl) return null;
-    let el = fieldEl.querySelector(
-      '.hsfc-ErrorAlert[data-newsletter-error="1"]'
-    );
+    let el = fieldEl.querySelector('.hsfc-ErrorAlert[data-newsletter-error="1"]');
     if (!el) {
       el = document.createElement("div");
       el.className = "hsfc-ErrorAlert";
@@ -42,9 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function clearError(fieldEl, inputEl) {
-    const el = fieldEl?.querySelector?.(
-      '.hsfc-ErrorAlert[data-newsletter-error="1"]'
-    );
+    const el = fieldEl?.querySelector?.('.hsfc-ErrorAlert[data-newsletter-error="1"]');
     if (el) el.hidden = true;
     if (inputEl) inputEl.setAttribute("aria-invalid", "false");
   }
@@ -93,7 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (ariaExpandedEl) ariaExpandedEl.setAttribute("aria-expanded", "true");
         if (toggleEl) toggleEl.setAttribute("aria-expanded", "true");
 
-        // Force HubSpot-like scrollbar behavior
         setListMaxHeight(listEl, 260);
 
         if (searchEl) {
@@ -139,9 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (searchEl) {
-      searchEl.addEventListener("input", () =>
-        filterItems(items, searchEl.value)
-      );
+      searchEl.addEventListener("input", () => filterItems(items, searchEl.value));
       searchEl.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
           e.preventDefault();
@@ -170,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return api;
   }
 
-  // Close dropdowns on outside click/tap
+  // ✅ Clicking/tapping outside any open dropdown closes it (City + Country list)
   document.addEventListener("pointerdown", (e) => {
     if (!openDropdowns.size) return;
     for (const dd of openDropdowns) {
@@ -179,7 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
     closeAllDropdowns(null);
   });
 
-  // Close dropdowns on Escape anywhere
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeAllDropdowns(null);
   });
@@ -205,10 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cityItems.forEach((item) => {
         const selected = item === li;
         item.setAttribute("aria-selected", selected ? "true" : "false");
-        item.classList.toggle(
-          "hsfc-DropdownOptions__List__ListItem--selected",
-          selected
-        );
+        item.classList.toggle("hsfc-DropdownOptions__List__ListItem--selected", selected);
       });
 
       clearError(cityField, cityCombobox);
@@ -240,6 +232,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Phone (country + dial code)
   // -------------------------
   const phoneHidden = form.querySelector('input[type="hidden"][name="0-1/phone"]');
+  let phoneHelpers = null;
+
   if (phoneHidden) {
     const phoneField = phoneHidden.closest(".hsfc-PhoneField");
     const phoneInput = phoneField.querySelector('input[type="tel"]');
@@ -275,13 +269,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!countryByDial.has(c.dialCode)) countryByDial.set(c.dialCode, c);
     });
 
-    // initial selected
-    let selectedCountry =
+    // initial selected (DOM marks PH selected in your paste)
+    const initialSelected =
       countries.find(
         (c) =>
           c.li.getAttribute("aria-selected") === "true" ||
           c.li.classList.contains("hsfc-DropdownOptions__List__ListItem--selected")
       ) || countries[0];
+
+    let selectedCountry = initialSelected;
 
     function updateCountrySelectionUI(country) {
       if (!country) return;
@@ -289,12 +285,10 @@ document.addEventListener("DOMContentLoaded", () => {
       countries.forEach((c) => {
         const selected = c === country;
         c.li.setAttribute("aria-selected", selected ? "true" : "false");
-        c.li.classList.toggle(
-          "hsfc-DropdownOptions__List__ListItem--selected",
-          selected
-        );
+        c.li.classList.toggle("hsfc-DropdownOptions__List__ListItem--selected", selected);
       });
 
+      // Keep a stable flag display (and reset to initial when empty)
       if (flagSpan) flagSpan.textContent = country.flag || "";
     }
 
@@ -336,7 +330,88 @@ document.addEventListener("DOMContentLoaded", () => {
       clearError(phoneField, phoneInput);
     }
 
-    // initial sync
+    // ✅ normalize input to: + then digits only (typing restriction)
+    function normalizePhoneValueKeepCursor(inputEl) {
+      const before = inputEl.value || "";
+      const selStart = inputEl.selectionStart;
+
+      // keep only digits and plus
+      let v = before.replace(/[^\d+]/g, "");
+
+      // keep only one leading "+"
+      const plusCount = (v.match(/\+/g) || []).length;
+      if (plusCount > 1) {
+        // remove all plus and re-add later
+        v = v.replace(/\+/g, "");
+      } else if (plusCount === 1 && !v.startsWith("+")) {
+        v = v.replace(/\+/g, "");
+      }
+
+      // auto-prefix + if digits exist
+      if (v && !v.startsWith("+")) v = `+${v}`;
+
+      // treat lone "+" as empty (so it truly clears)
+      if (v === "+") v = "";
+
+      if (v !== before) {
+        inputEl.value = v;
+
+        // best-effort cursor repair (avoid wild jumps)
+        if (typeof selStart === "number") {
+          const delta = v.length - before.length;
+          const next = Math.max(0, Math.min(v.length, selStart + delta));
+          try {
+            inputEl.setSelectionRange(next, next);
+          } catch (_) {}
+        }
+      }
+
+      return v;
+    }
+
+    // ✅ Phone validation that enforces ONLY two messages:
+    // - required
+    // - invalid/wrong format (your custom string)
+    function validatePhone(showMsg) {
+      const v = (phoneInput.value || "").trim();
+
+      // clears when empty
+      if (!v) {
+        syncHiddenPhone();
+        // Reset country UI back to initial when empty (so the component looks consistent)
+        setSelectedCountry(initialSelected, false);
+        if (showMsg) showError(phoneField, phoneInput, REQUIRED_MSG);
+        return false;
+      }
+
+      // must be +digits only (we already normalize on input, but keep defensive)
+      if (!/^\+\d+$/.test(v)) {
+        if (showMsg) showError(phoneField, phoneInput, PHONE_INVALID_FORMAT_MSG);
+        return false;
+      }
+
+      // determine dial vs national length (minimum national digits = 4)
+      const { dialCode } = splitDialAndRest(v);
+      const found = dialCode ? countryByDial.get(dialCode) : null;
+      if (found && found !== selectedCountry) setSelectedCountry(found, false);
+
+      const digits = v.replace(/\D/g, "");
+      const dialDigits = (dialCode || "").replace(/\D/g, "");
+      const nationalDigits = dialDigits
+        ? Math.max(0, digits.length - dialDigits.length)
+        : digits.length;
+
+      // not enough digits after country code => invalid format
+      if (!dialDigits || nationalDigits < 4) {
+        if (showMsg) showError(phoneField, phoneInput, PHONE_INVALID_FORMAT_MSG);
+        return false;
+      }
+
+      clearError(phoneField, phoneInput);
+      return true;
+    }
+
+    // initial UI + hidden sync
     setSelectedCountry(selectedCountry, false);
     syncHiddenPhone();
 
@@ -350,60 +425,47 @@ document.addEventListener("DOMContentLoaded", () => {
       ariaExpandedEl: flagAndCaret,
       onSelect: (li) => {
         const dc = parseDialCode(li.textContent);
-        setSelectedCountry(countryByDial.get(dc), true);
+        const country = countryByDial.get(dc);
+        if (country) setSelectedCountry(country, true);
       },
     });
 
-    // typing dial code auto-selects country
+    // ✅ country detection by typing (+63 → PH), and clears when empty
     phoneInput.addEventListener("input", () => {
-      const raw = (phoneInput.value || "").trim();
+      const v = normalizePhoneValueKeepCursor(phoneInput);
+      syncHiddenPhone();
 
-      // clear lone "+"
-      if (raw === "+") {
-        phoneInput.value = "";
-        syncHiddenPhone();
+      // if empty -> reset country UI, clear errors (required will show on blur/submit)
+      if (!v) {
+        setSelectedCountry(initialSelected, false);
+        clearError(phoneField, phoneInput);
         return;
       }
 
-      syncHiddenPhone();
-
-      // auto-prefix +
-      if (raw && !raw.startsWith("+") && /^\d/.test(raw)) {
-        const pos = phoneInput.selectionStart;
-        phoneInput.value = `+${raw}`;
-        if (typeof pos === "number") phoneInput.setSelectionRange(pos + 1, pos + 1);
-      }
-
-      const { dialCode } = splitDialAndRest(phoneInput.value);
+      const { dialCode } = splitDialAndRest(v);
       if (dialCode) {
         const found = countryByDial.get(dialCode);
         if (found && found !== selectedCountry) {
-          // do not rewrite input while typing (avoid cursor jump)
+          // don't rewrite prefix while typing (avoid cursor jump)
           setSelectedCountry(found, false);
         }
       }
 
-      if ((phoneInput.value || "").trim()) clearError(phoneField, phoneInput);
+      // live clear error once user types something
+      clearError(phoneField, phoneInput);
     });
 
     phoneInput.addEventListener("blur", () => {
-      const v = (phoneInput.value || "").trim();
-
-      if (v && !/^[+\d().\-\sx]+$/i.test(v)) {
-        showError(phoneField, phoneInput, PHONE_INVALID_CHARS_MSG);
-        return;
-      }
-
-      const digits = v.replace(/\D/g, "");
-      const dialDigits = (selectedCountry?.dialCode || "").replace(/\D/g, "");
-      const nationalDigits = dialDigits
-        ? Math.max(0, digits.length - dialDigits.length)
-        : digits.length;
-
-      if (!v || nationalDigits < 4) {
-        showError(phoneField, phoneInput, REQUIRED_MSG);
-      }
+      // on blur we enforce the two-message policy
+      validatePhone(true);
     });
+
+    phoneHelpers = {
+      field: phoneField,
+      input: phoneInput,
+      validatePhone,
+      syncHiddenPhone,
+    };
   }
 
   // -------------------------
@@ -433,16 +495,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  const checkboxInput = form.querySelector('input[type="checkbox"][name="0-1/confirmation_checkbox"]');
+  const checkboxInput = form.querySelector(
+    'input[type="checkbox"][name="0-1/confirmation_checkbox"]'
+  );
+
   if (checkboxInput) {
     const field = checkboxInput.closest(".hsfc-CheckboxField");
 
-    // Make checkbox submit "true" when checked
+    // ensure value matches checked state for submission
     checkboxInput.value = checkboxInput.checked ? "true" : "false";
 
     checkboxInput.addEventListener("change", () => {
       checkboxInput.value = checkboxInput.checked ? "true" : "false";
-      if (checkboxInput.checked) clearError(field, checkboxInput);
+      if (checkboxInput.checked) {
+        clearError(field, checkboxInput);
+      } else {
+        // ✅ Missing checkbox required red message: show immediately when user unchecks
+        showError(field, checkboxInput, REQUIRED_MSG);
+      }
+    });
+
+    // ✅ show required on blur if they tab away without checking
+    checkboxInput.addEventListener("blur", () => {
+      if (!checkboxInput.checked) showError(field, checkboxInput, REQUIRED_MSG);
+      else clearError(field, checkboxInput);
     });
   }
 
@@ -472,24 +548,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Phone (hidden is synced; validate visible)
-    const phoneHidden2 = form.querySelector('input[type="hidden"][name="0-1/phone"]');
-    if (phoneHidden2) {
-      const phoneField = phoneHidden2.closest(".hsfc-PhoneField");
-      const phoneInput = phoneField.querySelector('input[type="tel"]');
-      const v = (phoneInput.value || "").trim();
-
-      const digits = v.replace(/\D/g, "");
-      const possibleDial = ((v.startsWith("+") ? v : `+${v}`).match(/^\+\d{1,4}/) || [])[0] || "";
-      const dialDigits = possibleDial.replace(/\D/g, "");
-      const nationalDigits = dialDigits
-        ? Math.max(0, digits.length - dialDigits.length)
-        : digits.length;
-
-      if (!v || v === "+" || nationalDigits < 4) {
-        showError(phoneField, phoneInput, REQUIRED_MSG);
-        invalidTargets.push(phoneInput);
-      }
+    // Phone (ONLY two messages: required or invalid format)
+    if (phoneHelpers?.validatePhone) {
+      const ok = phoneHelpers.validatePhone(true);
+      if (!ok) invalidTargets.push(phoneHelpers.input);
     }
 
     // Email
