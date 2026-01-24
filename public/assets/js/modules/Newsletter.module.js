@@ -7,11 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = ROOT.querySelector("form.hsfc-Form");
   if (!form) return;
 
-  // Required strings (keep these exactly)
   const REQUIRED_MSG = "Please complete this required field.";
   const EMAIL_INVALID_MSG = "Email must be formatted correctly.";
-
-  // Per your instruction: ONLY this 2nd phone error message (override DOM wording)
   const PHONE_INVALID_FORMAT_MSG =
     "This phone number is either invalid or is in the wrong format.";
 
@@ -19,9 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const toArray = (x) => Array.prototype.slice.call(x || []);
   const norm = (s) => (s || "").toString().trim().toLowerCase();
 
+  // Keep a handle to phone validation for submit
+  let phoneCtx = null;
+
   function ensureErrorEl(fieldEl) {
     if (!fieldEl) return null;
-    let el = fieldEl.querySelector('.hsfc-ErrorAlert[data-newsletter-error="1"]');
+    let el = fieldEl.querySelector(
+      '.hsfc-ErrorAlert[data-newsletter-error="1"]'
+    );
     if (!el) {
       el = document.createElement("div");
       el.className = "hsfc-ErrorAlert";
@@ -43,7 +45,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function clearError(fieldEl, inputEl) {
-    const el = fieldEl?.querySelector?.('.hsfc-ErrorAlert[data-newsletter-error="1"]');
+    const el = fieldEl?.querySelector?.(
+      '.hsfc-ErrorAlert[data-newsletter-error="1"]'
+    );
     if (el) el.hidden = true;
     if (inputEl) inputEl.setAttribute("aria-invalid", "false");
   }
@@ -92,6 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (ariaExpandedEl) ariaExpandedEl.setAttribute("aria-expanded", "true");
         if (toggleEl) toggleEl.setAttribute("aria-expanded", "true");
 
+        // Force HubSpot-like scrollbar behavior
         setListMaxHeight(listEl, 260);
 
         if (searchEl) {
@@ -137,7 +142,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (searchEl) {
-      searchEl.addEventListener("input", () => filterItems(items, searchEl.value));
+      searchEl.addEventListener("input", () =>
+        filterItems(items, searchEl.value)
+      );
       searchEl.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
           e.preventDefault();
@@ -166,7 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return api;
   }
 
-  // ✅ Clicking/tapping outside any open dropdown closes it (City + Country list)
+  // Close dropdowns on outside click/tap
   document.addEventListener("pointerdown", (e) => {
     if (!openDropdowns.size) return;
     for (const dd of openDropdowns) {
@@ -175,6 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
     closeAllDropdowns(null);
   });
 
+  // Close dropdowns on Escape anywhere
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeAllDropdowns(null);
   });
@@ -182,10 +190,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------
   // City dropdown
   // -------------------------
-  const cityHidden = form.querySelector('input[type="hidden"][name="0-1/location_"]');
+  const cityHidden = form.querySelector(
+    'input[type="hidden"][name="0-1/location_"]'
+  );
   if (cityHidden) {
     const cityField = cityHidden.closest(".hsfc-DropdownField");
-    const cityCombobox = cityField.querySelector("input.hsfc-TextInput--button");
+    const cityCombobox = cityField.querySelector(
+      "input.hsfc-TextInput--button"
+    );
     const cityOptions = cityField.querySelector(".hsfc-DropdownOptions");
     const citySearch = cityOptions.querySelector('input[role="searchbox"]');
     const cityList = cityOptions.querySelector('ul[role="listbox"]');
@@ -200,7 +212,10 @@ document.addEventListener("DOMContentLoaded", () => {
       cityItems.forEach((item) => {
         const selected = item === li;
         item.setAttribute("aria-selected", selected ? "true" : "false");
-        item.classList.toggle("hsfc-DropdownOptions__List__ListItem--selected", selected);
+        item.classList.toggle(
+          "hsfc-DropdownOptions__List__ListItem--selected",
+          selected
+        );
       });
 
       clearError(cityField, cityCombobox);
@@ -224,248 +239,429 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     cityCombobox.addEventListener("blur", () => {
-      if (!cityHidden.value.trim()) showError(cityField, cityCombobox, REQUIRED_MSG);
+      if (!cityHidden.value.trim())
+        showError(cityField, cityCombobox, REQUIRED_MSG);
+    });
+
+    cityCombobox.addEventListener("focus", () => {
+      clearError(cityField, cityCombobox);
     });
   }
 
   // -------------------------
   // Phone (country + dial code)
   // -------------------------
-  const phoneHidden = form.querySelector('input[type="hidden"][name="0-1/phone"]');
-  let phoneHelpers = null;
-
+  const phoneHidden = form.querySelector(
+    'input[type="hidden"][name="0-1/phone"]'
+  );
   if (phoneHidden) {
     const phoneField = phoneHidden.closest(".hsfc-PhoneField");
-    const phoneInput = phoneField.querySelector('input[type="tel"]');
-    const phoneUI = phoneField.querySelector(".hsfc-PhoneInput");
-    const flagAndCaret = phoneUI.querySelector(".hsfc-PhoneInput__FlagAndCaret");
-    const flagSpan = phoneUI.querySelector(".hsfc-PhoneInput__FlagAndCaret__Flag");
-    const phoneOptions = phoneUI.querySelector(".hsfc-DropdownOptions");
-    const phoneSearch = phoneOptions.querySelector('input[role="searchbox"]');
-    const phoneList = phoneOptions.querySelector('ul[role="listbox"]');
-    const countryLis = toArray(phoneList.querySelectorAll('li[role="option"]'));
-
-    function parseDialCode(text) {
-      const m = (text || "").trim().match(/\+[\d]+$/);
-      return m ? m[0] : "";
-    }
-
-    // Map countries from LI text
-    const countries = countryLis
-      .map((li) => {
-        const text = (li.textContent || "").trim();
-        const dialCode = parseDialCode(text);
-        const flag = text.split(/\s+/)[0] || "";
-        return { li, text, dialCode, flag };
-      })
-      .filter((c) => c.dialCode);
-
-    const dialCodesSortedDesc = [...new Set(countries.map((c) => c.dialCode))].sort(
-      (a, b) => b.length - a.length
+    const phoneInput = phoneField?.querySelector?.('input[type="tel"]');
+    const phoneUI = phoneField?.querySelector?.(".hsfc-PhoneInput");
+    const flagAndCaret = phoneUI?.querySelector?.(
+      ".hsfc-PhoneInput__FlagAndCaret"
+    );
+    const flagSpan = phoneUI?.querySelector?.(
+      ".hsfc-PhoneInput__FlagAndCaret__Flag"
+    );
+    const phoneOptions = phoneUI?.querySelector?.(".hsfc-DropdownOptions");
+    const phoneSearch = phoneOptions?.querySelector?.('input[role="searchbox"]');
+    const phoneList = phoneOptions?.querySelector?.('ul[role="listbox"]');
+    const countryLis = toArray(
+      phoneList?.querySelectorAll?.('li[role="option"]')
     );
 
-    const countryByDial = new Map();
-    countries.forEach((c) => {
-      if (!countryByDial.has(c.dialCode)) countryByDial.set(c.dialCode, c);
-    });
+    if (
+      phoneField &&
+      phoneInput &&
+      phoneUI &&
+      flagAndCaret &&
+      phoneOptions &&
+      phoneList
+    ) {
+      function parseDialCode(text) {
+        const m = (text || "").trim().match(/\+[\d]+$/);
+        return m ? m[0] : "";
+      }
 
-    // initial selected (DOM marks PH selected in your paste)
-    const initialSelected =
-      countries.find(
-        (c) =>
-          c.li.getAttribute("aria-selected") === "true" ||
-          c.li.classList.contains("hsfc-DropdownOptions__List__ListItem--selected")
-      ) || countries[0];
+      function flagEmojiToISO2(flag) {
+        const chars = Array.from((flag || "").trim());
+        if (chars.length !== 2) return "";
+        const A = 0x1f1e6;
+        const c0 = chars[0].codePointAt(0);
+        const c1 = chars[1].codePointAt(0);
+        if (!c0 || !c1) return "";
+        if (c0 < A || c1 < A) return "";
+        const iso2 = String.fromCharCode(c0 - A + 65, c1 - A + 65);
+        return /^[A-Z]{2}$/.test(iso2) ? iso2 : "";
+      }
 
-    let selectedCountry = initialSelected;
+      // Only allow: digits, spaces, and a single leading "+"
+      function sanitizePhoneRaw(raw) {
+        let v = (raw || "").toString();
 
-    function updateCountrySelectionUI(country) {
-      if (!country) return;
+        // Strip anything except digits, whitespace, and "+"
+        v = v.replace(/[^\d+\s]/g, "");
 
+        // Remove leading whitespace
+        v = v.replace(/^\s+/, "");
+
+        // If it starts with "+", keep only that leading "+"
+        if (v.startsWith("+")) {
+          v = "+" + v.slice(1).replace(/\+/g, "");
+          // No spaces directly after "+"
+          v = v.replace(/^\+\s+/, "+");
+        } else {
+          // No "+" allowed anywhere else
+          v = v.replace(/\+/g, "");
+        }
+
+        // Collapse consecutive spaces
+        v = v.replace(/\s{2,}/g, " ");
+
+        return v;
+      }
+
+      function normalizePhone(raw) {
+        let v = sanitizePhoneRaw(raw).trim();
+
+        // Auto-prefix "+" if user starts with a number
+        if (v && !v.startsWith("+") && /^\d/.test(v)) v = `+${v}`;
+
+        // Treat lone "+" as empty (for validation + hidden sync)
+        if (v === "+") return "";
+
+        return v;
+      }
+
+      // Map countries from LI text
+      const countries = countryLis
+        .map((li) => {
+          const text = (li.textContent || "").trim();
+          const dialCode = parseDialCode(text);
+
+          // The first token in HubSpot's list is the flag emoji
+          const flagEmoji = text.split(/\s+/)[0] || "";
+          const iso2 = flagEmojiToISO2(flagEmoji);
+          const display = iso2 || flagEmoji || "";
+
+          return { li, text, dialCode, flagEmoji, iso2, display };
+        })
+        .filter((c) => c.dialCode);
+
+      const dialCodesSortedDesc = [...new Set(countries.map((c) => c.dialCode))].sort(
+        (a, b) => b.length - a.length
+      );
+
+      const countryByDial = new Map();
       countries.forEach((c) => {
-        const selected = c === country;
-        c.li.setAttribute("aria-selected", selected ? "true" : "false");
-        c.li.classList.toggle("hsfc-DropdownOptions__List__ListItem--selected", selected);
+        if (!countryByDial.has(c.dialCode)) countryByDial.set(c.dialCode, c);
       });
 
-      // Keep a stable flag display (and reset to initial when empty)
-      if (flagSpan) flagSpan.textContent = country.flag || "";
-    }
+      // Small/targeted min-length map (default applies to everything else)
+      const MIN_NATIONAL_DIGITS_BY_DIAL = {
+        "+63": 10, // PH mobile (international format, no leading 0)
+        "+1": 10,  // NANP
+        "+7": 10,  // RU/KZ
+        "+65": 8,  // SG
+        "+852": 8, // HK
+      };
+      const DEFAULT_MIN_NATIONAL_DIGITS = 7;
 
-    function splitDialAndRest(rawValue) {
-      const v = (rawValue || "").trim();
-      if (!v) return { dialCode: "", rest: "" };
+      let selectedCountry = null;
 
-      const normalized = v.startsWith("+") ? v : `+${v}`;
-      const match = dialCodesSortedDesc.find((dc) => normalized.startsWith(dc));
-      if (match) return { dialCode: match, rest: normalized.slice(match.length) };
+      function updateCountrySelectionUI(country) {
+        countries.forEach((c) => {
+          const selected = !!country && c.dialCode === country.dialCode;
+          c.li.setAttribute("aria-selected", selected ? "true" : "false");
+          c.li.classList.toggle(
+            "hsfc-DropdownOptions__List__ListItem--selected",
+            selected
+          );
+        });
 
-      const m = normalized.match(/^\+\d{1,4}/);
-      if (m) return { dialCode: m[0], rest: normalized.slice(m[0].length) };
+        if (flagSpan) flagSpan.textContent = country?.display || "";
+      }
 
-      return { dialCode: "", rest: normalized };
-    }
+      function findDialMatch(v) {
+        if (!v) return "";
+        return dialCodesSortedDesc.find((dc) => v.startsWith(dc)) || "";
+      }
 
-    function syncHiddenPhone() {
-      phoneHidden.value = (phoneInput.value || "").trim();
-    }
+      function splitDialAndRest(rawValue) {
+        const v = sanitizePhoneRaw(rawValue).trim();
+        if (!v) return { dialCode: "", rest: "" };
 
-    function setSelectedCountry(country, rewriteInputPrefix) {
-      if (!country) return;
-      selectedCountry = country;
-      updateCountrySelectionUI(country);
+        const normalized = v.startsWith("+") ? v : `+${v}`;
+        const match = findDialMatch(normalized);
+        if (match) return { dialCode: match, rest: normalized.slice(match.length) };
 
-      if (rewriteInputPrefix) {
-        const current = phoneInput.value || "";
-        const { rest } = splitDialAndRest(current);
+        // No exact match (yet)
+        return { dialCode: "", rest: normalized };
+      }
 
-        if (!current.trim()) {
-          phoneInput.value = country.dialCode;
+      function syncHiddenPhone() {
+        const v = normalizePhone(phoneInput.value || "");
+        phoneHidden.value = v;
+      }
+
+      function setSelectedCountry(country, rewriteInputPrefix) {
+        selectedCountry = country || null;
+        updateCountrySelectionUI(selectedCountry);
+
+        if (rewriteInputPrefix && selectedCountry) {
+          const current = sanitizePhoneRaw(phoneInput.value || "");
+          const { rest } = splitDialAndRest(current);
+
+          if (!current.trim()) {
+            phoneInput.value = selectedCountry.dialCode;
+          } else {
+            phoneInput.value = `${selectedCountry.dialCode}${rest}`;
+          }
+
+          // No spaces directly after "+"
+          phoneInput.value = phoneInput.value.replace(/^\+\s+/, "+");
+        }
+
+        syncHiddenPhone();
+        clearError(phoneField, phoneInput);
+      }
+
+      function syncCountryFromInput() {
+        const normalized = normalizePhone(phoneInput.value || "");
+        if (!normalized) {
+          if (selectedCountry) setSelectedCountry(null, false);
+          else updateCountrySelectionUI(null);
+          return;
+        }
+
+        const dialCode = findDialMatch(normalized);
+        const found = dialCode ? countryByDial.get(dialCode) || null : null;
+
+        if (!found) {
+          if (selectedCountry) setSelectedCountry(null, false);
+          else updateCountrySelectionUI(null);
+          return;
+        }
+
+        if (!selectedCountry || selectedCountry.dialCode !== found.dialCode) {
+          // do not rewrite input while typing (avoid cursor jump)
+          setSelectedCountry(found, false);
         } else {
-          phoneInput.value = `${country.dialCode}${rest}`;
+          updateCountrySelectionUI(selectedCountry);
         }
       }
 
-      syncHiddenPhone();
-      clearError(phoneField, phoneInput);
-    }
-
-    // ✅ normalize input to: + then digits only (typing restriction)
-    function normalizePhoneValueKeepCursor(inputEl) {
-      const before = inputEl.value || "";
-      const selStart = inputEl.selectionStart;
-
-      // keep only digits and plus
-      let v = before.replace(/[^\d+]/g, "");
-
-      // keep only one leading "+"
-      const plusCount = (v.match(/\+/g) || []).length;
-      if (plusCount > 1) {
-        // remove all plus and re-add later
-        v = v.replace(/\+/g, "");
-      } else if (plusCount === 1 && !v.startsWith("+")) {
-        v = v.replace(/\+/g, "");
+      function getMinNationalDigits(dialCode) {
+        return MIN_NATIONAL_DIGITS_BY_DIAL[dialCode] || DEFAULT_MIN_NATIONAL_DIGITS;
       }
 
-      // auto-prefix + if digits exist
-      if (v && !v.startsWith("+")) v = `+${v}`;
+      function validatePhoneValue(rawValue) {
+        const normalized = normalizePhone(rawValue);
 
-      // treat lone "+" as empty (so it truly clears)
-      if (v === "+") v = "";
+        // Empty => required
+        if (!normalized) return { ok: false, message: REQUIRED_MSG };
 
-      if (v !== before) {
-        inputEl.value = v;
+        // Must have a *full* recognized dial code
+        const dialCode = findDialMatch(normalized);
+        if (!dialCode) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
 
-        // best-effort cursor repair (avoid wild jumps)
-        if (typeof selStart === "number") {
-          const delta = v.length - before.length;
-          const next = Math.max(0, Math.min(v.length, selStart + delta));
+        const digits = normalized.replace(/\D/g, "");
+        const dialDigits = dialCode.replace(/\D/g, "");
+        const nationalDigits = Math.max(0, digits.length - dialDigits.length);
+
+        // Dial code selected but no actual number yet => required
+        if (nationalDigits === 0) return { ok: false, message: REQUIRED_MSG };
+
+        // E.164 max length guardrail
+        if (digits.length > 15) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
+
+        const minNat = getMinNationalDigits(dialCode);
+        if (nationalDigits < minNat) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
+
+        return { ok: true, message: "" };
+      }
+
+      // Expose for submit validation
+      phoneCtx = {
+        field: phoneField,
+        input: phoneInput,
+        validate() {
+          return validatePhoneValue(phoneInput.value || "");
+        },
+      };
+
+      // initial sync (based on prefilled input)
+      syncHiddenPhone();
+      syncCountryFromInput();
+
+      // dropdown setup (Country list)
+      createDropdown({
+        toggleEl: flagAndCaret,
+        optionsEl: phoneOptions,
+        searchEl: phoneSearch,
+        listEl: phoneList,
+        items: countryLis,
+        ariaExpandedEl: flagAndCaret,
+        onSelect: (li) => {
+          const dc = parseDialCode(li.textContent);
+          setSelectedCountry(countryByDial.get(dc) || null, true);
+        },
+      });
+
+      // Hard block unwanted characters: only digits, spaces, and "+" (only at the start)
+      phoneInput.addEventListener("keydown", (e) => {
+        // Allow shortcuts (copy/paste/select all/etc.)
+        if (e.ctrlKey || e.metaKey) return;
+
+        const k = e.key;
+
+        // Navigation / editing keys
+        const okKeys = [
+          "Backspace",
+          "Delete",
+          "ArrowLeft",
+          "ArrowRight",
+          "ArrowUp",
+          "ArrowDown",
+          "Home",
+          "End",
+          "Tab",
+          "Enter",
+          "Escape",
+        ];
+        if (okKeys.includes(k)) return;
+
+        // Digits
+        if (k >= "0" && k <= "9") return;
+
+        // Spaces (allowed)
+        if (k === " ") return;
+
+        // Plus is allowed ONLY at the very start
+        if (k === "+") {
+          const v = phoneInput.value || "";
+          const start =
+            typeof phoneInput.selectionStart === "number"
+              ? phoneInput.selectionStart
+              : 0;
+          const end =
+            typeof phoneInput.selectionEnd === "number"
+              ? phoneInput.selectionEnd
+              : 0;
+
+          const replacingAll = start === 0 && end === v.length;
+          const replacingFirstChar = start === 0 && end >= 1;
+
+          if ((start === 0 && !v.includes("+")) || replacingAll || replacingFirstChar) return;
+
+          e.preventDefault();
+          return;
+        }
+
+        // Block everything else: letters, punctuation, symbols
+        e.preventDefault();
+      });
+
+      // Sanitize on paste too
+      phoneInput.addEventListener("paste", (e) => {
+        if (!e.clipboardData) return;
+        e.preventDefault();
+
+        const pasted = e.clipboardData.getData("text") || "";
+        const insert = sanitizePhoneRaw(pasted);
+
+        const current = phoneInput.value || "";
+        const start =
+          typeof phoneInput.selectionStart === "number"
+            ? phoneInput.selectionStart
+            : current.length;
+        const end =
+          typeof phoneInput.selectionEnd === "number"
+            ? phoneInput.selectionEnd
+            : start;
+
+        let next = current.slice(0, start) + insert + current.slice(end);
+        next = sanitizePhoneRaw(next);
+
+        // Auto-prefix "+" if it starts with a number
+        if (next && !next.startsWith("+") && /^\d/.test(next)) next = `+${next}`;
+        next = next.replace(/^\+\s+/, "+");
+
+        phoneInput.value = next;
+
+        const newPos = Math.min(
+          (current.slice(0, start) + insert).length,
+          phoneInput.value.length
+        );
+        try {
+          phoneInput.setSelectionRange(newPos, newPos);
+        } catch (_) {}
+
+        clearError(phoneField, phoneInput);
+        syncHiddenPhone();
+        syncCountryFromInput();
+      });
+
+      // typing dial code auto-selects country, clears when empty/no exact match
+      phoneInput.addEventListener("input", () => {
+        // Always clear while editing (only show errors on blur/submit)
+        clearError(phoneField, phoneInput);
+
+        const raw = phoneInput.value || "";
+        const caret =
+          typeof phoneInput.selectionStart === "number"
+            ? phoneInput.selectionStart
+            : null;
+
+        // Sanitize while preserving caret reasonably well
+        if (caret !== null) {
+          const before = raw.slice(0, caret);
+          const sanitizedAll = sanitizePhoneRaw(raw);
+          const sanitizedBefore = sanitizePhoneRaw(before);
+
+          phoneInput.value = sanitizedAll;
+          const newCaret = sanitizedBefore.length;
+
           try {
-            inputEl.setSelectionRange(next, next);
+            phoneInput.setSelectionRange(newCaret, newCaret);
+          } catch (_) {}
+        } else {
+          phoneInput.value = sanitizePhoneRaw(raw);
+        }
+
+        // Auto-prefix +
+        if (
+          phoneInput.value &&
+          !phoneInput.value.startsWith("+") &&
+          /^\d/.test(phoneInput.value)
+        ) {
+          const pos =
+            typeof phoneInput.selectionStart === "number"
+              ? phoneInput.selectionStart
+              : phoneInput.value.length;
+          phoneInput.value = `+${phoneInput.value}`;
+          try {
+            phoneInput.setSelectionRange(pos + 1, pos + 1);
           } catch (_) {}
         }
-      }
 
-      return v;
-    }
+        // No spaces directly after "+"
+        phoneInput.value = phoneInput.value.replace(/^\+\s+/, "+");
 
-    // ✅ Phone validation that enforces ONLY two messages:
-    // - required
-    // - invalid/wrong format (your custom string)
-    function validatePhone(showMsg) {
-      const v = (phoneInput.value || "").trim();
-
-      // clears when empty
-      if (!v) {
         syncHiddenPhone();
-        // Reset country UI back to initial when empty (so the component looks consistent)
-        setSelectedCountry(initialSelected, false);
-        if (showMsg) showError(phoneField, phoneInput, REQUIRED_MSG);
-        return false;
-      }
+        syncCountryFromInput();
+      });
 
-      // must be +digits only (we already normalize on input, but keep defensive)
-      if (!/^\+\d+$/.test(v)) {
-        if (showMsg) showError(phoneField, phoneInput, PHONE_INVALID_FORMAT_MSG);
-        return false;
-      }
-
-      // determine dial vs national length (minimum national digits = 4)
-      const { dialCode } = splitDialAndRest(v);
-      const found = dialCode ? countryByDial.get(dialCode) : null;
-      if (found && found !== selectedCountry) setSelectedCountry(found, false);
-
-      const digits = v.replace(/\D/g, "");
-      const dialDigits = (dialCode || "").replace(/\D/g, "");
-      const nationalDigits = dialDigits
-        ? Math.max(0, digits.length - dialDigits.length)
-        : digits.length;
-
-      // not enough digits after country code => invalid format
-      if (!dialDigits || nationalDigits < 4) {
-        if (showMsg) showError(phoneField, phoneInput, PHONE_INVALID_FORMAT_MSG);
-        return false;
-      }
-
-      clearError(phoneField, phoneInput);
-      return true;
-    }
-
-    // initial UI + hidden sync
-    setSelectedCountry(selectedCountry, false);
-    syncHiddenPhone();
-
-    // dropdown setup
-    createDropdown({
-      toggleEl: flagAndCaret,
-      optionsEl: phoneOptions,
-      searchEl: phoneSearch,
-      listEl: phoneList,
-      items: countryLis,
-      ariaExpandedEl: flagAndCaret,
-      onSelect: (li) => {
-        const dc = parseDialCode(li.textContent);
-        const country = countryByDial.get(dc);
-        if (country) setSelectedCountry(country, true);
-      },
-    });
-
-    // ✅ country detection by typing (+63 → PH), and clears when empty
-    phoneInput.addEventListener("input", () => {
-      const v = normalizePhoneValueKeepCursor(phoneInput);
-      syncHiddenPhone();
-
-      // if empty -> reset country UI, clear errors (required will show on blur/submit)
-      if (!v) {
-        setSelectedCountry(initialSelected, false);
+      phoneInput.addEventListener("focus", () => {
         clearError(phoneField, phoneInput);
-        return;
-      }
+      });
 
-      const { dialCode } = splitDialAndRest(v);
-      if (dialCode) {
-        const found = countryByDial.get(dialCode);
-        if (found && found !== selectedCountry) {
-          // don't rewrite prefix while typing (avoid cursor jump)
-          setSelectedCountry(found, false);
-        }
-      }
-
-      // live clear error once user types something
-      clearError(phoneField, phoneInput);
-    });
-
-    phoneInput.addEventListener("blur", () => {
-      // on blur we enforce the two-message policy
-      validatePhone(true);
-    });
-
-    phoneHelpers = {
-      field: phoneField,
-      input: phoneInput,
-      validatePhone,
-      syncHiddenPhone,
-    };
+      phoneInput.addEventListener("blur", () => {
+        const res = validatePhoneValue(phoneInput.value || "");
+        if (!res.ok) showError(phoneField, phoneInput, res.message);
+      });
+    }
   }
 
   // -------------------------
@@ -475,10 +671,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (firstNameInput) {
     const field = firstNameInput.closest(".hsfc-TextField");
     firstNameInput.addEventListener("input", () => {
-      if (firstNameInput.value.trim()) clearError(field, firstNameInput);
+      clearError(field, firstNameInput);
     });
     firstNameInput.addEventListener("blur", () => {
-      if (!firstNameInput.value.trim()) showError(field, firstNameInput, REQUIRED_MSG);
+      if (!firstNameInput.value.trim())
+        showError(field, firstNameInput, REQUIRED_MSG);
     });
   }
 
@@ -486,103 +683,112 @@ document.addEventListener("DOMContentLoaded", () => {
   if (emailInput) {
     const field = emailInput.closest(".hsfc-EmailField");
     emailInput.addEventListener("input", () => {
-      if (emailInput.value.trim()) clearError(field, emailInput);
+      clearError(field, emailInput);
     });
     emailInput.addEventListener("blur", () => {
       const v = emailInput.value.trim();
       if (!v) showError(field, emailInput, REQUIRED_MSG);
-      else if (!emailInput.checkValidity()) showError(field, emailInput, EMAIL_INVALID_MSG);
+      else if (!emailInput.checkValidity())
+        showError(field, emailInput, EMAIL_INVALID_MSG);
     });
   }
 
   const checkboxInput = form.querySelector(
     'input[type="checkbox"][name="0-1/confirmation_checkbox"]'
   );
-
   if (checkboxInput) {
     const field = checkboxInput.closest(".hsfc-CheckboxField");
 
-    // ensure value matches checked state for submission
+    // Make checkbox submit "true" when checked
     checkboxInput.value = checkboxInput.checked ? "true" : "false";
 
     checkboxInput.addEventListener("change", () => {
       checkboxInput.value = checkboxInput.checked ? "true" : "false";
-      if (checkboxInput.checked) {
-        clearError(field, checkboxInput);
-      } else {
-        // ✅ Missing checkbox required red message: show immediately when user unchecks
-        showError(field, checkboxInput, REQUIRED_MSG);
-      }
+      if (checkboxInput.checked) clearError(field, checkboxInput);
     });
 
-    // ✅ show required on blur if they tab away without checking
+    // Show required red message if user leaves it unchecked
     checkboxInput.addEventListener("blur", () => {
       if (!checkboxInput.checked) showError(field, checkboxInput, REQUIRED_MSG);
-      else clearError(field, checkboxInput);
+    });
+
+    checkboxInput.addEventListener("focus", () => {
+      clearError(field, checkboxInput);
     });
   }
 
   // -------------------------
   // Submit validation (required text in red)
   // -------------------------
-  form.addEventListener("submit", (e) => {
-    const invalidTargets = [];
+  form.addEventListener(
+    "submit",
+    (e) => {
+      const invalidTargets = [];
 
-    // First Name
-    if (firstNameInput) {
-      const field = firstNameInput.closest(".hsfc-TextField");
-      if (!firstNameInput.value.trim()) {
-        showError(field, firstNameInput, REQUIRED_MSG);
-        invalidTargets.push(firstNameInput);
+      // First Name
+      if (firstNameInput) {
+        const field = firstNameInput.closest(".hsfc-TextField");
+        if (!firstNameInput.value.trim()) {
+          showError(field, firstNameInput, REQUIRED_MSG);
+          invalidTargets.push(firstNameInput);
+        }
       }
-    }
 
-    // City (uses hidden value)
-    const cityHidden2 = form.querySelector('input[type="hidden"][name="0-1/location_"]');
-    if (cityHidden2) {
-      const cityField = cityHidden2.closest(".hsfc-DropdownField");
-      const cityCombobox = cityField.querySelector("input.hsfc-TextInput--button");
-      if (!cityHidden2.value.trim()) {
-        showError(cityField, cityCombobox, REQUIRED_MSG);
-        invalidTargets.push(cityCombobox);
+      // City (uses hidden value)
+      const cityHidden2 = form.querySelector(
+        'input[type="hidden"][name="0-1/location_"]'
+      );
+      if (cityHidden2) {
+        const cityField = cityHidden2.closest(".hsfc-DropdownField");
+        const cityCombobox = cityField.querySelector(
+          "input.hsfc-TextInput--button"
+        );
+        if (!cityHidden2.value.trim()) {
+          showError(cityField, cityCombobox, REQUIRED_MSG);
+          invalidTargets.push(cityCombobox);
+        }
       }
-    }
 
-    // Phone (ONLY two messages: required or invalid format)
-    if (phoneHelpers?.validatePhone) {
-      const ok = phoneHelpers.validatePhone(true);
-      if (!ok) invalidTargets.push(phoneHelpers.input);
-    }
-
-    // Email
-    if (emailInput) {
-      const field = emailInput.closest(".hsfc-EmailField");
-      const v = emailInput.value.trim();
-      if (!v) {
-        showError(field, emailInput, REQUIRED_MSG);
-        invalidTargets.push(emailInput);
-      } else if (!emailInput.checkValidity()) {
-        showError(field, emailInput, EMAIL_INVALID_MSG);
-        invalidTargets.push(emailInput);
+      // Phone (same validation rules as blur)
+      if (phoneCtx?.field && phoneCtx?.input && typeof phoneCtx.validate === "function") {
+        const res = phoneCtx.validate();
+        if (!res.ok) {
+          showError(phoneCtx.field, phoneCtx.input, res.message);
+          invalidTargets.push(phoneCtx.input);
+        }
       }
-    }
 
-    // Checkbox
-    if (checkboxInput) {
-      const field = checkboxInput.closest(".hsfc-CheckboxField");
-      if (!checkboxInput.checked) {
-        showError(field, checkboxInput, REQUIRED_MSG);
-        invalidTargets.push(checkboxInput);
+      // Email
+      if (emailInput) {
+        const field = emailInput.closest(".hsfc-EmailField");
+        const v = emailInput.value.trim();
+        if (!v) {
+          showError(field, emailInput, REQUIRED_MSG);
+          invalidTargets.push(emailInput);
+        } else if (!emailInput.checkValidity()) {
+          showError(field, emailInput, EMAIL_INVALID_MSG);
+          invalidTargets.push(emailInput);
+        }
       }
-    }
 
-    if (invalidTargets.length) {
-      e.preventDefault();
-      e.stopPropagation();
-      closeAllDropdowns(null);
-      invalidTargets[0].focus();
-    }
-  });
+      // Checkbox
+      if (checkboxInput) {
+        const field = checkboxInput.closest(".hsfc-CheckboxField");
+        if (!checkboxInput.checked) {
+          showError(field, checkboxInput, REQUIRED_MSG);
+          invalidTargets.push(checkboxInput);
+        }
+      }
+
+      if (invalidTargets.length) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeAllDropdowns(null);
+        invalidTargets[0].focus();
+      }
+    },
+    true // capture: run before other submit handlers
+  );
 });
 
 
@@ -598,67 +804,67 @@ document.addEventListener("DOMContentLoaded", () => {
    We patch it AFTER render by switching the role to "combobox"
    (which DOES support aria-expanded/aria-haspopup/listbox patterns).
    ========================= */
-(function () {
-  "use strict";
+//(function () {
+//  "use strict";
 
-  function patchHubSpotDropdownA11y(root) {
-    if (!root || root.nodeType !== 1) return;
+//  function patchHubSpotDropdownA11y(root) {
+//    if (!root || root.nodeType !== 1) return;
 
     // Target the HubSpot dropdown input pattern seen in your Lighthouse screenshot.
     // Example classes: .hsfc-DropdownInput .hsfc-TextInput--button
-    var inputs = root.querySelectorAll(
-      'input.hsfc-TextInput[role="button"][aria-haspopup="listbox"], ' +
-      'input.hsfc-TextInput--button[role="button"], ' +
-      'div.hsfc-DropdownInput input[role="button"]'
-    );
+//    var inputs = root.querySelectorAll(
+//      'input.hsfc-TextInput[role="button"][aria-haspopup="listbox"], ' +
+//      'input.hsfc-TextInput--button[role="button"], ' +
+//      'div.hsfc-DropdownInput input[role="button"]'
+//    );
 
-    inputs.forEach(function (el) {
+//    inputs.forEach(function (el) {
       // Avoid re-patching
-      if (el.dataset && el.dataset.samA11yPatched === "1") return;
+//      if (el.dataset && el.dataset.samA11yPatched === "1") return;
 
       // Switch invalid role="button" to a valid dropdown text-entry control pattern.
       // This resolves Lighthouse ARIA role mismatch warnings.
-      el.setAttribute("role", "combobox");
+//      el.setAttribute("role", "combobox");
 
       // Ensure autocomplete semantics are coherent for combobox.
-      if (!el.hasAttribute("aria-autocomplete")) {
-        el.setAttribute("aria-autocomplete", "list");
-      }
+//      if (!el.hasAttribute("aria-autocomplete")) {
+//        el.setAttribute("aria-autocomplete", "list");
+//      }
 
       // Keep aria-haspopup="listbox" if present; it's valid for combobox.
       // Keep aria-expanded if present; it's valid for combobox.
 
       // Mark patched
-      if (el.dataset) el.dataset.samA11yPatched = "1";
-    });
-  }
+//      if (el.dataset) el.dataset.samA11yPatched = "1";
+//    });
+//  }
 
-  function initNewsletterA11yFix() {
+//  function initNewsletterA11yFix() {
     // Limit patching to the newsletter module area first.
-    var newsletterRoot = document.querySelector(".newsletter-form");
-    if (newsletterRoot) patchHubSpotDropdownA11y(newsletterRoot);
+//    var newsletterRoot = document.querySelector(".newsletter-form");
+//    if (newsletterRoot) patchHubSpotDropdownA11y(newsletterRoot);
 
     // Also observe future form injections/re-renders (HubSpot can do late hydration).
-    var mo = new MutationObserver(function (mutations) {
-      for (var i = 0; i < mutations.length; i++) {
-        var m = mutations[i];
-        if (m.addedNodes && m.addedNodes.length) {
-          m.addedNodes.forEach(function (node) {
-            if (node && node.nodeType === 1) {
+//    var mo = new MutationObserver(function (mutations) {
+//      for (var i = 0; i < mutations.length; i++) {
+//        var m = mutations[i];
+//        if (m.addedNodes && m.addedNodes.length) {
+//          m.addedNodes.forEach(function (node) {
+//            if (node && node.nodeType === 1) {
               // Patch within the added subtree
-              patchHubSpotDropdownA11y(node);
-            }
-          });
-        }
-      }
-    });
+//              patchHubSpotDropdownA11y(node);
+//            }
+//          });
+//        }
+//      }
+//    });
 
-    mo.observe(document.documentElement, { childList: true, subtree: true });
-  }
+//    mo.observe(document.documentElement, { childList: true, subtree: true });
+//  }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initNewsletterA11yFix);
-  } else {
-    initNewsletterA11yFix();
-  }
-})();
+//  if (document.readyState === "loading") {
+//    document.addEventListener("DOMContentLoaded", initNewsletterA11yFix);
+//  } else {
+//    initNewsletterA11yFix();
+//  }
+//})();
