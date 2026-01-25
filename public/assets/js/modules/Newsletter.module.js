@@ -7,6 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = ROOT.querySelector("form.hsfc-Form");
   if (!form) return;
 
+  // -------------------------
+  // Messages
+  // -------------------------
   const REQUIRED_MSG = "Please complete this required field.";
   const EMAIL_INVALID_MSG = "Please enter a valid email address.";
   const EMAIL_INVALID_FORMAT_MSG = "Email must be formatted correctly.";
@@ -21,9 +24,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let phoneCtx = null;
 
   // -------------------------
-  // libphonenumber-js (optional, best-practice source-of-truth)
+  // Optional: libphonenumber-js hooks (if present)
   // -------------------------
-  // Supports multiple possible globals depending on how you bundle/include it.
   const LibPhone =
     window.libphonenumber ||
     window.libphonenumberJs ||
@@ -35,39 +37,56 @@ document.addEventListener("DOMContentLoaded", () => {
   const parsePhoneNumberFromString = LibPhone?.parsePhoneNumberFromString || null;
 
   // -------------------------
-  // Error helpers
+  // Pre-hide all Error/Info alerts in the form (since HTML is static)
   // -------------------------
-  function ensureErrorEl(fieldEl) {
-    if (!fieldEl) return null;
-    let el = fieldEl.querySelector('.hsfc-ErrorAlert[data-newsletter-error="1"]');
-    if (!el) {
-      el = document.createElement("div");
-      el.className = "hsfc-ErrorAlert";
-      el.dataset.newsletterError = "1";
-      el.setAttribute("role", "alert");
+  function hideInitialAlerts() {
+    const errorEls = form.querySelectorAll(
+      '.hsfc-ErrorAlert[data-hsfc-id="ErrorAlert"], .hsfc-ErrorAlert'
+    );
+    errorEls.forEach((el) => {
+      // Don’t wipe text; just hide
       el.hidden = true;
-      fieldEl.appendChild(el);
-    }
-    return el;
+      el.setAttribute("role", el.getAttribute("role") || "alert");
+      el.setAttribute("aria-live", el.getAttribute("aria-live") || "polite");
+    });
+
+    const infoEls = form.querySelectorAll(
+      '.hsfc-InfoAlert[data-hsfc-id="InfoAlert"], .hsfc-InfoAlert'
+    );
+    infoEls.forEach((el) => {
+      el.hidden = true;
+      el.setAttribute("role", el.getAttribute("role") || "status");
+      el.setAttribute("aria-live", el.getAttribute("aria-live") || "polite");
+    });
+  }
+  hideInitialAlerts();
+
+  // -------------------------
+  // Error/Info helpers (REUSE existing HTML elements)
+  // -------------------------
+  function getErrorEl(fieldEl) {
+    if (!fieldEl) return null;
+
+    // Prefer the HubSpot-ish marker if present
+    return (
+      fieldEl.querySelector('.hsfc-ErrorAlert[data-hsfc-id="ErrorAlert"]') ||
+      fieldEl.querySelector(".hsfc-ErrorAlert") ||
+      null
+    );
   }
 
-  function ensureInfoEl(fieldEl) {
+  function getInfoEl(fieldEl) {
     if (!fieldEl) return null;
-    let el = fieldEl.querySelector('.hsfc-InfoAlert[data-newsletter-info="1"]');
-    if (!el) {
-      el = document.createElement("div");
-      el.className = "hsfc-InfoAlert";
-      el.dataset.newsletterInfo = "1";
-      el.setAttribute("role", "status");
-      el.setAttribute("aria-live", "polite");
-      el.hidden = true;
-      fieldEl.appendChild(el);
-    }
-    return el;
+
+    return (
+      fieldEl.querySelector('.hsfc-InfoAlert[data-hsfc-id="InfoAlert"]') ||
+      fieldEl.querySelector(".hsfc-InfoAlert") ||
+      null
+    );
   }
 
   function showError(fieldEl, inputEl, message) {
-    const el = ensureErrorEl(fieldEl);
+    const el = getErrorEl(fieldEl);
     if (el) {
       el.textContent = message;
       el.hidden = false;
@@ -76,37 +95,65 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function clearError(fieldEl, inputEl) {
-    const el = fieldEl?.querySelector?.('.hsfc-ErrorAlert[data-newsletter-error="1"]');
+    const el = getErrorEl(fieldEl);
     if (el) el.hidden = true;
     if (inputEl) inputEl.setAttribute("aria-invalid", "false");
   }
 
-  function showInfo(fieldEl, htmlOrNode) {
-    const el = ensureInfoEl(fieldEl);
+  function clearInfo(fieldEl) {
+    const el = getInfoEl(fieldEl);
     if (!el) return;
-
-    el.hidden = false;
-    el.innerHTML = "";
-    if (typeof htmlOrNode === "string") {
-      el.innerHTML = htmlOrNode;
-    } else if (htmlOrNode && htmlOrNode.nodeType) {
-      el.appendChild(htmlOrNode);
-    }
+    el.hidden = true;
   }
 
-  function clearInfo(fieldEl) {
-    const el = fieldEl?.querySelector?.('.hsfc-InfoAlert[data-newsletter-info="1"]');
-    if (el) {
-      el.hidden = true;
-      el.innerHTML = "";
+  function showEmailSuggestion(fieldEl, inputEl, suggestion) {
+    const infoEl = getInfoEl(fieldEl);
+    if (!infoEl) return;
+
+    // Reuse existing button if present
+    let btn =
+      infoEl.querySelector('.hsfc-LinkButton[data-hsfc-id="LinkButton"]') ||
+      infoEl.querySelector(".hsfc-LinkButton") ||
+      null;
+
+    if (!btn) {
+      // Fallback: create a button if HTML doesn’t have it
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "hsfc-LinkButton";
+      btn.dataset.hsfcId = "LinkButton";
+      infoEl.innerHTML = "";
+      infoEl.appendChild(btn);
     }
+
+    // Set the button text
+    btn.textContent = `Did you mean ${suggestion}?`;
+
+    // Remove previous click handlers safely by cloning (simple + reliable)
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+
+    newBtn.addEventListener("click", () => {
+      inputEl.value = suggestion;
+
+      clearError(fieldEl, inputEl);
+      clearInfo(fieldEl);
+
+      // keep any other listeners in sync
+      try {
+        inputEl.dispatchEvent(new Event("input", { bubbles: true }));
+      } catch (_) {}
+
+      inputEl.focus();
+    });
+
+    infoEl.hidden = false;
   }
 
   // -------------------------
-  // Dropdown positioning + scrollbar
+  // Dropdown utilities
   // -------------------------
   function setListScrollbar(listEl, px = 260) {
-    // This is the ONLY styling we force (scrollbar visibility)
     if (!listEl) return;
     listEl.style.maxHeight = `${px}px`;
     listEl.style.overflowY = "auto";
@@ -128,25 +175,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (except) openDropdowns.add(except);
   }
 
-  /**
-   * Positions `.hsfc-DropdownOptions` so it doesn't cover the anchor field.
-   * Chooses drop-down vs drop-up based on available viewport space.
-   */
   function positionDropdownOptions(optionsEl, anchorEl, offsetParentEl, gap = 6) {
     if (!optionsEl || !anchorEl) return;
 
     const parent = offsetParentEl || optionsEl.offsetParent || anchorEl.offsetParent;
     if (!parent) return;
 
-    // Ensure we can measure
     const prevDisplay = optionsEl.style.display;
     const prevVisibility = optionsEl.style.visibility;
 
-    // Must be displayed to measure size; keep hidden to avoid flicker
     optionsEl.style.display = "flex";
     optionsEl.style.visibility = "hidden";
 
-    // Make sure list scroll rules are applied BEFORE measuring
     const listEl =
       optionsEl.querySelector(".hsfc-DropdownOptions__List") ||
       optionsEl.querySelector('ul[role="listbox"]');
@@ -161,24 +201,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const availableAbove = anchorRect.top - gap;
 
     const shouldDropDown =
-      availableBelow >= Math.min(optionsHeight, 280) ||
-      availableBelow >= availableAbove;
+      availableBelow >= Math.min(optionsHeight, 280) || availableBelow >= availableAbove;
 
-    // Reset both so we don't accumulate stale rules
     optionsEl.style.top = "";
     optionsEl.style.bottom = "";
 
     if (shouldDropDown) {
-      // Place below anchor
       const topPx = anchorRect.bottom - parentRect.top + gap;
       optionsEl.style.top = `${Math.max(0, topPx)}px`;
     } else {
-      // Place above anchor
       const bottomPx = parentRect.bottom - anchorRect.top + gap;
       optionsEl.style.bottom = `${Math.max(0, bottomPx)}px`;
     }
 
-    // Restore visibility, keep display as-is
     optionsEl.style.visibility = prevVisibility || "";
     optionsEl.style.display = prevDisplay || "flex";
   }
@@ -191,8 +226,8 @@ document.addEventListener("DOMContentLoaded", () => {
     items,
     ariaExpandedEl,
     onSelect,
-    anchorElForPosition, // the element whose bottom/top we align to
-    offsetParentEl, // positioned container (usually the field wrapper)
+    anchorElForPosition,
+    offsetParentEl,
   }) {
     let isOpen = false;
 
@@ -203,15 +238,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         closeAllDropdowns(api);
 
-        // Show first (needed for measuring), then position, then focus
         optionsEl.style.display = "flex";
         if (ariaExpandedEl) ariaExpandedEl.setAttribute("aria-expanded", "true");
         if (toggleEl) toggleEl.setAttribute("aria-expanded", "true");
 
-        // Scrollbar (only forced CSS behavior)
         setListScrollbar(listEl, 260);
 
-        // Dropup/dropdown positioning (prevents covering the field)
         positionDropdownOptions(
           optionsEl,
           anchorElForPosition || toggleEl,
@@ -298,7 +330,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return api;
   }
 
-  // Close dropdowns on outside click/tap
   document.addEventListener("pointerdown", (e) => {
     if (!openDropdowns.size) return;
     for (const dd of openDropdowns) {
@@ -307,17 +338,14 @@ document.addEventListener("DOMContentLoaded", () => {
     closeAllDropdowns(null);
   });
 
-  // Close dropdowns on Escape anywhere
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeAllDropdowns(null);
   });
 
-  // Reposition open dropdowns on resize/scroll (keeps alignment stable)
   window.addEventListener("resize", () => {
     for (const dd of openDropdowns) dd.reposition();
   });
 
-  // Capture scroll from any scroll container
   window.addEventListener(
     "scroll",
     () => {
@@ -332,65 +360,63 @@ document.addEventListener("DOMContentLoaded", () => {
   const cityHidden = form.querySelector('input[type="hidden"][name="0-1/location_"]');
   if (cityHidden) {
     const cityField = cityHidden.closest(".hsfc-DropdownField");
-    const cityCombobox = cityField.querySelector("input.hsfc-TextInput--button");
-    const cityOptions = cityField.querySelector(".hsfc-DropdownOptions");
-    const citySearch = cityOptions.querySelector('input[role="searchbox"]');
-    const cityList = cityOptions.querySelector('ul[role="listbox"]');
-    const cityItems = toArray(cityList.querySelectorAll('li[role="option"]'));
-    const cityCaret = cityField.querySelector(".hsfc-DropdownInput__Caret");
-    const cityAnchor = cityField.querySelector(".hsfc-DropdownInput"); // align menu to this box
+    const cityCombobox = cityField?.querySelector("input.hsfc-TextInput--button");
+    const cityOptions = cityField?.querySelector(".hsfc-DropdownOptions");
+    const citySearch = cityOptions?.querySelector('input[role="searchbox"]');
+    const cityList = cityOptions?.querySelector('ul[role="listbox"]');
+    const cityItems = cityList ? toArray(cityList.querySelectorAll('li[role="option"]')) : [];
+    const cityCaret = cityField?.querySelector(".hsfc-DropdownInput__Caret");
+    const cityAnchor = cityField?.querySelector(".hsfc-DropdownInput");
 
-    function setCitySelected(li) {
-      const value = (li.textContent || "").trim();
-      cityCombobox.value = value;
-      cityHidden.value = value;
+    if (cityField && cityCombobox && cityOptions && cityList) {
+      function setCitySelected(li) {
+        const value = (li.textContent || "").trim();
+        cityCombobox.value = value;
+        cityHidden.value = value;
 
-      cityItems.forEach((item) => {
-        const selected = item === li;
-        item.setAttribute("aria-selected", selected ? "true" : "false");
-        item.classList.toggle(
-          "hsfc-DropdownOptions__List__ListItem--selected",
-          selected
-        );
+        cityItems.forEach((item) => {
+          const selected = item === li;
+          item.setAttribute("aria-selected", selected ? "true" : "false");
+          item.classList.toggle(
+            "hsfc-DropdownOptions__List__ListItem--selected",
+            selected
+          );
+        });
+
+        clearError(cityField, cityCombobox);
+      }
+
+      const cityDropdown = createDropdown({
+        toggleEl: cityCombobox,
+        optionsEl: cityOptions,
+        searchEl: citySearch,
+        listEl: cityList,
+        items: cityItems,
+        ariaExpandedEl: cityCombobox,
+        onSelect: setCitySelected,
+        anchorElForPosition: cityAnchor || cityCombobox,
+        offsetParentEl: cityField,
       });
 
-      clearError(cityField, cityCombobox);
-    }
+      if (cityCaret) {
+        cityCaret.addEventListener("click", (e) => {
+          e.preventDefault();
+          cityDropdown.toggle();
+        });
+      }
 
-    const cityDropdown = createDropdown({
-      toggleEl: cityCombobox,
-      optionsEl: cityOptions,
-      searchEl: citySearch,
-      listEl: cityList,
-      items: cityItems,
-      ariaExpandedEl: cityCombobox,
-      onSelect: setCitySelected,
-      anchorElForPosition: cityAnchor || cityCombobox,
-      offsetParentEl: cityField, // `.hsfc-DropdownField` is position:relative in your DOM CSS
-    });
+      cityCombobox.addEventListener("blur", () => {
+        if (!cityHidden.value.trim()) showError(cityField, cityCombobox, REQUIRED_MSG);
+      });
 
-    if (cityCaret) {
-      cityCaret.addEventListener("click", (e) => {
-        e.preventDefault();
-        cityDropdown.toggle();
+      cityCombobox.addEventListener("focus", () => {
+        clearError(cityField, cityCombobox);
       });
     }
-
-    cityCombobox.addEventListener("blur", () => {
-      if (!cityHidden.value.trim()) showError(cityField, cityCombobox, REQUIRED_MSG);
-    });
-
-    cityCombobox.addEventListener("focus", () => {
-      clearError(cityField, cityCombobox);
-    });
   }
 
   // -------------------------
-  // Phone (country + dial code + as-you-type spacing)
-  // Rules requested:
-  // - Only "+" allowed, only as first character
-  // - Only numbers otherwise
-  // - No manual spaces from keyboard (spaces only via auto formatting)
+  // Phone: sanitize + format + validate
   // -------------------------
   const phoneHidden = form.querySelector('input[type="hidden"][name="0-1/phone"]');
   if (phoneHidden) {
@@ -404,14 +430,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const phoneList = phoneOptions?.querySelector?.('ul[role="listbox"]');
     const countryLis = toArray(phoneList?.querySelectorAll?.('li[role="option"]'));
 
-    if (
-      phoneField &&
-      phoneInput &&
-      phoneUI &&
-      flagAndCaret &&
-      phoneOptions &&
-      phoneList
-    ) {
+    if (phoneField && phoneInput && phoneUI && flagAndCaret && phoneOptions && phoneList) {
       function parseDialCode(text) {
         const m = (text || "").trim().match(/\+[\d]+$/);
         return m ? m[0] : "";
@@ -429,33 +448,18 @@ document.addEventListener("DOMContentLoaded", () => {
         return /^[A-Z]{2}$/.test(iso2) ? iso2 : "";
       }
 
-      // Digits + optional single leading "+".
-      // NOTE: removes ALL spaces; spacing is added ONLY by auto-format.
       function sanitizePhoneRawNoSpaces(raw) {
         let v = (raw || "").toString();
-
-        // Keep digits and plus only
         v = v.replace(/[^\d+]/g, "");
-
-        // Ensure only one "+" and only at the beginning
-        if (v.startsWith("+")) {
-          v = "+" + v.slice(1).replace(/\+/g, "");
-        } else {
-          v = v.replace(/\+/g, "");
-        }
-
+        if (v.startsWith("+")) v = "+" + v.slice(1).replace(/\+/g, "");
+        else v = v.replace(/\+/g, "");
         return v;
       }
 
       function normalizePhoneE164ish(raw) {
         let v = sanitizePhoneRawNoSpaces(raw).trim();
-
-        // Auto-prefix "+" if user starts with a number
         if (v && !v.startsWith("+") && /^\d/.test(v)) v = `+${v}`;
-
-        // Treat lone "+" as empty
         if (v === "+") return "";
-
         return v;
       }
 
@@ -468,13 +472,9 @@ document.addEventListener("DOMContentLoaded", () => {
         return digitsCount(before);
       }
 
-      // Returns caret index in formatted string after N digits (ignores "+")
       function caretIndexAfterNDigits(formatted, nDigits) {
         if (!formatted) return 0;
-        if (nDigits <= 0) {
-          // place after "+" if it exists, else at start
-          return formatted.startsWith("+") ? 1 : 0;
-        }
+        if (nDigits <= 0) return formatted.startsWith("+") ? 1 : 0;
         let count = 0;
         for (let i = 0; i < formatted.length; i++) {
           if (/\d/.test(formatted[i])) count++;
@@ -483,23 +483,19 @@ document.addEventListener("DOMContentLoaded", () => {
         return formatted.length;
       }
 
-      // libphonenumber-js AsYouType formatting (best-practice),
-      // sanitized to only: "+" digits spaces (no hyphens/parentheses/etc).
       function formatWithAsYouType(normalizedPlusDigits, iso2Hint) {
         if (!AsYouTypeCtor || !normalizedPlusDigits) return null;
-
         try {
           const ayt = iso2Hint ? new AsYouTypeCtor(iso2Hint) : new AsYouTypeCtor();
           const out = ayt.input(normalizedPlusDigits);
 
-          // Keep only "+", digits; convert any separators to spaces
           const safe = (out || "")
             .replace(/[^\d+]+/g, " ")
             .replace(/\s{2,}/g, " ")
             .trim();
 
-          // Prefer the library's E.164 if it has it
-          const e164 = typeof ayt.getNumberValue === "function" ? ayt.getNumberValue() : "";
+          const e164 =
+            typeof ayt.getNumberValue === "function" ? ayt.getNumberValue() : "";
           const detectedCountry =
             typeof ayt.getCountry === "function" ? ayt.getCountry() : "";
 
@@ -513,8 +509,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Fallback display formatting with spaces only (your existing intent),
-      // used when libphonenumber-js isn't present.
       function groupDigits(digits, groups) {
         const out = [];
         let i = 0;
@@ -529,8 +523,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       function formatPhoneDisplayFallback(normalized) {
         if (!normalized) return "";
-
-        // normalized: +<digits only>
         const dialCode = findDialMatch(normalized);
         if (!dialCode) return normalized;
 
@@ -553,7 +545,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return `${dialCode} ${groupDigits(national, g)}`.trim();
         }
 
-        // Generic chunk by 3s
         const groups = [];
         let remaining = national.length;
         while (remaining > 3) {
@@ -568,7 +559,6 @@ document.addEventListener("DOMContentLoaded", () => {
       function autoFormatPhone(normalizedPlusDigits, iso2Hint) {
         const viaLib = formatWithAsYouType(normalizedPlusDigits, iso2Hint);
         if (viaLib) return viaLib;
-
         return {
           display: formatPhoneDisplayFallback(normalizedPlusDigits),
           e164: normalizedPlusDigits,
@@ -576,13 +566,12 @@ document.addEventListener("DOMContentLoaded", () => {
         };
       }
 
-      // Countries mapped from LI text
       const countries = countryLis
         .map((li) => {
           const text = (li.textContent || "").trim();
           const dialCode = parseDialCode(text);
           const flagEmoji = text.split(/\s+/)[0] || "";
-          const iso2 = flagEmojiToISO2(flagEmoji); // "PH"
+          const iso2 = flagEmojiToISO2(flagEmoji);
           const display = iso2 || flagEmoji || "";
           return { li, text, dialCode, flagEmoji, iso2, display };
         })
@@ -599,13 +588,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (c.iso2 && !countryByIso2.has(c.iso2)) countryByIso2.set(c.iso2, c);
       });
 
-      // Your original targeted minimum-length rules (kept)
       const MIN_NATIONAL_DIGITS_BY_DIAL = {
-        "+63": 10, // PH mobile without leading 0 (e.g., 9XXXXXXXXX)
-        "+1": 10, // NANP
-        "+7": 10, // RU/KZ (common)
-        "+65": 8, // SG
-        "+852": 8, // HK
+        "+63": 10,
+        "+1": 10,
+        "+7": 10,
+        "+65": 8,
+        "+852": 8,
       };
       const DEFAULT_MIN_NATIONAL_DIGITS = 7;
 
@@ -637,19 +625,13 @@ document.addEventListener("DOMContentLoaded", () => {
         return MIN_NATIONAL_DIGITS_BY_DIAL[dialCode] || DEFAULT_MIN_NATIONAL_DIGITS;
       }
 
-      // Best-practice validation path:
-      // 1) If libphonenumber-js available: parse + isValid()
-      // 2) Else fallback to your existing heuristic
       function validatePhoneValue(rawValue) {
         const normalized = normalizePhoneE164ish(rawValue);
-
         if (!normalized) return { ok: false, message: REQUIRED_MSG };
 
-        // E.164 max is 15 digits total (excluding "+")
         const digitsOnly = normalized.replace(/\D/g, "");
         if (digitsOnly.length > 15) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
 
-        // Preferred: libphonenumber validation
         if (parsePhoneNumberFromString) {
           try {
             const hint = selectedCountry?.iso2 || "";
@@ -658,21 +640,14 @@ document.addEventListener("DOMContentLoaded", () => {
               : parsePhoneNumberFromString(normalized);
 
             if (parsed) {
-              // If it's valid, accept immediately
               if (typeof parsed.isValid === "function" && parsed.isValid()) {
                 return { ok: true, message: "" };
               }
-
-              // If it's possible-but-not-valid, still treat as invalid for submit
-              // (keeps your strictness for phone numbers).
               return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
             }
-          } catch (_) {
-            // fall through to heuristic
-          }
+          } catch (_) {}
         }
 
-        // Fallback heuristic (your original intent)
         const dialCode = findDialMatch(normalized);
         if (!dialCode) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
 
@@ -693,8 +668,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (rewriteInputPrefix && selectedCountry) {
           const normalized = normalizePhoneE164ish(phoneInput.value || "");
-
-          // Extract digits after whatever dial code is currently present (or assume selected)
           const currentDial = findDialMatch(normalized) || selectedCountry.dialCode;
 
           const digitsAll = normalized.replace(/\D/g, "");
@@ -707,12 +680,10 @@ document.addEventListener("DOMContentLoaded", () => {
           phoneInput.value = fmt.display || nextNormalized;
           syncHiddenPhoneValue(fmt.e164 || nextNormalized);
 
-          // Keep caret at end after selection (matches HubSpot feel)
           try {
             phoneInput.setSelectionRange(phoneInput.value.length, phoneInput.value.length);
           } catch (_) {}
         } else {
-          // Just re-sync hidden without forcing a rewrite
           const normalized2 = normalizePhoneE164ish(phoneInput.value || "");
           const fmt2 = autoFormatPhone(normalized2, selectedCountry?.iso2 || "");
           syncHiddenPhoneValue(fmt2.e164 || normalized2);
@@ -730,7 +701,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // If lib can detect country, prefer that
         if (AsYouTypeCtor) {
           const fmt = formatWithAsYouType(normalized, selectedCountry?.iso2 || "");
           const detected = fmt?.detectedCountry || "";
@@ -744,7 +714,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         }
 
-        // Fallback: match by dial code
         const dialCode = findDialMatch(normalized);
         const found = dialCode ? countryByDial.get(dialCode) || null : null;
 
@@ -755,7 +724,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (!selectedCountry || selectedCountry.dialCode !== found.dialCode) {
-          // Don't rewrite while typing (avoid cursor jump)
           selectedCountry = found;
           updateCountrySelectionUI(selectedCountry);
         } else {
@@ -763,7 +731,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Expose for submit validation
       phoneCtx = {
         field: phoneField,
         input: phoneInput,
@@ -772,7 +739,6 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       };
 
-      // initial sync (based on prefilled input)
       {
         const normalized = normalizePhoneE164ish(phoneInput.value || "");
         const fmt = autoFormatPhone(normalized, selectedCountry?.iso2 || "");
@@ -781,7 +747,6 @@ document.addEventListener("DOMContentLoaded", () => {
         syncCountryFromInput();
       }
 
-      // dropdown setup (Country list)
       const phoneDropdown = createDropdown({
         toggleEl: flagAndCaret,
         optionsEl: phoneOptions,
@@ -793,15 +758,10 @@ document.addEventListener("DOMContentLoaded", () => {
           const dc = parseDialCode(li.textContent);
           setSelectedCountry(countryByDial.get(dc) || null, true);
         },
-        // Align dropdown to the whole phone input row (so it doesn't cover it)
         anchorElForPosition: phoneUI,
-        offsetParentEl: phoneField, // `.hsfc-PhoneField` is position:relative in your DOM CSS
+        offsetParentEl: phoneField,
       });
 
-      // Hard block unwanted characters:
-      // - digits allowed
-      // - "+" allowed ONLY at the first character
-      // - NO manual spaces (spaces come only from auto format)
       phoneInput.addEventListener("keydown", (e) => {
         if (e.ctrlKey || e.metaKey) return;
 
@@ -823,7 +783,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (k >= "0" && k <= "9") return;
 
-        // block manual spaces always
         if (k === " ") {
           e.preventDefault();
           return;
@@ -839,18 +798,15 @@ document.addEventListener("DOMContentLoaded", () => {
           const replacingAll = start === 0 && end === v.length;
           const replacingFirstChar = start === 0 && end >= 1;
 
-          // allow "+" only if caret is at start and there isn't already a "+"
           if ((start === 0 && !v.includes("+")) || replacingAll || replacingFirstChar) return;
 
           e.preventDefault();
           return;
         }
 
-        // everything else blocked
         e.preventDefault();
       });
 
-      // Sanitize on paste (strip spaces/letters/symbols; keep +digits)
       phoneInput.addEventListener("paste", (e) => {
         if (!e.clipboardData) return;
         e.preventDefault();
@@ -866,7 +822,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const end =
           typeof phoneInput.selectionEnd === "number" ? phoneInput.selectionEnd : start;
 
-        // Keep caret-digit count
         const caretDigits = digitCountBeforeCaret(current, start);
 
         let next = current.slice(0, start) + insert + current.slice(end);
@@ -876,7 +831,6 @@ document.addEventListener("DOMContentLoaded", () => {
         phoneInput.value = fmt.display || normalized;
         syncHiddenPhoneValue(fmt.e164 || normalized);
 
-        // Restore caret by digit count
         const newCaret = caretIndexAfterNDigits(phoneInput.value, caretDigits);
         try {
           phoneInput.setSelectionRange(newCaret, newCaret);
@@ -887,7 +841,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       phoneInput.addEventListener("input", () => {
-        // Clear while editing (errors on blur/submit)
         clearError(phoneField, phoneInput);
 
         const raw = phoneInput.value || "";
@@ -896,26 +849,18 @@ document.addEventListener("DOMContentLoaded", () => {
             ? phoneInput.selectionStart
             : raw.length;
 
-        // Count digits before caret (so we can restore caret after we inject spaces)
         const caretDigits = digitCountBeforeCaret(raw, caretPos);
-
-        // Sanitize to "+digits" only (no spaces)
         const normalized = normalizePhoneE164ish(raw);
 
-        // Auto-format (spaces only)
         const fmt = autoFormatPhone(normalized, selectedCountry?.iso2 || "");
         phoneInput.value = fmt.display || normalized;
 
-        // Restore caret position
         const newCaret = caretIndexAfterNDigits(phoneInput.value, caretDigits);
         try {
           phoneInput.setSelectionRange(newCaret, newCaret);
         } catch (_) {}
 
-        // Hidden should always store a clean number (E.164 when possible)
         syncHiddenPhoneValue(fmt.e164 || normalized);
-
-        // Keep flag/country in sync without rewriting while typing
         syncCountryFromInput();
       });
 
@@ -924,7 +869,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       phoneInput.addEventListener("blur", () => {
-        // On blur, reformat to stable output (still spaces only)
         const normalized = normalizePhoneE164ish(phoneInput.value || "");
         const fmt = autoFormatPhone(normalized, selectedCountry?.iso2 || "");
         phoneInput.value = fmt.display || normalized;
@@ -935,7 +879,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!res.ok) showError(phoneField, phoneInput, res.message);
       });
 
-      // If the dropdown is open and user scrolls inside it, keep it aligned (optional but helpful)
       phoneOptions.addEventListener("wheel", () => {
         phoneDropdown.reposition();
       });
@@ -943,7 +886,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // First name + Email + Checkbox
+  // First Name
   // -------------------------
   const firstNameInput = form.querySelector('input[name="0-1/firstname"]');
   if (firstNameInput) {
@@ -957,23 +900,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // Email validation + suggestion (practical, not gatekeep-y)
-  // Requirements you asked for:
-  // - Keep multiple messages (we add, not remove)
-  // - Show "Email address X is invalid" when we can confidently detect a typo
-  // - Show "Did you mean ...?" suggestion when available
-  // - Still practical: do NOT block rare/unknown TLDs unless we have a strong suggestion
+  // Email validation + suggestion (REUSES existing ErrorAlert + InfoAlert)
   // -------------------------
   function isEmailBasicFormat(v) {
     const s = (v || "").trim();
     if (!s) return false;
-    // Basic: local@domain.tld (tld >= 2). No spaces. Not insane.
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     return re.test(s);
   }
 
-  // Small, practical suggestion list (like Mailcheck-style).
-  // We do NOT attempt to maintain a full TLD list here (too big, changes often).
   const COMMON_EMAIL_DOMAINS = [
     "gmail.com",
     "yahoo.com",
@@ -990,22 +925,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "gmx.com",
   ];
 
-  const COMMON_TLDS = [
-    "com",
-    "net",
-    "org",
-    "edu",
-    "gov",
-    "io",
-    "co",
-    "me",
-    "ph",
-    "asia",
-    "info",
-    "biz",
-    "app",
-    "dev",
-  ];
+  const COMMON_TLDS = ["com", "net", "org", "edu", "gov", "io", "co", "me", "ph", "asia", "info", "biz", "app", "dev"];
 
   function levenshtein(a, b) {
     a = (a || "").toLowerCase();
@@ -1023,9 +943,9 @@ document.addEventListener("DOMContentLoaded", () => {
       for (let j = 1; j <= n; j++) {
         const cost = a[i - 1] === b[j - 1] ? 0 : 1;
         dp[i][j] = Math.min(
-          dp[i - 1][j] + 1, // deletion
-          dp[i][j - 1] + 1, // insertion
-          dp[i - 1][j - 1] + cost // substitution
+          dp[i - 1][j] + 1,
+          dp[i][j - 1] + 1,
+          dp[i - 1][j - 1] + cost
         );
       }
     }
@@ -1054,16 +974,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const domain = v.slice(at + 1).toLowerCase();
     if (!local || !domain) return null;
 
-    // If it's already one of our common domains, no suggestion
     if (COMMON_EMAIL_DOMAINS.includes(domain)) return null;
 
-    // If domain has dots, check full domain first
     const domainMatch = bestCloseMatch(domain, COMMON_EMAIL_DOMAINS);
     if (domainMatch.best && domainMatch.score <= 2) {
       return `${local}@${domainMatch.best}`;
     }
 
-    // Else check just TLD typos (e.g. yahoo.asfag -> yahoo.asia)
     const parts = domain.split(".");
     if (parts.length >= 2) {
       const tld = parts[parts.length - 1];
@@ -1072,7 +989,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (tldMatch.best && tldMatch.score <= 2) {
         const suggested = `${base}.${tldMatch.best}`;
-        // Only suggest if it looks plausibly intentional (not empty base)
         if (base) return `${local}@${suggested}`;
       }
     }
@@ -1091,39 +1007,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return COMMON_TLDS.includes(tld);
   }
 
-  function renderEmailSuggestion(fieldEl, inputEl, suggestion) {
-    // Match HubSpot-ish UI: "Did you mean <button>email</button>?"
-    const wrap = document.createElement("div");
-    wrap.className = "hsfc-InfoAlert";
-    wrap.dataset.hsfcId = "InfoAlert";
-    wrap.setAttribute("aria-live", "polite");
-    wrap.setAttribute("lang", "EN");
-
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "hsfc-LinkButton";
-    btn.dataset.hsfcId = "LinkButton";
-    btn.setAttribute("lang", "EN");
-    btn.setAttribute("aria-live", "polite");
-    btn.textContent = `Did you mean ${suggestion}?`;
-
-    btn.addEventListener("click", () => {
-      inputEl.value = suggestion;
-      clearError(fieldEl, inputEl);
-      clearInfo(fieldEl);
-
-      // trigger input event so any other logic stays consistent
-      try {
-        inputEl.dispatchEvent(new Event("input", { bubbles: true }));
-      } catch (_) {}
-
-      inputEl.focus();
-    });
-
-    wrap.appendChild(btn);
-    showInfo(fieldEl, wrap);
-  }
-
   const emailInput = form.querySelector('input[name="0-1/email"]');
   if (emailInput) {
     const field = emailInput.closest(".hsfc-EmailField");
@@ -1135,7 +1018,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     emailInput.addEventListener("blur", () => {
       const v = emailInput.value.trim();
-
       clearInfo(field);
 
       if (!v) {
@@ -1143,40 +1025,35 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // If browser thinks it's invalid (type=email), use the requested message
-      // (this mirrors the screenshot "Please enter a valid email address.")
+      // If browser thinks it's invalid (type=email)
       if (typeof emailInput.checkValidity === "function" && !emailInput.checkValidity()) {
         showError(field, emailInput, EMAIL_INVALID_MSG);
         return;
       }
 
-      // Our format check (keeps your previous intent)
       if (!isEmailBasicFormat(v)) {
         showError(field, emailInput, EMAIL_INVALID_FORMAT_MSG);
         return;
       }
 
-      // Practical anti-typo: if TLD looks wrong BUT we have a strong suggestion, show:
-      // "Email address X is invalid" + "Did you mean ...?"
-      // If we have no strong suggestion, we DO NOT block (avoids gatekeeping newer/rare TLDs).
       const suggestion = getEmailSuggestion(v);
-
-      // Only enforce when:
-      // - TLD isn't in our common list (so likely typo)
-      // - AND we can suggest a close fix
       const tldIsKnown = isKnownCommonTld(v);
+
+      // Only enforce "Email address X is invalid" when we can suggest a fix
       if (!tldIsKnown && suggestion) {
         showError(field, emailInput, `Email address ${v} is invalid`);
-        renderEmailSuggestion(field, emailInput, suggestion);
+        showEmailSuggestion(field, emailInput, suggestion);
         return;
       }
 
-      // Otherwise: accept silently (practical)
       clearError(field, emailInput);
       clearInfo(field);
     });
   }
 
+  // -------------------------
+  // Checkbox
+  // -------------------------
   const checkboxInput = form.querySelector(
     'input[type="checkbox"][name="0-1/confirmation_checkbox"]'
   );
@@ -1200,7 +1077,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // Submit validation (required text in red)
+  // Submit validation
   // -------------------------
   form.addEventListener(
     "submit",
@@ -1220,8 +1097,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const cityHidden2 = form.querySelector('input[type="hidden"][name="0-1/location_"]');
       if (cityHidden2) {
         const cityField = cityHidden2.closest(".hsfc-DropdownField");
-        const cityCombobox = cityField.querySelector("input.hsfc-TextInput--button");
-        if (!cityHidden2.value.trim()) {
+        const cityCombobox = cityField?.querySelector("input.hsfc-TextInput--button");
+        if (cityField && cityCombobox && !cityHidden2.value.trim()) {
           showError(cityField, cityCombobox, REQUIRED_MSG);
           invalidTargets.push(cityCombobox);
         }
@@ -1258,10 +1135,9 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           const suggestion = getEmailSuggestion(v);
           const tldIsKnown = isKnownCommonTld(v);
-
           if (!tldIsKnown && suggestion) {
             showError(field, emailInput, `Email address ${v} is invalid`);
-            renderEmailSuggestion(field, emailInput, suggestion);
+            showEmailSuggestion(field, emailInput, suggestion);
             invalidTargets.push(emailInput);
           }
         }
