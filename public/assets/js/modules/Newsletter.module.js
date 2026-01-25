@@ -1094,15 +1094,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderEmailSuggestion(fieldEl, inputEl, suggestion) {
     // Match HubSpot-ish UI: "Did you mean <button>email</button>?"
     const wrap = document.createElement("div");
-
-    const text1 = document.createElement("span");
-    text1.textContent = "Did you mean ";
-    wrap.appendChild(text1);
+    wrap.className = "hsfc-InfoAlert";
+    wrap.dataset.hsfcId = "InfoAlert";
+    wrap.setAttribute("aria-live", "polite");
+    wrap.setAttribute("lang", "EN");
 
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "hsfc-LinkButton";
-    btn.textContent = suggestion;
+    btn.dataset.hsfcId = "LinkButton";
+    btn.setAttribute("lang", "EN");
+    btn.setAttribute("aria-live", "polite");
+    btn.textContent = `Did you mean ${suggestion}?`;
+
     btn.addEventListener("click", () => {
       inputEl.value = suggestion;
       clearError(fieldEl, inputEl);
@@ -1112,14 +1116,11 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         inputEl.dispatchEvent(new Event("input", { bubbles: true }));
       } catch (_) {}
+
       inputEl.focus();
     });
+
     wrap.appendChild(btn);
-
-    const text2 = document.createElement("span");
-    text2.textContent = "?";
-    wrap.appendChild(text2);
-
     showInfo(fieldEl, wrap);
   }
 
