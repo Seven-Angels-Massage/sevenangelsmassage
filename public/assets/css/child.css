@@ -1563,7 +1563,7 @@ footer h4, footer h5 {
   background-repeat: no-repeat;
   background-size: contain;
   /* curved gold checkmark SVG */
-  background-image: url("https://spa.sevenangelsmassage.com/hubfs/gold-check.svg");
+  background-image: url("/assets/media/gold-check.svg");
 }
 
 /* ===== FOOTER REVIEWS CTA ===== */
@@ -1602,7 +1602,7 @@ footer h4, footer h5 {
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
-  background-image: url("https://spa.sevenangelsmassage.com/hubfs/gold-star.svg");
+  background-image: url("/assets/media/gold-star.svg");
 }
 .footer-reviews div {
   font-size: 0.8em !important;
