@@ -11,10 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Messages
   // -------------------------
   const REQUIRED_MSG = "Please complete this required field.";
+  const FORM_REQUIRED_MSG = "Please complete all required fields.";
   const EMAIL_INVALID_MSG = "Please enter a valid email address.";
   const EMAIL_INVALID_FORMAT_MSG = "Email must be formatted correctly.";
   const PHONE_INVALID_FORMAT_MSG =
     "This phone number is either invalid or is in the wrong format.";
+  const NO_MATCHES_MSG = "No matches found";
 
   const openDropdowns = new Set();
   const toArray = (x) => Array.prototype.slice.call(x || []);
@@ -37,52 +39,101 @@ document.addEventListener("DOMContentLoaded", () => {
   const parsePhoneNumberFromString = LibPhone?.parsePhoneNumberFromString || null;
 
   // -------------------------
-  // Pre-hide all Error/Info alerts in the form (since HTML is static)
+  // Pre-hide all Error/Info/PostSubmit alerts in the form (since HTML is static)
   // -------------------------
   function hideInitialAlerts() {
-    const errorEls = form.querySelectorAll(
-      '.hsfc-ErrorAlert[data-hsfc-id="ErrorAlert"], .hsfc-ErrorAlert'
-    );
+    const errorEls = form.querySelectorAll(".hsfc-ErrorAlert");
     errorEls.forEach((el) => {
-      // Don’t wipe text; just hide
       el.hidden = true;
       el.setAttribute("role", el.getAttribute("role") || "alert");
       el.setAttribute("aria-live", el.getAttribute("aria-live") || "polite");
     });
 
-    const infoEls = form.querySelectorAll(
-      '.hsfc-InfoAlert[data-hsfc-id="InfoAlert"], .hsfc-InfoAlert'
-    );
+    const infoEls = form.querySelectorAll(".hsfc-InfoAlert");
     infoEls.forEach((el) => {
       el.hidden = true;
       el.setAttribute("role", el.getAttribute("role") || "status");
       el.setAttribute("aria-live", el.getAttribute("aria-live") || "polite");
     });
+
+    // Hide the post-submit section if it exists (static HTML contains it)
+    const postSubmit = form.querySelector(".hsfc-PostSubmit");
+    if (postSubmit) postSubmit.hidden = true;
   }
   hideInitialAlerts();
+
+  // -------------------------
+  // Form-level error + post-submit helpers
+  // -------------------------
+  function getFormErrorEl() {
+    // Prefer the NavigationRow alert (your screenshot)
+    const navAlerts =
+      form.querySelector(".hsfc-NavigationRow__Alerts") ||
+      form.querySelector('[data-hsfc-id="NavigationRow"] .hsfc-NavigationRow__Alerts') ||
+      null;
+
+    if (navAlerts) {
+      return navAlerts.querySelector(".hsfc-ErrorAlert") || null;
+    }
+
+    // Fallback: first error alert inside form
+    return form.querySelector(".hsfc-ErrorAlert") || null;
+  }
+
+  function showFormError(message) {
+    const el = getFormErrorEl();
+    if (!el) return;
+    el.textContent = message || FORM_REQUIRED_MSG;
+    el.hidden = false;
+  }
+
+  function clearFormError() {
+    const el = getFormErrorEl();
+    if (!el) return;
+    el.hidden = true;
+  }
+
+  function showPostSubmit() {
+    const postSubmit = form.querySelector(".hsfc-PostSubmit");
+    if (!postSubmit) return;
+
+    // Hide the "step"/fields + navigation row, show post-submit
+    const step = form.querySelector(".hsfc-Step");
+    if (step) step.hidden = true;
+
+    const nav = form.querySelector(".hsfc-NavigationRow");
+    if (nav) nav.hidden = true;
+
+    postSubmit.hidden = false;
+
+    // Optional: bring success into view nicely
+    try {
+      postSubmit.scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (_) {}
+  }
+
+  function hidePostSubmit() {
+    const postSubmit = form.querySelector(".hsfc-PostSubmit");
+    if (postSubmit) postSubmit.hidden = true;
+
+    const step = form.querySelector(".hsfc-Step");
+    if (step) step.hidden = false;
+
+    const nav = form.querySelector(".hsfc-NavigationRow");
+    if (nav) nav.hidden = false;
+  }
 
   // -------------------------
   // Error/Info helpers (REUSE existing HTML elements)
   // -------------------------
   function getErrorEl(fieldEl) {
     if (!fieldEl) return null;
-
-    // Prefer the HubSpot-ish marker if present
-    return (
-      fieldEl.querySelector('.hsfc-ErrorAlert[data-hsfc-id="ErrorAlert"]') ||
-      fieldEl.querySelector(".hsfc-ErrorAlert") ||
-      null
-    );
+    return fieldEl.querySelector(".hsfc-ErrorAlert") || null;
   }
 
   function getInfoEl(fieldEl) {
     if (!fieldEl) return null;
-
-    return (
-      fieldEl.querySelector('.hsfc-InfoAlert[data-hsfc-id="InfoAlert"]') ||
-      fieldEl.querySelector(".hsfc-InfoAlert") ||
-      null
-    );
+    return fieldEl.querySelector(".hsfc-InfoAlert") || null;
   }
 
   function showError(fieldEl, inputEl, message) {
@@ -111,25 +162,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!infoEl) return;
 
     // Reuse existing button if present
-    let btn =
-      infoEl.querySelector('.hsfc-LinkButton[data-hsfc-id="LinkButton"]') ||
-      infoEl.querySelector(".hsfc-LinkButton") ||
-      null;
+    let btn = infoEl.querySelector(".hsfc-LinkButton") || null;
 
     if (!btn) {
-      // Fallback: create a button if HTML doesn’t have it
       btn = document.createElement("button");
       btn.type = "button";
       btn.className = "hsfc-LinkButton";
-      btn.dataset.hsfcId = "LinkButton";
       infoEl.innerHTML = "";
       infoEl.appendChild(btn);
     }
 
-    // Set the button text
     btn.textContent = `Did you mean ${suggestion}?`;
 
-    // Remove previous click handlers safely by cloning (simple + reliable)
+    // Remove previous click handlers safely by cloning
     const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
 
@@ -138,8 +183,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       clearError(fieldEl, inputEl);
       clearInfo(fieldEl);
+      clearFormError();
 
-      // keep any other listeners in sync
       try {
         inputEl.dispatchEvent(new Event("input", { bubbles: true }));
       } catch (_) {}
@@ -159,12 +204,49 @@ document.addEventListener("DOMContentLoaded", () => {
     listEl.style.overflowY = "auto";
   }
 
-  function filterItems(items, q) {
+  function ensureNoMatchesEl(optionsEl) {
+    if (!optionsEl) return null;
+    let el = optionsEl.querySelector('[data-newsletter-no-matches="1"]');
+    if (!el) {
+      el = document.createElement("div");
+      el.dataset.newsletterNoMatches = "1";
+      el.textContent = NO_MATCHES_MSG;
+      // Keep styling minimal; your CSS can style this if you want.
+      el.style.padding = "14px 16px";
+      el.style.display = "none";
+      optionsEl.appendChild(el);
+    }
+    return el;
+  }
+
+  function updateNoMatches(optionsEl, items) {
+    const noEl = ensureNoMatchesEl(optionsEl);
+    if (!noEl) return;
+
+    const anyVisible = (items || []).some((li) => li && li.style.display !== "none");
+    noEl.style.display = anyVisible ? "none" : "block";
+  }
+
+  function filterItems(items, q, optionsEl) {
     const query = norm(q);
-    items.forEach((li) => {
+    (items || []).forEach((li) => {
       const hit = !query || norm(li.textContent).includes(query);
       li.style.display = hit ? "" : "none";
     });
+    updateNoMatches(optionsEl, items);
+  }
+
+  function clearSearchAndFilter(searchEl, items, optionsEl) {
+    if (searchEl) {
+      searchEl.value = "";
+      // Make sure UI is clean on reopen
+      filterItems(items, "", optionsEl);
+      try {
+        searchEl.dispatchEvent(new Event("input", { bubbles: true }));
+      } catch (_) {}
+    } else {
+      filterItems(items, "", optionsEl);
+    }
   }
 
   function closeAllDropdowns(except) {
@@ -180,6 +262,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const parent = offsetParentEl || optionsEl.offsetParent || anchorEl.offsetParent;
     if (!parent) return;
+
+    // Force overlay behavior so error alerts don't push the menu (your request)
+    optionsEl.style.position = "absolute";
+    optionsEl.style.zIndex = "9999";
+    optionsEl.style.left = "0";
+    optionsEl.style.right = "0";
 
     const prevDisplay = optionsEl.style.display;
     const prevVisibility = optionsEl.style.visibility;
@@ -228,6 +316,8 @@ document.addEventListener("DOMContentLoaded", () => {
     onSelect,
     anchorElForPosition,
     offsetParentEl,
+    onOpen,
+    onClose,
   }) {
     let isOpen = false;
 
@@ -238,6 +328,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         closeAllDropdowns(api);
 
+        // Show first then position
         optionsEl.style.display = "flex";
         if (ariaExpandedEl) ariaExpandedEl.setAttribute("aria-expanded", "true");
         if (toggleEl) toggleEl.setAttribute("aria-expanded", "true");
@@ -250,11 +341,11 @@ document.addEventListener("DOMContentLoaded", () => {
           offsetParentEl
         );
 
-        if (searchEl) {
-          searchEl.value = "";
-          filterItems(items, "");
-          setTimeout(() => searchEl.focus(), 0);
-        }
+        clearSearchAndFilter(searchEl, items, optionsEl);
+
+        if (typeof onOpen === "function") onOpen();
+
+        if (searchEl) setTimeout(() => searchEl.focus(), 0);
       },
       close() {
         if (!isOpen) return;
@@ -264,10 +355,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (ariaExpandedEl) ariaExpandedEl.setAttribute("aria-expanded", "false");
         if (toggleEl) toggleEl.setAttribute("aria-expanded", "false");
 
-        if (searchEl) {
-          searchEl.value = "";
-          filterItems(items, "");
-        }
+        clearSearchAndFilter(searchEl, items, optionsEl);
+
+        if (typeof onClose === "function") onClose();
 
         openDropdowns.delete(api);
       },
@@ -285,6 +375,9 @@ document.addEventListener("DOMContentLoaded", () => {
           offsetParentEl
         );
       },
+      isOpen() {
+        return isOpen;
+      },
     };
 
     toggleEl.addEventListener("click", (e) => {
@@ -301,7 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (searchEl) {
-      searchEl.addEventListener("input", () => filterItems(items, searchEl.value));
+      searchEl.addEventListener("input", () => filterItems(items, searchEl.value, optionsEl));
       searchEl.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
           e.preventDefault();
@@ -311,7 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    items.forEach((li) => {
+    (items || []).forEach((li) => {
       li.addEventListener("click", (e) => {
         e.preventDefault();
         onSelect(li);
@@ -330,6 +423,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return api;
   }
 
+  // Close dropdowns on outside click/tap
   document.addEventListener("pointerdown", (e) => {
     if (!openDropdowns.size) return;
     for (const dd of openDropdowns) {
@@ -338,10 +432,12 @@ document.addEventListener("DOMContentLoaded", () => {
     closeAllDropdowns(null);
   });
 
+  // Close dropdowns on Escape anywhere
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeAllDropdowns(null);
   });
 
+  // Reposition open dropdowns on resize/scroll
   window.addEventListener("resize", () => {
     for (const dd of openDropdowns) dd.reposition();
   });
@@ -356,6 +452,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // -------------------------
   // City dropdown
+  // Fixes included:
+  // - "No matches found" handling
+  // - Search clears on close/open (always)
+  // - Error shows ONLY after user touched the field and closed without selecting
+  // - Dropdown overlays error (position absolute + zIndex + anchor)
   // -------------------------
   const cityHidden = form.querySelector('input[type="hidden"][name="0-1/location_"]');
   if (cityHidden) {
@@ -369,6 +470,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const cityAnchor = cityField?.querySelector(".hsfc-DropdownInput");
 
     if (cityField && cityCombobox && cityOptions && cityList) {
+      // Track "touched" + "selected at least once"
+      let cityTouched = false;
+      let cityHasSelection = !!cityHidden.value.trim();
+
       function setCitySelected(li) {
         const value = (li.textContent || "").trim();
         cityCombobox.value = value;
@@ -383,7 +488,9 @@ document.addEventListener("DOMContentLoaded", () => {
           );
         });
 
+        cityHasSelection = !!value;
         clearError(cityField, cityCombobox);
+        clearFormError();
       }
 
       const cityDropdown = createDropdown({
@@ -394,8 +501,24 @@ document.addEventListener("DOMContentLoaded", () => {
         items: cityItems,
         ariaExpandedEl: cityCombobox,
         onSelect: setCitySelected,
+
+        // Anchor to the input row only (NOT the error area)
         anchorElForPosition: cityAnchor || cityCombobox,
-        offsetParentEl: cityField,
+
+        // IMPORTANT: position relative to the same anchor wrapper to avoid error offset
+        offsetParentEl: cityAnchor || cityField,
+
+        onOpen: () => {
+          cityTouched = true;
+          clearError(cityField, cityCombobox);
+          clearFormError();
+        },
+        onClose: () => {
+          // only show error after user touched AND closed without selection
+          if (cityTouched && !cityHidden.value.trim()) {
+            showError(cityField, cityCombobox, REQUIRED_MSG);
+          }
+        },
       });
 
       if (cityCaret) {
@@ -405,18 +528,29 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
-      cityCombobox.addEventListener("blur", () => {
-        if (!cityHidden.value.trim()) showError(cityField, cityCombobox, REQUIRED_MSG);
+      // Don’t show error on blur (this was the annoying behavior).
+      // Just mark touched and clear while interacting.
+      cityCombobox.addEventListener("focus", () => {
+        cityTouched = true;
+        clearError(cityField, cityCombobox);
+        clearFormError();
       });
 
-      cityCombobox.addEventListener("focus", () => {
+      // Keep selection state in sync if prefilled
+      if (cityHasSelection) {
         clearError(cityField, cityCombobox);
-      });
+      }
     }
   }
 
   // -------------------------
   // Phone: sanitize + format + validate
+  // Fixes included:
+  // - "No matches found" handling
+  // - Search clears on close/open
+  // - Multiple countries with same dial code (e.g. +1):
+  //   - typing +1 defaults to US (not CA)
+  //   - selecting PR/DO/CA/US from list stays selected (no forced CA)
   // -------------------------
   const phoneHidden = form.querySelector('input[type="hidden"][name="0-1/phone"]');
   if (phoneHidden) {
@@ -577,16 +711,27 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .filter((c) => c.dialCode);
 
+      // dialCode -> [countries...], so we can support +1 (US/CA/PR/DO/etc.)
+      const countriesByDial = new Map();
+      const countryByLi = new Map();
+      const countryByIso2 = new Map();
+
+      countries.forEach((c) => {
+        countryByLi.set(c.li, c);
+        if (c.iso2 && !countryByIso2.has(c.iso2)) countryByIso2.set(c.iso2, c);
+
+        if (!countriesByDial.has(c.dialCode)) countriesByDial.set(c.dialCode, []);
+        countriesByDial.get(c.dialCode).push(c);
+      });
+
       const dialCodesSortedDesc = [...new Set(countries.map((c) => c.dialCode))].sort(
         (a, b) => b.length - a.length
       );
 
-      const countryByDial = new Map();
-      const countryByIso2 = new Map();
-      countries.forEach((c) => {
-        if (!countryByDial.has(c.dialCode)) countryByDial.set(c.dialCode, c);
-        if (c.iso2 && !countryByIso2.has(c.iso2)) countryByIso2.set(c.iso2, c);
-      });
+      // Preference: if multiple countries share dial code, choose this ISO2 by default
+      const PREFERRED_COUNTRY_BY_DIAL = {
+        "+1": "US", // Your requested best-practice default
+      };
 
       const MIN_NATIONAL_DIGITS_BY_DIAL = {
         "+63": 10,
@@ -600,8 +745,10 @@ document.addEventListener("DOMContentLoaded", () => {
       let selectedCountry = null;
 
       function updateCountrySelectionUI(country) {
+        // IMPORTANT: selection should be by LI identity, not dial-code,
+        // so US/CA/PR/DO can all be selected independently.
         countries.forEach((c) => {
-          const selected = !!country && c.dialCode === country.dialCode;
+          const selected = !!country && c.li === country.li;
           c.li.setAttribute("aria-selected", selected ? "true" : "false");
           c.li.classList.toggle(
             "hsfc-DropdownOptions__List__ListItem--selected",
@@ -615,6 +762,19 @@ document.addEventListener("DOMContentLoaded", () => {
       function findDialMatch(v) {
         if (!v) return "";
         return dialCodesSortedDesc.find((dc) => v.startsWith(dc)) || "";
+      }
+
+      function pickDefaultCountryForDial(dialCode) {
+        const list = countriesByDial.get(dialCode) || [];
+        if (!list.length) return null;
+
+        const preferredIso2 = PREFERRED_COUNTRY_BY_DIAL[dialCode];
+        if (preferredIso2) {
+          const hit = list.find((c) => c.iso2 === preferredIso2);
+          if (hit) return hit;
+        }
+
+        return list[0] || null;
       }
 
       function syncHiddenPhoneValue(e164) {
@@ -690,45 +850,53 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         clearError(phoneField, phoneInput);
+        clearFormError();
       }
 
       function syncCountryFromInput() {
         const normalized = normalizePhoneE164ish(phoneInput.value || "");
 
         if (!normalized) {
-          if (selectedCountry) setSelectedCountry(null, false);
-          else updateCountrySelectionUI(null);
+          selectedCountry = null;
+          updateCountrySelectionUI(null);
           return;
         }
+
+        // If lib can detect country, prefer that (BUT do not override a deliberate user selection)
+        // We only use detection when selectedCountry is null OR dial code changed.
+        const dialCode = findDialMatch(normalized);
+        const currentDial = selectedCountry?.dialCode || "";
+
+        const dialChanged = dialCode && dialCode !== currentDial;
 
         if (AsYouTypeCtor) {
           const fmt = formatWithAsYouType(normalized, selectedCountry?.iso2 || "");
           const detected = fmt?.detectedCountry || "";
-          if (detected && countryByIso2.has(detected)) {
+          if (detected && countryByIso2.has(detected) && (selectedCountry === null || dialChanged)) {
             const found = countryByIso2.get(detected);
-            if (!selectedCountry || selectedCountry.dialCode !== found.dialCode) {
-              selectedCountry = found;
-              updateCountrySelectionUI(selectedCountry);
-              return;
-            }
+            selectedCountry = found;
+            updateCountrySelectionUI(selectedCountry);
+            return;
           }
         }
 
-        const dialCode = findDialMatch(normalized);
-        const found = dialCode ? countryByDial.get(dialCode) || null : null;
+        // Fallback: match by dial code; if multiple exist, default to preferred (US for +1)
+        if (dialCode) {
+          // If the user already selected a specific +1 country from the list, keep it
+          if (selectedCountry && selectedCountry.dialCode === dialCode) {
+            updateCountrySelectionUI(selectedCountry);
+            return;
+          }
 
-        if (!found) {
-          if (selectedCountry) setSelectedCountry(null, false);
-          else updateCountrySelectionUI(null);
+          const picked = pickDefaultCountryForDial(dialCode);
+          selectedCountry = picked;
+          updateCountrySelectionUI(selectedCountry);
           return;
         }
 
-        if (!selectedCountry || selectedCountry.dialCode !== found.dialCode) {
-          selectedCountry = found;
-          updateCountrySelectionUI(selectedCountry);
-        } else {
-          updateCountrySelectionUI(selectedCountry);
-        }
+        // No match -> clear
+        selectedCountry = null;
+        updateCountrySelectionUI(null);
       }
 
       phoneCtx = {
@@ -739,12 +907,14 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       };
 
+      // Initial sync
       {
         const normalized = normalizePhoneE164ish(phoneInput.value || "");
+        syncCountryFromInput();
+
         const fmt = autoFormatPhone(normalized, selectedCountry?.iso2 || "");
         phoneInput.value = fmt.display || phoneInput.value || "";
         syncHiddenPhoneValue(fmt.e164 || normalized);
-        syncCountryFromInput();
       }
 
       const phoneDropdown = createDropdown({
@@ -754,14 +924,23 @@ document.addEventListener("DOMContentLoaded", () => {
         listEl: phoneList,
         items: countryLis,
         ariaExpandedEl: flagAndCaret,
+
+        // IMPORTANT: select by LI identity so +1 countries work correctly
         onSelect: (li) => {
-          const dc = parseDialCode(li.textContent);
-          setSelectedCountry(countryByDial.get(dc) || null, true);
+          const c = countryByLi.get(li) || null;
+          setSelectedCountry(c, true);
         },
+
         anchorElForPosition: phoneUI,
         offsetParentEl: phoneField,
+
+        onOpen: () => {
+          clearError(phoneField, phoneInput);
+          clearFormError();
+        },
       });
 
+      // Hard block unwanted characters:
       phoneInput.addEventListener("keydown", (e) => {
         if (e.ctrlKey || e.metaKey) return;
 
@@ -783,6 +962,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (k >= "0" && k <= "9") return;
 
+        // block manual spaces always
         if (k === " ") {
           e.preventDefault();
           return;
@@ -827,6 +1007,8 @@ document.addEventListener("DOMContentLoaded", () => {
         let next = current.slice(0, start) + insert + current.slice(end);
         const normalized = normalizePhoneE164ish(next);
 
+        syncCountryFromInput();
+
         const fmt = autoFormatPhone(normalized, selectedCountry?.iso2 || "");
         phoneInput.value = fmt.display || normalized;
         syncHiddenPhoneValue(fmt.e164 || normalized);
@@ -837,11 +1019,12 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (_) {}
 
         clearError(phoneField, phoneInput);
-        syncCountryFromInput();
+        clearFormError();
       });
 
       phoneInput.addEventListener("input", () => {
         clearError(phoneField, phoneInput);
+        clearFormError();
 
         const raw = phoneInput.value || "";
         const caretPos =
@@ -852,6 +1035,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const caretDigits = digitCountBeforeCaret(raw, caretPos);
         const normalized = normalizePhoneE164ish(raw);
 
+        // Determine country based on dial code; for +1 default to US unless user selected otherwise
+        syncCountryFromInput();
+
         const fmt = autoFormatPhone(normalized, selectedCountry?.iso2 || "");
         phoneInput.value = fmt.display || normalized;
 
@@ -861,19 +1047,20 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (_) {}
 
         syncHiddenPhoneValue(fmt.e164 || normalized);
-        syncCountryFromInput();
       });
 
       phoneInput.addEventListener("focus", () => {
         clearError(phoneField, phoneInput);
+        clearFormError();
       });
 
       phoneInput.addEventListener("blur", () => {
         const normalized = normalizePhoneE164ish(phoneInput.value || "");
+        syncCountryFromInput();
+
         const fmt = autoFormatPhone(normalized, selectedCountry?.iso2 || "");
         phoneInput.value = fmt.display || normalized;
         syncHiddenPhoneValue(fmt.e164 || normalized);
-        syncCountryFromInput();
 
         const res = validatePhoneValue(phoneInput.value || "");
         if (!res.ok) showError(phoneField, phoneInput, res.message);
@@ -893,6 +1080,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const field = firstNameInput.closest(".hsfc-TextField");
     firstNameInput.addEventListener("input", () => {
       clearError(field, firstNameInput);
+      clearFormError();
+      hidePostSubmit();
     });
     firstNameInput.addEventListener("blur", () => {
       if (!firstNameInput.value.trim()) showError(field, firstNameInput, REQUIRED_MSG);
@@ -900,7 +1089,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // Email validation + suggestion (REUSES existing ErrorAlert + InfoAlert)
+  // Email validation + suggestion
   // -------------------------
   function isEmailBasicFormat(v) {
     const s = (v || "").trim();
@@ -925,7 +1114,22 @@ document.addEventListener("DOMContentLoaded", () => {
     "gmx.com",
   ];
 
-  const COMMON_TLDS = ["com", "net", "org", "edu", "gov", "io", "co", "me", "ph", "asia", "info", "biz", "app", "dev"];
+  const COMMON_TLDS = [
+    "com",
+    "net",
+    "org",
+    "edu",
+    "gov",
+    "io",
+    "co",
+    "me",
+    "ph",
+    "asia",
+    "info",
+    "biz",
+    "app",
+    "dev",
+  ];
 
   function levenshtein(a, b) {
     a = (a || "").toLowerCase();
@@ -1014,6 +1218,8 @@ document.addEventListener("DOMContentLoaded", () => {
     emailInput.addEventListener("input", () => {
       clearError(field, emailInput);
       clearInfo(field);
+      clearFormError();
+      hidePostSubmit();
     });
 
     emailInput.addEventListener("blur", () => {
@@ -1065,6 +1271,8 @@ document.addEventListener("DOMContentLoaded", () => {
     checkboxInput.addEventListener("change", () => {
       checkboxInput.value = checkboxInput.checked ? "true" : "false";
       if (checkboxInput.checked) clearError(field, checkboxInput);
+      clearFormError();
+      hidePostSubmit();
     });
 
     checkboxInput.addEventListener("blur", () => {
@@ -1073,16 +1281,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     checkboxInput.addEventListener("focus", () => {
       clearError(field, checkboxInput);
+      clearFormError();
+      hidePostSubmit();
     });
   }
 
   // -------------------------
-  // Submit validation
+  // Submit validation + NEW behaviors requested:
+  // - Show the form-level error: "Please complete all required fields."
+  // - Show PostSubmit success section when valid (static HTML success)
   // -------------------------
   form.addEventListener(
     "submit",
     (e) => {
+      // Always hide success while trying a new submit attempt
+      hidePostSubmit();
+
       const invalidTargets = [];
+      clearFormError();
 
       // First Name
       if (firstNameInput) {
@@ -1156,8 +1372,23 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         e.stopPropagation();
         closeAllDropdowns(null);
+
+        // Show the NEW global error message (NavigationRow error)
+        showFormError(FORM_REQUIRED_MSG);
+
+        // Focus the first invalid input
         invalidTargets[0].focus();
+        return;
       }
+
+      // If everything is valid:
+      // Since your homepage is a static HTML build and you already have the PostSubmit markup,
+      // we show it here and prevent default (so you get the success state like your screenshot).
+      e.preventDefault();
+      e.stopPropagation();
+      closeAllDropdowns(null);
+      clearFormError();
+      showPostSubmit();
     },
     true
   );
