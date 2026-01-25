@@ -682,7 +682,7 @@ document.addEventListener("DOMContentLoaded", function () {
 (function () {
   const API_ENDPOINT = "https://www.sevenangelsmassage.com/api/fresha-reviews";
   const FRESHA_LINK = "https://www.fresha.com/a/seven-angels-massage-makati-city-valero-street-salcedo-village-barangay-bel-air-ppd0tkwk&utm_source=website&utm_medium=fresha_booking&utm_campaign=booking_intent&utm_content=footer_fresha_reviews&utm_term=seven_angels_massage";
-  const FRESHA_LOGO = "https://spa.sevenangelsmassage.com/hubfs/Fresha-Logo.webp";
+  const FRESHA_LOGO = "/assets/media/Fresha-Logo.webp";
   const FRESHA_LOGO_LINK = "https://www.fresha.com/a/seven-angels-massage-makati-city-valero-street-salcedo-village-barangay-bel-air-ppd0tkwk&utm_source=website&utm_medium=fresha_booking&utm_campaign=booking_intent&utm_content=footer_fresha_logo&utm_term=seven_angels_massage";
   
   document.addEventListener("DOMContentLoaded", async () => {
@@ -898,7 +898,7 @@ document.addEventListener("DOMContentLoaded", function () {
     "- Number of guests:\n" +
     "- Additional notes:";
 
-  const VCARD_FILE_URL = "https://www.sevenangelsmassage.com/files/seven-angels-massage.vcf";
+  const VCARD_FILE_URL = "/files/seven-angels-massage.vcf";
   const params = new URLSearchParams(window.location.search);
 
   // ✅ IMPORTANT: child.js is global on HubSpot.
