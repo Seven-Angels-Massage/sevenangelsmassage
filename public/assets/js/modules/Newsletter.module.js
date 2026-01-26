@@ -17,30 +17,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const PHONE_INVALID_FORMAT_MSG =
     "This phone number is either invalid or is in the wrong format.";
 
-  // submission / network (form-level)
-  const FORM_SUBMITTING_MSG = "Submitting… Please wait.";
-  const FORM_NETWORK_MSG =
-    "We couldn’t submit right now. Please check your connection and try again.";
-  const FORM_SERVER_MSG =
-    "Something went wrong submitting the form. Please review your details and try again.";
-
-  // strict submit-only email typo gate
-  const EMAIL_SUGGESTION_SUBMIT_MSG =
-    "Please correct your email address before submitting.";
-  const EMAIL_DOMAIN_INVALID_MSG =
-    "Email domain looks invalid. Please check your email and try again.";
-
   const openDropdowns = new Set();
   const toArray = (x) => Array.prototype.slice.call(x || []);
   const norm = (s) => (s || "").toString().trim().toLowerCase();
 
   // Keep a handle to phone validation for submit
   let phoneCtx = null;
-
-  // submit state
-  let pendingSubmit = false;
-  let programmaticSubmit = false;
-  let submitTimeoutId = null;
 
   // -------------------------
   // Optional: libphonenumber-js hooks (if present)
@@ -83,36 +65,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cs.position === "static") el.style.position = "relative";
   }
 
-  function getSubmitBtn() {
-    return (
-      form.querySelector('button[type="submit"]') ||
-      form.querySelector('input[type="submit"]') ||
-      null
-    );
-  }
-
-  function setSubmittingUI(isSubmitting) {
-    const btn = getSubmitBtn();
-    if (btn) {
-      btn.disabled = !!isSubmitting;
-      btn.setAttribute("aria-disabled", isSubmitting ? "true" : "false");
-    }
-    form.setAttribute("aria-busy", isSubmitting ? "true" : "false");
-  }
-
-  function clearSubmitTimeout() {
-    if (submitTimeoutId) {
-      clearTimeout(submitTimeoutId);
-      submitTimeoutId = null;
-    }
-  }
-
   // -------------------------
   // Alerts/PostSubmit (you set style="display:none" in HTML; we respect that)
+  // We still enforce aria defaults and ensure PostSubmit is hidden initially.
   // -------------------------
   function normalizeStaticBits() {
     const allAlerts = form.querySelectorAll(".hsfc-ErrorAlert, .hsfc-InfoAlert");
     allAlerts.forEach((el) => {
+      // respect your inline display:none; just ensure ARIA is sane
       if (el.classList.contains("hsfc-ErrorAlert")) {
         el.setAttribute("role", el.getAttribute("role") || "alert");
         el.setAttribute("aria-live", el.getAttribute("aria-live") || "polite");
@@ -120,9 +80,8 @@ document.addEventListener("DOMContentLoaded", () => {
         el.setAttribute("role", el.getAttribute("role") || "status");
         el.setAttribute("aria-live", el.getAttribute("aria-live") || "polite");
       }
-      // respect inline style="display:none"; but if missing, keep hidden
+      // do not force-hide if you already did; but if someone forgot, keep it hidden
       if (!el.style.display) el.style.display = "none";
-      el.hidden = true;
     });
 
     const FORM_WRAPPER =
@@ -218,24 +177,17 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.dataset.hsfcId = "LinkButton";
       infoEl.innerHTML = "";
       infoEl.appendChild(btn);
-    } else {
-      // keep only the button inside
-      infoEl.innerHTML = "";
-      infoEl.appendChild(btn);
     }
 
     btn.textContent = `Did you mean ${suggestion}?`;
 
-    // replace to drop old listeners
     const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
 
     newBtn.addEventListener("click", () => {
-      // IMPORTANT: clicking suggestion should NOT trigger new errors.
       inputEl.value = suggestion;
       clearError(fieldEl, inputEl);
       clearInfo(fieldEl);
-      clearFormLevelError();
 
       try {
         inputEl.dispatchEvent(new Event("input", { bubbles: true }));
@@ -248,9 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // Dropdown utilities
-  // IMPORTANT: "No matches found" must OVERRIDE the entire UL contents (not inject extra LI)
-  // and must RESTORE the full list on close.
+  // Dropdown utilities (Phone + City should behave IDENTICALLY)
   // -------------------------
   function setListScrollbar(listEl, px = 260) {
     if (!listEl) return;
@@ -258,52 +208,48 @@ document.addEventListener("DOMContentLoaded", () => {
     listEl.style.overflowY = "auto";
   }
 
-  function cacheOriginalUl(listEl) {
-    if (!listEl) return;
-    if (!listEl.dataset.origHtml) {
-      listEl.dataset.origHtml = listEl.innerHTML;
-    }
+  // Ensure a HubSpot-native looking status row exists (we inject if missing)
+  function ensureNoMatchesStatusLi(listEl) {
+    if (!listEl) return null;
+
+    let statusLi = listEl.querySelector('li[role="status"]');
+    if (statusLi) return statusLi;
+
+    statusLi = document.createElement("li");
+    statusLi.setAttribute("role", "status");
+    statusLi.className =
+      "hsfc-DropdownOptions__List__ListItem hsfc-DropdownOptions__List__ListItem--disabled";
+    statusLi.textContent = "No matches found";
+    statusLi.style.display = "none";
+    listEl.appendChild(statusLi);
+
+    return statusLi;
   }
 
-  function restoreOriginalUl(listEl) {
-    if (!listEl) return;
-    const orig = listEl.dataset.origHtml;
-    if (!orig) return;
-    if (listEl.innerHTML !== orig) listEl.innerHTML = orig;
+  function getStatusLis(listEl) {
+    if (!listEl) return [];
+    // include injected role="status" item(s)
+    return toArray(listEl.querySelectorAll('li[role="status"]'));
   }
 
-  function showNoMatchesUl(listEl) {
-    if (!listEl) return;
-    cacheOriginalUl(listEl);
-    listEl.innerHTML =
-      '<li role="status" class="hsfc-DropdownOptions__List__ListItem hsfc-DropdownOptions__List__ListItem--disabled">No matches found</li>';
-  }
-
-  function filterUlWithOverride(listEl, query) {
-    if (!listEl) return;
-
-    const q = norm(query);
-
-    // Always restore first so we filter the real options list
-    restoreOriginalUl(listEl);
-
-    if (!q) {
-      // show all options
-      toArray(listEl.querySelectorAll('li[role="option"]')).forEach((li) => {
-        li.style.display = "";
-      });
-      return;
-    }
-
+  function filterItemsWithStatus({ optionLis, statusLis, q }) {
+    const query = norm(q);
     let visibleCount = 0;
-    toArray(listEl.querySelectorAll('li[role="option"]')).forEach((li) => {
-      const hit = norm(li.textContent).includes(q);
+
+    (statusLis || []).forEach((li) => {
+      li.style.display = "none";
+    });
+
+    (optionLis || []).forEach((li) => {
+      const hit = !query || norm(li.textContent).includes(query);
       li.style.display = hit ? "" : "none";
       if (hit) visibleCount++;
     });
 
-    if (visibleCount === 0) {
-      showNoMatchesUl(listEl);
+    if (visibleCount === 0 && statusLis && statusLis.length) {
+      statusLis.forEach((li) => {
+        li.style.display = "";
+      });
     }
   }
 
@@ -315,10 +261,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (except) openDropdowns.add(except);
   }
 
-  // Position options as overlay with a tiny gap (City and Phone identical)
+  // Position options as an overlay with a small gap (same for City + Phone)
   function positionDropdownOptions(optionsEl, anchorEl, offsetParentEl, gap = 2) {
     if (!optionsEl || !anchorEl) return;
 
+    // We intentionally position relative to the input wrapper itself (offsetParentEl),
+    // so City/Phone behave identically and avoid weird "big gap" cases.
     const parent = offsetParentEl || optionsEl.offsetParent || anchorEl.offsetParent;
     if (!parent) return;
 
@@ -329,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
     optionsEl.style.right = "0";
     optionsEl.style.zIndex = "9999";
 
-    // kill unexpected spacing
+    // Kill unexpected spacing coming from CSS
     optionsEl.style.marginTop = "0";
     optionsEl.style.marginBottom = "0";
     optionsEl.style.transform = "none";
@@ -376,6 +324,7 @@ document.addEventListener("DOMContentLoaded", () => {
     optionsEl,
     searchEl,
     listEl,
+    optionItems, // li[role="option"]
     ariaExpandedEl,
     onSelect,
     onOpen,
@@ -386,8 +335,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }) {
     let isOpen = false;
 
-    // Cache original list on first use (required for "No matches found" override + restore)
-    cacheOriginalUl(listEl);
+    // Make sure "No matches found" exists
+    ensureNoMatchesStatusLi(listEl);
+    const statusLis = getStatusLis(listEl);
 
     const api = {
       open() {
@@ -408,12 +358,13 @@ document.addEventListener("DOMContentLoaded", () => {
           gapPx
         );
 
-        // reset search + restore list on open
-        if (searchEl) searchEl.value = "";
-        restoreOriginalUl(listEl);
-        filterUlWithOverride(listEl, "");
-
-        if (searchEl) setTimeout(() => searchEl.focus(), 0);
+        if (searchEl) {
+          searchEl.value = "";
+          filterItemsWithStatus({ optionLis: optionItems, statusLis, q: "" });
+          setTimeout(() => searchEl.focus(), 0);
+        } else {
+          filterItemsWithStatus({ optionLis: optionItems, statusLis, q: "" });
+        }
 
         if (typeof onOpen === "function") {
           try {
@@ -429,9 +380,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (ariaExpandedEl) ariaExpandedEl.setAttribute("aria-expanded", "false");
         if (toggleEl) toggleEl.setAttribute("aria-expanded", "false");
 
-        // IMPORTANT: Restore full UL on close
-        if (searchEl) searchEl.value = "";
-        restoreOriginalUl(listEl);
+        if (searchEl) {
+          searchEl.value = "";
+          filterItemsWithStatus({ optionLis: optionItems, statusLis, q: "" });
+        } else {
+          filterItemsWithStatus({ optionLis: optionItems, statusLis, q: "" });
+        }
 
         openDropdowns.delete(api);
 
@@ -461,7 +415,6 @@ document.addEventListener("DOMContentLoaded", () => {
       },
     };
 
-    // Toggle open/close
     toggleEl.addEventListener("click", (e) => {
       e.preventDefault();
       api.toggle();
@@ -475,39 +428,38 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.key === "Escape") api.close();
     });
 
-    // Search filtering (with UL override)
     if (searchEl) {
-      searchEl.addEventListener("input", () => {
-        filterUlWithOverride(listEl, searchEl.value);
-      });
+      searchEl.addEventListener("input", () =>
+        filterItemsWithStatus({
+          optionLis: optionItems,
+          statusLis,
+          q: searchEl.value,
+        })
+      );
 
       searchEl.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
           e.preventDefault();
           api.close();
-          try {
-            toggleEl.focus();
-          } catch (_) {}
+          toggleEl.focus();
         }
       });
     }
 
-    // Delegated selection (survives UL innerHTML replacement/restoration)
-    listEl.addEventListener("click", (e) => {
-      const li = e.target?.closest?.('li[role="option"]');
-      if (!li) return;
-      e.preventDefault();
-      onSelect(li);
-      api.close();
-    });
+    optionItems.forEach((li) => {
+      li.addEventListener("click", (e) => {
+        e.preventDefault();
+        onSelect(li);
+        api.close();
+      });
 
-    listEl.addEventListener("keydown", (e) => {
-      if (e.key !== "Enter" && e.key !== " ") return;
-      const li = e.target?.closest?.('li[role="option"]');
-      if (!li) return;
-      e.preventDefault();
-      onSelect(li);
-      api.close();
+      li.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect(li);
+          api.close();
+        }
+      });
     });
 
     return api;
@@ -547,6 +499,8 @@ document.addEventListener("DOMContentLoaded", () => {
     FORM_WRAPPER?.querySelector?.('[data-hsfc-id="PostSubmit"]') ||
     ROOT.querySelector('[data-hsfc-id="PostSubmit"]');
 
+  let pendingSubmit = false;
+
   function showPostSubmitOnly() {
     hideEl(form);
 
@@ -560,15 +514,6 @@ document.addEventListener("DOMContentLoaded", () => {
     clearFormLevelError();
     closeAllDropdowns(null);
     pendingSubmit = false;
-    setSubmittingUI(false);
-    clearSubmitTimeout();
-  }
-
-  function markSubmitFailed(message) {
-    pendingSubmit = false;
-    setSubmittingUI(false);
-    clearSubmitTimeout();
-    showFormLevelError(message || FORM_SERVER_MSG);
   }
 
   // HubSpot postMessage callbacks (when present)
@@ -638,7 +583,7 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
       if (anyVisibleError) {
-        markSubmitFailed(FORM_SERVER_MSG);
+        pendingSubmit = false;
         return;
       }
 
@@ -648,20 +593,24 @@ document.addEventListener("DOMContentLoaded", () => {
   hookIframeLoadFallback();
 
   // -------------------------
-  // City dropdown (IDENTICAL dropdown mechanics to Phone)
+  // City dropdown (UPDATED: now uses IDENTICAL dropdown mechanics to Phone)
   // -------------------------
   const cityHidden = form.querySelector('input[type="hidden"][name="0-1/location_"]');
   if (cityHidden) {
     const cityField = cityHidden.closest(".hsfc-DropdownField");
     const cityCombobox = cityField?.querySelector("input.hsfc-TextInput--button");
-    const cityInputWrap = cityField?.querySelector(".hsfc-DropdownInput");
+    const cityInputWrap = cityField?.querySelector(".hsfc-DropdownInput"); // acts like PhoneInput wrapper
     const cityOptions = cityField?.querySelector(".hsfc-DropdownOptions");
     const citySearch = cityOptions?.querySelector('input[role="searchbox"]');
     const cityList = cityOptions?.querySelector('ul[role="listbox"]');
+    const cityItems = cityList ? toArray(cityList.querySelectorAll('li[role="option"]')) : [];
 
     let cityTouched = false;
 
     if (cityField && cityCombobox && cityInputWrap && cityOptions && cityList) {
+      // Ensure "No matches found" exists for City list
+      ensureNoMatchesStatusLi(cityList);
+
       function setCitySelected(li) {
         cityTouched = true;
 
@@ -669,8 +618,7 @@ document.addEventListener("DOMContentLoaded", () => {
         cityCombobox.value = value;
         cityHidden.value = value;
 
-        // update selected state
-        toArray(cityList.querySelectorAll('li[role="option"]')).forEach((item) => {
+        cityItems.forEach((item) => {
           const selected = item === li;
           item.setAttribute("aria-selected", selected ? "true" : "false");
           item.classList.toggle(
@@ -684,14 +632,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const cityDropdown = createDropdown({
-        toggleEl: cityInputWrap,
+        toggleEl: cityInputWrap,          // identical concept to Phone's toggle wrapper
         optionsEl: cityOptions,
         searchEl: citySearch,
         listEl: cityList,
-        ariaExpandedEl: cityCombobox,
+        optionItems: cityItems,
+        ariaExpandedEl: cityCombobox,     // aria-expanded belongs on the combobox input
         onSelect: setCitySelected,
         anchorElForPosition: cityInputWrap,
-        offsetParentEl: cityInputWrap,
+        offsetParentEl: cityInputWrap,    // IMPORTANT: fixes big gap by positioning relative to wrapper
         gapPx: 2,
         onOpen: () => {
           cityTouched = true;
@@ -705,6 +654,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       });
 
+      // Keyboard support on the input itself (since toggle wrapper won't receive keydown when input is focused)
       cityCombobox.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
@@ -723,9 +673,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // Phone: REVERTED to the previous working digit logic
-  // + Change requested: if field is empty/cleared, show BLANK country acronym
-  //   (default selection remains PH in the list/HTML)
+  // Phone: sanitize + format + validate + shared dial-code country switching
+  // (UPDATED: keep PH default from HTML; do NOT override to US)
   // -------------------------
   const phoneHidden = form.querySelector('input[type="hidden"][name="0-1/phone"]');
   if (phoneHidden) {
@@ -740,6 +689,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const countryLis = toArray(phoneList?.querySelectorAll?.('li[role="option"]'));
 
     if (phoneField && phoneInput && phoneUI && flagAndCaret && phoneOptions && phoneList) {
+      // Ensure "No matches found" exists for Phone list
+      ensureNoMatchesStatusLi(phoneList);
+
       function parseDialCode(text) {
         const m = (text || "").trim().match(/\+[\d]+$/);
         return m ? m[0] : "";
@@ -880,14 +832,14 @@ document.addEventListener("DOMContentLoaded", () => {
         };
       }
 
-      // Build country list; display should be ISO2 acronym (PH/US/etc.) when possible
       const countries = countryLis
         .map((li) => {
           const text = (li.textContent || "").trim();
           const dialCode = parseDialCode(text);
           const flagEmoji = text.split(/\s+/)[0] || "";
           const iso2 = flagEmojiToISO2(flagEmoji);
-          const display = iso2 || flagEmoji || ""; // <-- acronym first
+          // Keep the UI flag as whatever HubSpot uses; DO NOT replace emoji with ISO for display
+          const display = flagEmoji || iso2 || "";
           return { li, text, dialCode, flagEmoji, iso2, display };
         })
         .filter((c) => c.dialCode);
@@ -928,25 +880,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let selectedCountry = null;
 
-      function syncHiddenPhoneValue(e164) {
-        phoneHidden.value = e164 || "";
-      }
-
-      function getMinNationalDigits(dialCode) {
-        return MIN_NATIONAL_DIGITS_BY_DIAL[dialCode] || DEFAULT_MIN_NATIONAL_DIGITS;
-      }
-
-      // IMPORTANT UX: if input is empty, show blank acronym (but keep PH selected internally)
-      function applyAcronymDisplayForValue(currentValue) {
-        const v = (currentValue || "").trim();
-        if (!flagSpan) return;
-        if (!v) {
-          flagSpan.textContent = "";
-        } else {
-          flagSpan.textContent = selectedCountry?.display || flagSpan.textContent || "";
-        }
-      }
-
       function updateCountrySelectionUI(country) {
         countries.forEach((c) => {
           const selected = !!country && c === country;
@@ -957,13 +890,20 @@ document.addEventListener("DOMContentLoaded", () => {
           );
         });
 
-        // show acronym unless input is empty
-        applyAcronymDisplayForValue(phoneInput.value);
+        // keep whatever HubSpot shows (emoji)
+        if (flagSpan) flagSpan.textContent = country?.display || flagSpan.textContent || "";
+      }
+
+      function syncHiddenPhoneValue(e164) {
+        phoneHidden.value = e164 || "";
+      }
+
+      function getMinNationalDigits(dialCode) {
+        return MIN_NATIONAL_DIGITS_BY_DIAL[dialCode] || DEFAULT_MIN_NATIONAL_DIGITS;
       }
 
       function validatePhoneValue(rawValue) {
         const normalized = normalizePhoneE164ish(rawValue);
-
         if (!normalized) return { ok: false, message: REQUIRED_MSG };
 
         const digitsOnly = normalized.replace(/\D/g, "");
@@ -1007,15 +947,6 @@ document.addEventListener("DOMContentLoaded", () => {
       function setSelectedCountry(country, rewriteInputPrefix) {
         selectedCountry = country || null;
         updateCountrySelectionUI(selectedCountry);
-
-        // if empty, keep empty; do not inject anything into the input
-        const currentRaw = (phoneInput.value || "").trim();
-        if (!currentRaw) {
-          syncHiddenPhoneValue("");
-          clearError(phoneField, phoneInput);
-          clearFormLevelError();
-          return;
-        }
 
         if (rewriteInputPrefix && selectedCountry) {
           const normalized = normalizePhoneE164ish(phoneInput.value || "");
@@ -1061,10 +992,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       function detectAndSyncCountryFromNormalized(normalized) {
-        // If cleared, keep PH internally but show blank acronym (requested)
         if (!normalized) {
-          syncHiddenPhoneValue("");
-          applyAcronymDisplayForValue("");
+          if (selectedCountry) setSelectedCountry(null, false);
+          else updateCountrySelectionUI(null);
           return;
         }
 
@@ -1085,8 +1015,8 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         }
 
-        // If we can't detect a specific country, pick preferred default for the dial code (+1 -> US).
-        // This will NOT override PH unless the user typed +1.
+        // If we can't detect a specific country, only pick a preferred default for the dial code.
+        // This matters for +1, but will NOT override PH unless the user actually typed +1.
         if (dial) {
           const fallback = preferredCountryForDial(dial);
           if (fallback && (!selectedCountry || selectedCountry !== fallback)) {
@@ -1098,7 +1028,8 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        updateCountrySelectionUI(selectedCountry);
+        if (selectedCountry) setSelectedCountry(null, false);
+        else updateCountrySelectionUI(null);
       }
 
       phoneCtx = {
@@ -1122,54 +1053,43 @@ document.addEventListener("DOMContentLoaded", () => {
         if (match) selectedCountry = match;
       }
 
-      // Initial UI: show blank acronym if input empty; otherwise show selection acronym
-      applyAcronymDisplayForValue(phoneInput.value);
-
       // Initial sync/format (does not override PH default; just formats and syncs hidden)
       {
         const normalized = normalizePhoneE164ish(phoneInput.value || "");
-        if (!normalized) {
-          syncHiddenPhoneValue("");
-        } else {
-          const dial = findDialMatch(normalized, dialCodesSortedDesc);
-          const shared = dial && (countriesByDial.get(dial) || []).length > 1;
+        const dial = findDialMatch(normalized, dialCodesSortedDesc);
+        const shared = dial && (countriesByDial.get(dial) || []).length > 1;
 
-          const fmt = autoFormatPhone(
-            normalized,
-            shared ? "" : selectedCountry?.iso2 || "",
-            dialCodesSortedDesc
-          );
+        const fmt = autoFormatPhone(
+          normalized,
+          shared ? "" : selectedCountry?.iso2 || "",
+          dialCodesSortedDesc
+        );
 
-          phoneInput.value = fmt.display || phoneInput.value || "";
-          syncHiddenPhoneValue(fmt.e164 || normalized);
+        // Keep input as-is if it's empty; otherwise apply formatting
+        if (normalized) phoneInput.value = fmt.display || phoneInput.value || "";
+        syncHiddenPhoneValue(fmt.e164 || normalized);
 
-          detectAndSyncCountryFromNormalized(fmt.e164 || normalized);
-        }
-
+        // Update UI flag/selected row to match the HTML-selected country first
         updateCountrySelectionUI(selectedCountry);
+
+        // Then allow detection to refine ONLY if dial is shared and digits indicate otherwise (+1 etc.)
+        detectAndSyncCountryFromNormalized(fmt.e164 || normalized);
       }
 
-      // Country dropdown (with UL override for "No matches found" + restore on close)
+      // Country dropdown
       const phoneDropdown = createDropdown({
         toggleEl: flagAndCaret,
         optionsEl: phoneOptions,
         searchEl: phoneSearch,
         listEl: phoneList,
+        optionItems: countryLis,
         ariaExpandedEl: flagAndCaret,
         onSelect: (li) => {
-          // restore list (if it was showing "No matches found") before resolving selection
-          restoreOriginalUl(phoneList);
-
-          // find matching country by LI identity (after restore, LI nodes are refreshed)
-          // So match by text instead of node reference.
-          const pickedText = (li.textContent || "").trim();
-          const match =
-            countries.find((c) => (c.text || "").trim() === pickedText) || null;
-
+          const match = countries.find((c) => c.li === li) || null;
           setSelectedCountry(match, true);
         },
         anchorElForPosition: phoneUI,
-        offsetParentEl: phoneUI,
+        offsetParentEl: phoneUI, // match City behavior; avoids odd offsets
         gapPx: 2,
         onOpen: () => {
           clearError(phoneField, phoneInput);
@@ -1177,7 +1097,6 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       });
 
-      // Input restrictions (same as your previous working logic)
       phoneInput.addEventListener("keydown", (e) => {
         if (e.ctrlKey || e.metaKey) return;
 
@@ -1243,13 +1162,6 @@ document.addEventListener("DOMContentLoaded", () => {
         let next = current.slice(0, start) + insert + current.slice(end);
         const normalized = normalizePhoneE164ish(next);
 
-        if (!normalized) {
-          phoneInput.value = "";
-          syncHiddenPhoneValue("");
-          applyAcronymDisplayForValue("");
-          return;
-        }
-
         const dial = findDialMatch(normalized, dialCodesSortedDesc);
         const shared = dial && (countriesByDial.get(dial) || []).length > 1;
 
@@ -1286,14 +1198,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const caretDigits = digitCountBeforeCaret(raw, caretPos);
         const normalized = normalizePhoneE164ish(raw);
 
-        // IMPORTANT: if cleared, keep empty + blank acronym
-        if (!normalized) {
-          phoneInput.value = "";
-          syncHiddenPhoneValue("");
-          applyAcronymDisplayForValue("");
-          return;
-        }
-
         const dial = findDialMatch(normalized, dialCodesSortedDesc);
         const shared = dial && (countriesByDial.get(dial) || []).length > 1;
 
@@ -1320,8 +1224,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         detectAndSyncCountryFromNormalized(fmt.e164 || normalized);
 
-        // ensure acronym visible while typing
-        applyAcronymDisplayForValue(phoneInput.value);
+        // If user typed +1 and we still have no country selected, apply +1 preferred (US) only then
+        if (dial && !selectedCountry) {
+          const pref = preferredCountryForDial(dial);
+          if (pref) {
+            selectedCountry = pref;
+            updateCountrySelectionUI(selectedCountry);
+          }
+        }
       });
 
       phoneInput.addEventListener("focus", () => {
@@ -1331,14 +1241,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       phoneInput.addEventListener("blur", () => {
         const normalized = normalizePhoneE164ish(phoneInput.value || "");
-
-        if (!normalized) {
-          phoneInput.value = "";
-          syncHiddenPhoneValue("");
-          applyAcronymDisplayForValue("");
-          return;
-        }
-
         const dial = findDialMatch(normalized, dialCodesSortedDesc);
         const shared = dial && (countriesByDial.get(dial) || []).length > 1;
 
@@ -1357,7 +1259,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!res.ok) showError(phoneField, phoneInput, res.message);
       });
 
-      // keep overlay positioned
       phoneOptions.addEventListener("wheel", () => {
         phoneDropdown.reposition();
       });
@@ -1380,7 +1281,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // Email validation + suggestion (submit-only strict gate)
+  // Email validation + suggestion
   // -------------------------
   function isEmailBasicFormat(v) {
     const s = (v || "").trim();
@@ -1502,46 +1403,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return COMMON_TLDS.includes(tld);
   }
 
-  function getEmailDomain(email) {
-    const v = (email || "").trim();
-    const at = v.lastIndexOf("@");
-    if (at <= 0) return "";
-    return v.slice(at + 1).trim().toLowerCase();
-  }
-
-  async function checkDomainHasMxOrA(domain, timeoutMs = 2500) {
-    if (!domain) return false;
-
-    const controller = new AbortController();
-    const t = setTimeout(() => controller.abort(), timeoutMs);
-
-    async function query(type) {
-      const url = `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(
-        domain
-      )}&type=${encodeURIComponent(type)}`;
-      const res = await fetch(url, {
-        method: "GET",
-        headers: { Accept: "application/dns-json" },
-        signal: controller.signal,
-      });
-      if (!res.ok) throw new Error("dns_http");
-      const json = await res.json();
-      if (json && json.Status === 0 && Array.isArray(json.Answer) && json.Answer.length > 0) {
-        return true;
-      }
-      return false;
-    }
-
-    try {
-      const hasMx = await query("MX");
-      if (hasMx) return true;
-      const hasA = await query("A");
-      return !!hasA;
-    } finally {
-      clearTimeout(t);
-    }
-  }
-
   const emailInput = form.querySelector('input[name="0-1/email"]');
   if (emailInput) {
     const field = emailInput.closest(".hsfc-EmailField");
@@ -1571,11 +1432,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Suggestion is allowed, but should not force an error on blur
       const suggestion = getEmailSuggestion(v);
       const tldIsKnown = isKnownCommonTld(v);
+
       if (!tldIsKnown && suggestion) {
-        clearError(field, emailInput);
+        showError(field, emailInput, `Email address ${v} is invalid`);
         showEmailSuggestion(field, emailInput, suggestion);
         return;
       }
@@ -1613,55 +1474,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // Submit validation + PostSubmit on success
+  // Submit validation + trigger PostSubmit on success
   // -------------------------
-  async function runAsyncSubmitChecks() {
-    if (!emailInput) return { ok: true, target: null };
-
-    const field = emailInput.closest(".hsfc-EmailField");
-    const v = emailInput.value.trim();
-
-    if (!v) return { ok: false, target: emailInput };
-    if (!isEmailBasicFormat(v)) return { ok: false, target: emailInput };
-
-    // submit-only suggestion gate
-    const suggestion = getEmailSuggestion(v);
-    const tldIsKnown = isKnownCommonTld(v);
-    if (!tldIsKnown && suggestion) {
-      showError(field, emailInput, EMAIL_SUGGESTION_SUBMIT_MSG);
-      showEmailSuggestion(field, emailInput, suggestion);
-      return { ok: false, target: emailInput };
-    }
-
-    // DNS check (strict)
-    const domain = getEmailDomain(v);
-    try {
-      const ok = await checkDomainHasMxOrA(domain);
-      if (!ok) {
-        showError(field, emailInput, EMAIL_DOMAIN_INVALID_MSG);
-        return { ok: false, target: emailInput };
-      }
-    } catch (_) {
-      showFormLevelError(FORM_NETWORK_MSG);
-      return { ok: false, target: emailInput };
-    }
-
-    return { ok: true, target: null };
-  }
-
   form.addEventListener(
     "submit",
-    async (e) => {
-      if (programmaticSubmit) return;
-
-      // prevent double submit
-      if (pendingSubmit) {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }
-
+    (e) => {
       const invalidTargets = [];
+
       clearFormLevelError();
 
       // First Name
@@ -1693,10 +1512,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Email (sync)
+      // Email
       if (emailInput) {
         const field = emailInput.closest(".hsfc-EmailField");
         const v = emailInput.value.trim();
+
         clearInfo(field);
 
         if (!v) {
@@ -1711,6 +1531,14 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (!isEmailBasicFormat(v)) {
           showError(field, emailInput, EMAIL_INVALID_FORMAT_MSG);
           invalidTargets.push(emailInput);
+        } else {
+          const suggestion = getEmailSuggestion(v);
+          const tldIsKnown = isKnownCommonTld(v);
+          if (!tldIsKnown && suggestion) {
+            showError(field, emailInput, `Email address ${v} is invalid`);
+            showEmailSuggestion(field, emailInput, suggestion);
+            invalidTargets.push(emailInput);
+          }
         }
       }
 
@@ -1727,56 +1555,15 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         e.stopPropagation();
         closeAllDropdowns(null);
+
         showFormLevelError(FORM_REQUIRED_MSG);
-        try {
-          invalidTargets[0].focus();
-        } catch (_) {}
+
+        invalidTargets[0].focus();
+        pendingSubmit = false;
         return;
       }
 
-      // Async submit-only checks (DNS + suggestion gate)
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (typeof navigator !== "undefined" && navigator && navigator.onLine === false) {
-        showFormLevelError(FORM_NETWORK_MSG);
-        return;
-      }
-
-      setSubmittingUI(true);
-      showFormLevelError(FORM_SUBMITTING_MSG);
-
-      const asyncRes = await runAsyncSubmitChecks();
-      if (!asyncRes.ok) {
-        setSubmittingUI(false);
-        if (asyncRes.target) {
-          try {
-            asyncRes.target.focus();
-          } catch (_) {}
-        }
-        return;
-      }
-
-      clearFormLevelError();
       pendingSubmit = true;
-
-      clearSubmitTimeout();
-      submitTimeoutId = setTimeout(() => {
-        if (!pendingSubmit) return;
-
-        const anyVisibleError = toArray(form.querySelectorAll(".hsfc-ErrorAlert")).some((el) =>
-          isVisible(el)
-        );
-
-        markSubmitFailed(anyVisibleError ? FORM_SERVER_MSG : FORM_NETWORK_MSG);
-      }, 12000);
-
-      try {
-        programmaticSubmit = true;
-        form.submit();
-      } finally {
-        programmaticSubmit = false;
-      }
     },
     true
   );
