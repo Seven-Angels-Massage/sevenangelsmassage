@@ -610,6 +610,7 @@
   padding:0;
   margin:0;
   overflow-y:auto
+  max-height:260px;
 }
 [data-hsfc-id=Renderer] .hsfc-DropdownOptions__List__ListItem {
   color:var(--hsf-field-input__color, var(--hsf-default-field-input__color));
