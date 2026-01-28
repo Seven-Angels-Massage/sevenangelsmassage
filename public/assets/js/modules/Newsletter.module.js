@@ -167,27 +167,37 @@ document.addEventListener("DOMContentLoaded", () => {
     hideEl(el);
   }
 
+  // ✅ PATCHED: Email suggestion must NEVER trigger submit/global errors
   function showEmailSuggestion(fieldEl, inputEl, suggestion) {
     const infoEl = getInfoEl(fieldEl);
     if (!infoEl) return;
 
     let btn = infoEl.querySelector(".hsfc-LinkButton") || null;
 
-    if (!btn) {
+    // Ensure it is ALWAYS a button, and ALWAYS type="button"
+    if (!btn || btn.tagName !== "BUTTON") {
       btn = document.createElement("button");
-      btn.type = "button";
       btn.className = "hsfc-LinkButton";
       infoEl.innerHTML = "";
       infoEl.appendChild(btn);
     }
 
+    btn.type = "button";
     btn.textContent = `Did you mean ${suggestion}?`;
 
-    // Remove previous click handlers safely by cloning
+    // Remove previous handlers safely by cloning (keeps DOM clean)
     const newBtn = btn.cloneNode(true);
+    newBtn.type = "button";
     btn.parentNode.replaceChild(newBtn, btn);
 
-    newBtn.addEventListener("click", () => {
+    const applySuggestion = (e) => {
+      // Hard-stop submit-like behavior + bubbling into form listeners
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
+      }
+
       inputEl.value = suggestion;
 
       clearError(fieldEl, inputEl);
@@ -199,6 +209,13 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (_) {}
 
       inputEl.focus();
+    };
+
+    newBtn.addEventListener("click", applySuggestion);
+
+    // Extra safety: Enter/Space while focused must not submit the form
+    newBtn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") applySuggestion(e);
     });
 
     showEl(infoEl);
@@ -977,7 +994,9 @@ document.addEventListener("DOMContentLoaded", () => {
           // Reapply selected class to the currently selectedCountry (by matching dial + flag text)
           if (selectedCountry) {
             const match = countries.find(
-              (c) => c.dialCode === selectedCountry.dialCode && c.display === selectedCountry.display
+              (c) =>
+                c.dialCode === selectedCountry.dialCode &&
+                c.display === selectedCountry.display
             );
             if (match) selectedCountry = match;
           }
