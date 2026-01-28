@@ -8,6 +8,16 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!form) return;
 
   // -------------------------
+  // HubSpot endpoint (FormsNext public endpoint)
+  // -------------------------
+  const HS_PORTAL_ID = "243726556";
+  const HS_FORM_GUID = "a8e00675-911e-492c-807c-4e00fdfff76a";
+  const HS_HUBLET = "na2";
+  const HS_FORMSNEXT_ENDPOINT =
+    `https://forms-${HS_HUBLET}.hsforms.com/submissions/v3/public/submit/formsnext/multipart/` +
+    `${HS_PORTAL_ID}/${HS_FORM_GUID}`;
+
+  // -------------------------
   // Messages
   // -------------------------
   const REQUIRED_MSG = "Please complete this required field.";
@@ -17,6 +27,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const PHONE_INVALID_FORMAT_MSG =
     "This phone number is either invalid or is in the wrong format.";
   const NO_MATCHES_MSG = "No matches found";
+
+  // Global error strings (HubSpot-like)
+  const HS_GLOBAL_ERRORS = {
+    BLOCKED_EMAIL: "Please change your email address to continue.",
+    FIELD_ERRORS: "The form could not be submitted because some fields contain errors.",
+    MISSING_REQUIRED: FORM_REQUIRED_MSG,
+    TOO_MANY_REQUESTS:
+      "There was an issue submitting your form. Please wait a few seconds and try again.",
+  };
 
   const openDropdowns = new Set();
   const toArray = (x) => Array.prototype.slice.call(x || []);
@@ -71,7 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
       el.setAttribute("aria-live", el.getAttribute("aria-live") || "polite");
     });
 
-    const postSubmit = form.querySelector(".hsfc-PostSubmit");
+    // Success block should be hidden on load (usually outside the form)
+    const postSubmit = ROOT.querySelector(".hsfc-PostSubmit");
     if (postSubmit) hideEl(postSubmit);
   }
   hideInitialAlerts();
@@ -79,16 +99,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // -------------------------
   // Form-level error + post-submit helpers
   // -------------------------
-  function getFormErrorEl() {
-    const navAlerts =
+  function getNavAlertsEl() {
+    return (
       form.querySelector(".hsfc-NavigationRow__Alerts") ||
       form.querySelector('[data-hsfc-id="NavigationRow"] .hsfc-NavigationRow__Alerts') ||
-      null;
+      null
+    );
+  }
 
-    if (navAlerts) {
-      return navAlerts.querySelector(".hsfc-ErrorAlert") || null;
-    }
-
+  function getFormErrorEl() {
+    const navAlerts = getNavAlertsEl();
+    if (navAlerts) return navAlerts.querySelector(".hsfc-ErrorAlert") || null;
     return form.querySelector(".hsfc-ErrorAlert") || null;
   }
 
@@ -101,19 +122,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function clearFormError() {
     const el = getFormErrorEl();
-    if (!el) return;
-    hideEl(el);
+    if (el) {
+      el.textContent = "";
+      hideEl(el);
+    }
+
+    // Never show info alert as part of submit/global error flow
+    const navAlerts = getNavAlertsEl();
+    const info = navAlerts ? navAlerts.querySelector(".hsfc-InfoAlert") : null;
+    if (info) {
+      info.textContent = "";
+      hideEl(info);
+    }
   }
 
+  // ✅ NEW BEHAVIOR: hide entire form (display none), show PostSubmit block
   function showPostSubmit() {
-    const postSubmit = form.querySelector(".hsfc-PostSubmit");
+    const postSubmit = ROOT.querySelector(".hsfc-PostSubmit");
     if (!postSubmit) return;
 
-    const step = form.querySelector(".hsfc-Step");
-    if (step) hideEl(step);
-
-    const nav = form.querySelector(".hsfc-NavigationRow");
-    if (nav) hideEl(nav);
+    // Hide the whole form
+    hideEl(form);
 
     showEl(postSubmit);
 
@@ -123,14 +152,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function hidePostSubmit() {
-    const postSubmit = form.querySelector(".hsfc-PostSubmit");
+    const postSubmit = ROOT.querySelector(".hsfc-PostSubmit");
     if (postSubmit) hideEl(postSubmit);
 
-    const step = form.querySelector(".hsfc-Step");
-    if (step) showEl(step);
-
-    const nav = form.querySelector(".hsfc-NavigationRow");
-    if (nav) showEl(nav);
+    // Reveal form again (if user edits/retries)
+    showEl(form);
   }
 
   // -------------------------
@@ -195,7 +221,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e) {
         e.preventDefault();
         e.stopPropagation();
-        if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
+        if (typeof e.stopImmediatePropagation === "function")
+          e.stopImmediatePropagation();
       }
 
       inputEl.value = suggestion;
@@ -534,19 +561,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cityField && cityCombobox && cityOptions && cityList) {
       let cityTouched = false;
 
+      // ✅ FIX: never reuse stale <li> references; always re-query the live UL
+      function getLiveCityListEl() {
+        return cityOptions.querySelector('ul[role="listbox"]');
+      }
+      function getLiveCityOptionEls() {
+        const ul = getLiveCityListEl();
+        if (!ul) return [];
+        return Array.from(ul.querySelectorAll('li[role="option"]'));
+      }
+
       function setCitySelected(li) {
         const value = (li.textContent || "").trim();
         cityCombobox.value = value;
         cityHidden.value = value;
 
-        // Update selected styles in the CURRENT list
-        const cityItems = toArray(
-          cityList.ownerDocument.querySelectorAll(
-            `#${CSS.escape(cityList.id)} li[role="option"]`
-          )
-        );
-
-        cityItems.forEach((item) => {
+        // Update selected styles on the LIVE list only
+        const items = getLiveCityOptionEls();
+        items.forEach((item) => {
           const selected = item.textContent.trim() === value;
           item.setAttribute("aria-selected", selected ? "true" : "false");
           item.classList.toggle(
@@ -581,7 +613,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         },
 
-        // After restore, ensure selected state reflects hidden value
+        // After restore, ensure selected state reflects hidden value (live UL passed)
         onListRestored: (ul) => {
           if (!ul) return;
           const value = (cityHidden.value || "").trim();
@@ -852,7 +884,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!normalized) return { ok: false, message: REQUIRED_MSG };
 
         const digitsOnly = normalized.replace(/\D/g, "");
-        if (digitsOnly.length > 15) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
+        if (digitsOnly.length > 15)
+          return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
 
         if (parsePhoneNumberFromString) {
           try {
@@ -875,7 +908,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (nationalDigits === 0) return { ok: false, message: REQUIRED_MSG };
 
         const minNat = getMinNationalDigits(dialCode);
-        if (nationalDigits < minNat) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
+        if (nationalDigits < minNat)
+          return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
 
         return { ok: true, message: "" };
       }
@@ -927,7 +961,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (AsYouTypeCtor) {
           const fmt = formatWithAsYouType(normalized, "");
           const detected = fmt?.detectedCountry || "";
-          // We are no longer using ISO2 mapping; rely on dial code fallback behavior.
           if (detected && (selectedCountry === null || dialChanged)) {
             // no-op; dial-code matching below will handle selection
           }
@@ -1042,7 +1075,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const replacingAll = start === 0 && end === v.length;
           const replacingFirstChar = start === 0 && end >= 1;
 
-          if ((start === 0 && !v.includes("+")) || replacingAll || replacingFirstChar) return;
+          if ((start === 0 && !v.includes("+")) || replacingAll || replacingFirstChar)
+            return;
 
           e.preventDefault();
           return;
@@ -1348,11 +1382,82 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // Submit validation + success state
+  // HubSpot AJAX submit helpers
+  // -------------------------
+  function hsGetCookie(name) {
+    const m = document.cookie.match(new RegExp("(^|;\\s*)" + name + "=([^;]+)"));
+    return m ? decodeURIComponent(m[2]) : "";
+  }
+
+  function hsBuildContextJSON() {
+    const hutk = hsGetCookie("hubspotutk");
+    const ctx = {
+      source: "forms-embed-static",
+      sourceName: "forms-embed",
+      sourceVersion: "1.0",
+      sourceVersionMajor: "1",
+      sourceVersionMinor: "0",
+      hutk: hutk || undefined,
+      pageUri: window.location.href,
+      pageName: document.title,
+      referrer: document.referrer || "",
+      userAgent: navigator.userAgent,
+    };
+    Object.keys(ctx).forEach((k) => ctx[k] === undefined && delete ctx[k]);
+    return JSON.stringify(ctx);
+  }
+
+  function setButtonLoading(loading) {
+    const btn =
+      form.querySelector('button[type="submit"]') || form.querySelector(".hsfc-Button");
+    if (!btn) return;
+    btn.disabled = !!loading;
+    btn.setAttribute("aria-busy", loading ? "true" : "false");
+    btn.classList.toggle("hsfc-Button--loading", !!loading);
+  }
+
+  async function hsSubmitToHubSpot() {
+    // Build FormData from form (captures hidden inputs too)
+    const fd = new FormData(form);
+
+    // Ensure hs_context exists + fresh
+    fd.set("hs_context", hsBuildContextJSON());
+
+    // Make checkbox unambiguous for HS
+    if (checkboxInput) {
+      fd.set(checkboxInput.name, checkboxInput.checked ? "true" : "false");
+    }
+
+    const res = await fetch(HS_FORMSNEXT_ENDPOINT, {
+      method: "POST",
+      mode: "cors",
+      body: fd,
+    });
+
+    // Try JSON first, then text
+    let payload = null;
+    const contentType = res.headers.get("content-type") || "";
+    try {
+      if (contentType.includes("application/json")) payload = await res.json();
+      else payload = await res.text();
+    } catch (_) {
+      payload = null;
+    }
+
+    return { res, payload };
+  }
+
+  // -------------------------
+  // Submit validation + HubSpot AJAX submission
   // -------------------------
   form.addEventListener(
     "submit",
-    (e) => {
+    async (e) => {
+      // ALWAYS handle submit here
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Ensure success screen is hidden while interacting
       hidePostSubmit();
 
       const invalidTargets = [];
@@ -1426,22 +1531,47 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
+      // ❌ Client validation fail: only show global error (no postsubmit)
       if (invalidTargets.length) {
-        e.preventDefault();
-        e.stopPropagation();
         closeAllDropdowns(null);
-
-        showFormError(FORM_REQUIRED_MSG);
+        showFormError(HS_GLOBAL_ERRORS.MISSING_REQUIRED);
         invalidTargets[0].focus();
         return;
       }
 
-      // Valid: show static PostSubmit success section
-      e.preventDefault();
-      e.stopPropagation();
+      // ✅ Valid: submit to HubSpot
       closeAllDropdowns(null);
       clearFormError();
-      showPostSubmit();
+      setButtonLoading(true);
+
+      try {
+        const { res, payload } = await hsSubmitToHubSpot();
+
+        if (res.ok) {
+          // ✅ SUCCESS: hide whole form, show PostSubmit (no in-between messages)
+          showPostSubmit();
+          return;
+        }
+
+        // ❌ ERROR: show ONLY global error (never PostSubmit)
+        if (res.status === 429) {
+          showFormError(HS_GLOBAL_ERRORS.TOO_MANY_REQUESTS);
+          return;
+        }
+
+        const text = typeof payload === "string" ? payload : JSON.stringify(payload || {});
+        const lowered = (text || "").toLowerCase();
+
+        if (lowered.includes("blocked") && lowered.includes("email")) {
+          showFormError(HS_GLOBAL_ERRORS.BLOCKED_EMAIL);
+        } else {
+          showFormError(HS_GLOBAL_ERRORS.FIELD_ERRORS);
+        }
+      } catch (_) {
+        showFormError(HS_GLOBAL_ERRORS.TOO_MANY_REQUESTS);
+      } finally {
+        setButtonLoading(false);
+      }
     },
     true
   );
