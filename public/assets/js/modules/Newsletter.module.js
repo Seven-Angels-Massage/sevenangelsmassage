@@ -789,6 +789,10 @@ document.addEventListener("DOMContentLoaded", () => {
       // Preference: if multiple countries share dial code, choose this by default
       const PREFERRED_COUNTRY_BY_DIAL = {
         "+1": "United States",
+        "+7": "Russia",
+        "+44": "United Kingdom",
+        "+61": "Australia",
+        "+672": "Norfolk Island",
       };
 
       const MIN_NATIONAL_DIGITS_BY_DIAL = {
@@ -797,8 +801,139 @@ document.addEventListener("DOMContentLoaded", () => {
         "+7": 10,
         "+65": 8,
         "+852": 8,
+        "+44": 9,
+        "+61": 9,
+        "+672": 5,
       };
       const DEFAULT_MIN_NATIONAL_DIGITS = 7;
+
+      // -------------------------
+      // ✅ Shared-country dial code detection (libphonenumber first, then prefix rules)
+      // -------------------------
+      function digitsOnly(s) {
+        return (s || "").toString().replace(/\D/g, "");
+      }
+
+      function nationalDigitsFromE164ish(dialCode, normalizedPlusDigits) {
+        const dAll = digitsOnly(normalizedPlusDigits);
+        const dDial = digitsOnly(dialCode);
+        if (!dAll.startsWith(dDial)) return "";
+        return dAll.slice(dDial.length);
+      }
+
+      // --- +1 NANP overrides (your patch) ---
+      const CANADA_AREA_CODES = new Set([
+        "204","226","236","249","250","263","289","306","343","354","365","367","368",
+        "403","416","418","431","437","438","450","468","474","506","514","519","548",
+        "579","581","584","587","604","613","639","647","672","683","705","709","742",
+        "753","778","780","782","807","819","825","867","873","902","905"
+      ]);
+
+      const NANP_OVERRIDES = [
+        { countryName: "Puerto Rico", areaCodes: new Set(["787", "939"]) },
+        { countryName: "Dominican Republic", areaCodes: new Set(["809", "829", "849"]) },
+        { countryName: "Canada", areaCodes: CANADA_AREA_CODES }
+        // else -> United States
+      ];
+
+      const ISO2_TO_COUNTRY_NAME = {
+        // +1 plan
+        US: "United States",
+        CA: "Canada",
+        PR: "Puerto Rico",
+        DO: "Dominican Republic",
+
+        // +7
+        RU: "Russia",
+        KZ: "Kazakhstan",
+
+        // +44
+        GB: "United Kingdom",
+        JE: "Jersey",
+        GG: "Guernsey",
+        IM: "Isle of Man",
+
+        // +61
+        AU: "Australia",
+        CX: "Christmas Island",
+        CC: "Cocos (Keeling) Islands",
+
+        // +672 (best-effort)
+        NF: "Norfolk Island",
+        AQ: "Australian Antarctic Territory",
+      };
+
+      function nanpAreaFromNormalized(normalizedPlusDigits) {
+        const d = digitsOnly(normalizedPlusDigits);
+        if (!d.startsWith("1")) return "";
+        const rest = d.slice(1);
+        if (rest.length < 3) return "";
+        return rest.slice(0, 3);
+      }
+
+      function detectCountryNameForDial(dialCode, normalizedPlusDigits) {
+        // 1) Best source-of-truth: libphonenumber (if available)
+        if (parsePhoneNumberFromString) {
+          try {
+            const parsed = parsePhoneNumberFromString(normalizedPlusDigits);
+            const iso2 = parsed?.country || "";
+            const mapped = ISO2_TO_COUNTRY_NAME[iso2] || "";
+            if (mapped) return mapped;
+          } catch (_) {}
+        }
+
+        // 2) Fallback prefix logic by dialCode (works while typing / partial)
+        const nat = nationalDigitsFromE164ish(dialCode, normalizedPlusDigits);
+
+        if (dialCode === "+1") {
+          const area = nanpAreaFromNormalized(normalizedPlusDigits);
+          if (area) {
+            for (const o of NANP_OVERRIDES) {
+              if (o.areaCodes && o.areaCodes.has(area)) return o.countryName;
+            }
+          }
+          return "United States";
+        }
+
+        if (dialCode === "+7") {
+          // Common heuristic: Kazakhstan uses +7 6xx and +7 7xx ranges; Russia is most other ranges.
+          const first = (nat || "")[0] || "";
+          if (first === "6" || first === "7") return "Kazakhstan";
+          return "Russia";
+        }
+
+        if (dialCode === "+44") {
+          // Crown dependencies have distinct geographic prefixes:
+          // Jersey: 1534, Guernsey: 1481, Isle of Man: 1624
+          if ((nat || "").startsWith("1534")) return "Jersey";
+          if ((nat || "").startsWith("1481")) return "Guernsey";
+          if ((nat || "").startsWith("1624")) return "Isle of Man";
+          return "United Kingdom";
+        }
+
+        if (dialCode === "+61") {
+          // Territories within +61:
+          // Cocos (Keeling) Islands: 8 9162 xxxx  -> nat starts "89162"
+          // Christmas Island:        8 9164 xxxx  -> nat starts "89164"
+          if ((nat || "").startsWith("89162")) return "Cocos (Keeling) Islands";
+          if ((nat || "").startsWith("89164")) return "Christmas Island";
+          return "Australia";
+        }
+
+        if (dialCode === "+672") {
+          // Norfolk Island is commonly +672 3xxxxxx; Australian Antarctic Territory often +672 1xxxx
+          const first = (nat || "")[0] || "";
+          if (first === "1") return "Australian Antarctic Territory";
+          if (first === "3") return "Norfolk Island";
+          return "Norfolk Island";
+        }
+
+        return "";
+      }
+
+      function isSharedDialCode(dialCode) {
+        return dialCode === "+1" || dialCode === "+7" || dialCode === "+44" || dialCode === "+61" || dialCode === "+672";
+      }
 
       // Dynamic country index (rebuilt when UL is restored)
       let countryLis = [];
@@ -858,10 +993,34 @@ document.addEventListener("DOMContentLoaded", () => {
         return dialCodesSortedDesc.find((dc) => v.startsWith(dc)) || "";
       }
 
-      function pickDefaultCountryForDial(dialCode) {
+      function pickCountryByNameAndDial(dialCode, countryName) {
+        if (!dialCode || !countryName) return null;
+        const list = countriesByDial.get(dialCode) || [];
+        const nameNorm = norm(countryName);
+        return list.find((c) => norm(c.text).includes(nameNorm)) || null;
+      }
+
+      function pickDefaultCountryForDial(dialCode, normalizedPlusDigits) {
         const list = countriesByDial.get(dialCode) || [];
         if (!list.length) return null;
 
+        // ✅ Shared-country dial codes: resolve by country name (libphonenumber -> prefix fallback)
+        if (isSharedDialCode(dialCode)) {
+          const name = detectCountryNameForDial(dialCode, normalizedPlusDigits || "");
+          const byName = pickCountryByNameAndDial(dialCode, name);
+          if (byName) return byName;
+
+          // fallback to preferred default per dial code
+          const preferredName = PREFERRED_COUNTRY_BY_DIAL[dialCode];
+          if (preferredName) {
+            const hit = list.find((c) => (c.text || "").includes(preferredName));
+            if (hit) return hit;
+          }
+
+          return list[0] || null;
+        }
+
+        // Normal single-country dial code: keep existing preference rule
         const preferredName = PREFERRED_COUNTRY_BY_DIAL[dialCode];
         if (preferredName) {
           const hit = list.find((c) => (c.text || "").includes(preferredName));
@@ -883,8 +1042,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const normalized = normalizePhoneE164ish(rawValue);
         if (!normalized) return { ok: false, message: REQUIRED_MSG };
 
-        const digitsOnly = normalized.replace(/\D/g, "");
-        if (digitsOnly.length > 15)
+        const digitsOnlyVal = normalized.replace(/\D/g, "");
+        if (digitsOnlyVal.length > 15)
           return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
 
         if (parsePhoneNumberFromString) {
@@ -903,7 +1062,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!dialCode) return { ok: false, message: PHONE_INVALID_FORMAT_MSG };
 
         const dialDigits = dialCode.replace(/\D/g, "");
-        const nationalDigits = Math.max(0, digitsOnly.length - dialDigits.length);
+        const nationalDigits = Math.max(0, digitsOnlyVal.length - dialDigits.length);
 
         if (nationalDigits === 0) return { ok: false, message: REQUIRED_MSG };
 
@@ -955,30 +1114,33 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const dialCode = findDialMatch(normalized);
-        const currentDial = selectedCountry?.dialCode || "";
-        const dialChanged = dialCode && dialCode !== currentDial;
-
-        if (AsYouTypeCtor) {
-          const fmt = formatWithAsYouType(normalized, "");
-          const detected = fmt?.detectedCountry || "";
-          if (detected && (selectedCountry === null || dialChanged)) {
-            // no-op; dial-code matching below will handle selection
-          }
+        if (!dialCode) {
+          selectedCountry = null;
+          updateCountrySelectionUI(null);
+          return;
         }
 
-        if (dialCode) {
-          if (selectedCountry && selectedCountry.dialCode === dialCode) {
+        // ✅ Shared dial codes: allow switching within same dial code based on prefix while typing
+        if (isSharedDialCode(dialCode)) {
+          const picked = pickDefaultCountryForDial(dialCode, normalized);
+          if (picked && (!selectedCountry || selectedCountry.li !== picked.li)) {
+            selectedCountry = picked;
             updateCountrySelectionUI(selectedCountry);
             return;
           }
-          const picked = pickDefaultCountryForDial(dialCode);
-          selectedCountry = picked;
           updateCountrySelectionUI(selectedCountry);
           return;
         }
 
-        selectedCountry = null;
-        updateCountrySelectionUI(null);
+        // Normal behavior for non-shared dial codes
+        if (selectedCountry && selectedCountry.dialCode === dialCode) {
+          updateCountrySelectionUI(selectedCountry);
+          return;
+        }
+
+        const picked = pickDefaultCountryForDial(dialCode, normalized);
+        selectedCountry = picked;
+        updateCountrySelectionUI(selectedCountry);
       }
 
       phoneCtx = {
@@ -1024,7 +1186,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (!ul) return;
           rebuildCountryIndex(ul);
 
-          // Reapply selected class to the currently selectedCountry (by matching dial + flag text)
+          // Re-resolve selection after rebuild (important for shared dial code swaps)
           if (selectedCountry) {
             const match = countries.find(
               (c) =>
@@ -1033,6 +1195,15 @@ document.addEventListener("DOMContentLoaded", () => {
             );
             if (match) selectedCountry = match;
           }
+
+          // ✅ Allow background re-detect to correct shared dial codes based on input
+          const normalized = normalizePhoneE164ish(phoneInput.value || "");
+          const dial = findDialMatch(normalized);
+          if (dial && isSharedDialCode(dial)) {
+            const picked = pickDefaultCountryForDial(dial, normalized);
+            if (picked) selectedCountry = picked;
+          }
+
           updateCountrySelectionUI(selectedCountry);
         },
       });
