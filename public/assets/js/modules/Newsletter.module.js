@@ -8,14 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!form) return;
 
   // -------------------------
-  // HubSpot endpoint (FormsNext public endpoint)
+  // HubSpot endpoint
+  // ✅ Use the form's action as source of truth
   // -------------------------
-  const HS_PORTAL_ID = "243726556";
-  const HS_FORM_GUID = "a8e00675-911e-492c-807c-4e00fdfff76a";
-  const HS_HUBLET = "na2";
-  const HS_FORMSNEXT_ENDPOINT =
-    `https://forms-${HS_HUBLET}.hsforms.com/submissions/v3/public/submit/formsnext/multipart/` +
-    `${HS_PORTAL_ID}/${HS_FORM_GUID}`;
+  const HS_FORMSNEXT_ENDPOINT = form.getAttribute("action") || "";
+  if (!HS_FORMSNEXT_ENDPOINT) return;
 
   // -------------------------
   // Messages
@@ -28,7 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "This phone number is either invalid or is in the wrong format.";
   const NO_MATCHES_MSG = "No matches found";
 
-  // Global error strings (HubSpot-like)
   const HS_GLOBAL_ERRORS = {
     BLOCKED_EMAIL: "Please change your email address to continue.",
     FIELD_ERRORS: "The form could not be submitted because some fields contain errors.",
@@ -41,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const toArray = (x) => Array.prototype.slice.call(x || []);
   const norm = (s) => (s || "").toString().trim().toLowerCase();
 
-  // Keep a handle to phone validation for submit
   let phoneCtx = null;
 
   // -------------------------
@@ -58,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const parsePhoneNumberFromString = LibPhone?.parsePhoneNumberFromString || null;
 
   // -------------------------
-  // Display helpers (works with inline style="display:none")
+  // Display helpers
   // -------------------------
   function showEl(el) {
     if (!el) return;
@@ -71,30 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
     el.hidden = true;
     el.style.display = "none";
   }
-
-  // -------------------------
-  // Pre-hide all Error/Info/PostSubmit alerts in the form (since HTML is static)
-  // -------------------------
-  function hideInitialAlerts() {
-    const errorEls = form.querySelectorAll(".hsfc-ErrorAlert");
-    errorEls.forEach((el) => {
-      hideEl(el);
-      el.setAttribute("role", el.getAttribute("role") || "alert");
-      el.setAttribute("aria-live", el.getAttribute("aria-live") || "polite");
-    });
-
-    const infoEls = form.querySelectorAll(".hsfc-InfoAlert");
-    infoEls.forEach((el) => {
-      hideEl(el);
-      el.setAttribute("role", el.getAttribute("role") || "status");
-      el.setAttribute("aria-live", el.getAttribute("aria-live") || "polite");
-    });
-
-    // Success block should be hidden on load (usually outside the form)
-    const postSubmit = ROOT.querySelector(".hsfc-PostSubmit");
-    if (postSubmit) hideEl(postSubmit);
-  }
-  hideInitialAlerts();
 
   // -------------------------
   // Form-level error + post-submit helpers
@@ -127,7 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
       hideEl(el);
     }
 
-    // Never show info alert as part of submit/global error flow
     const navAlerts = getNavAlertsEl();
     const info = navAlerts ? navAlerts.querySelector(".hsfc-InfoAlert") : null;
     if (info) {
@@ -136,14 +106,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ✅ NEW BEHAVIOR: hide entire form (display none), show PostSubmit block
   function showPostSubmit() {
     const postSubmit = ROOT.querySelector(".hsfc-PostSubmit");
     if (!postSubmit) return;
 
-    // Hide the whole form
     hideEl(form);
-
     showEl(postSubmit);
 
     try {
@@ -154,13 +121,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function hidePostSubmit() {
     const postSubmit = ROOT.querySelector(".hsfc-PostSubmit");
     if (postSubmit) hideEl(postSubmit);
-
-    // Reveal form again (if user edits/retries)
     showEl(form);
   }
 
   // -------------------------
-  // Error/Info helpers (REUSE existing HTML elements)
+  // Error/Info helpers
   // -------------------------
   function getErrorEl(fieldEl) {
     if (!fieldEl) return null;
@@ -193,14 +158,12 @@ document.addEventListener("DOMContentLoaded", () => {
     hideEl(el);
   }
 
-  // ✅ PATCHED: Email suggestion must NEVER trigger submit/global errors
   function showEmailSuggestion(fieldEl, inputEl, suggestion) {
     const infoEl = getInfoEl(fieldEl);
     if (!infoEl) return;
 
     let btn = infoEl.querySelector(".hsfc-LinkButton") || null;
 
-    // Ensure it is ALWAYS a button, and ALWAYS type="button"
     if (!btn || btn.tagName !== "BUTTON") {
       btn = document.createElement("button");
       btn.className = "hsfc-LinkButton";
@@ -211,13 +174,11 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.type = "button";
     btn.textContent = `Did you mean ${suggestion}?`;
 
-    // Remove previous handlers safely by cloning (keeps DOM clean)
     const newBtn = btn.cloneNode(true);
     newBtn.type = "button";
     btn.parentNode.replaceChild(newBtn, btn);
 
     const applySuggestion = (e) => {
-      // Hard-stop submit-like behavior + bubbling into form listeners
       if (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -239,8 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     newBtn.addEventListener("click", applySuggestion);
-
-    // Extra safety: Enter/Space while focused must not submit the form
     newBtn.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") applySuggestion(e);
     });
@@ -264,8 +223,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const parent = offsetParentEl || optionsEl.offsetParent || anchorEl.offsetParent;
     if (!parent) return;
-
-    // CSS owns position/z-index/width; JS only controls top/bottom placement logic.
 
     const prevDisplay = optionsEl.style.display;
     const prevVisibility = optionsEl.style.visibility;
@@ -326,17 +283,12 @@ document.addEventListener("DOMContentLoaded", () => {
     offsetParentEl,
     onOpen,
     onClose,
-    onListRestored, // called whenever the "real" UL is restored (fresh clone)
+    onListRestored,
   }) {
     let isOpen = false;
 
-    // Keep a template of the original full list (for restore)
     const originalListTemplate = listEl ? listEl.cloneNode(true) : null;
-
-    // Track whether we're currently showing the No Matches UL
     let showingNoMatches = false;
-
-    // Current list reference (may be swapped)
     let currentListEl = listEl;
 
     function setExpanded(v) {
@@ -375,7 +327,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function restoreFullList() {
       if (!originalListTemplate || !currentListEl) return;
 
-      // If we're already on a full list (not no-matches), still ensure bindings exist.
       if (!showingNoMatches) {
         bindOptionItems();
         return;
@@ -386,10 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
       currentListEl = restored;
       showingNoMatches = false;
 
-      // Rebind option item handlers (new nodes)
       bindOptionItems();
-
-      // Let the caller rebuild maps/selections if needed
       if (typeof onListRestored === "function") onListRestored(currentListEl);
     }
 
@@ -404,7 +352,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function applyFilter() {
-      // Always start from the full list so filtering is correct
       restoreFullList();
 
       const query = norm(searchEl?.value || "");
@@ -418,17 +365,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const anyVisible = items.some((li) => li && li.style.display !== "none");
-
-      if (!anyVisible) {
-        showNoMatchesList();
-      }
+      if (!anyVisible) showNoMatchesList();
     }
 
     function clearSearchAndNormalizeList() {
-      if (searchEl) {
-        searchEl.value = "";
-      }
-      // Restore full list and clear any "display:none" filtering
+      if (searchEl) searchEl.value = "";
       restoreFullList();
 
       const items = currentListEl
@@ -449,7 +390,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         positionDropdownOptions(optionsEl, anchorElForPosition || toggleEl, offsetParentEl);
 
-        // Always normalize list state on open
         clearSearchAndNormalizeList();
         bindOptionItems();
         if (typeof onListRestored === "function") onListRestored(currentListEl);
@@ -464,7 +404,6 @@ document.addEventListener("DOMContentLoaded", () => {
         optionsEl.style.display = "none";
         setExpanded(false);
 
-        // Requirement: on close, restore original list for next open
         clearSearchAndNormalizeList();
         bindOptionItems();
         if (typeof onListRestored === "function") onListRestored(currentListEl);
@@ -502,7 +441,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (searchEl) {
       searchEl.addEventListener("input", applyFilter);
-
       searchEl.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
           e.preventDefault();
@@ -512,13 +450,10 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Initial bind
     bindOptionItems();
-
     return api;
   }
 
-  // Close dropdowns on outside click/tap
   document.addEventListener("pointerdown", (e) => {
     if (!openDropdowns.size) return;
     for (const dd of openDropdowns) {
@@ -527,12 +462,10 @@ document.addEventListener("DOMContentLoaded", () => {
     closeAllDropdowns(null);
   });
 
-  // Close dropdowns on Escape anywhere
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeAllDropdowns(null);
   });
 
-  // Reposition open dropdowns on resize/scroll
   window.addEventListener("resize", () => {
     for (const dd of openDropdowns) dd.reposition();
   });
@@ -561,7 +494,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cityField && cityCombobox && cityOptions && cityList) {
       let cityTouched = false;
 
-      // ✅ FIX: never reuse stale <li> references; always re-query the live UL
       function getLiveCityListEl() {
         return cityOptions.querySelector('ul[role="listbox"]');
       }
@@ -576,7 +508,6 @@ document.addEventListener("DOMContentLoaded", () => {
         cityCombobox.value = value;
         cityHidden.value = value;
 
-        // Update selected styles on the LIVE list only
         const items = getLiveCityOptionEls();
         items.forEach((item) => {
           const selected = item.textContent.trim() === value;
@@ -613,7 +544,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         },
 
-        // After restore, ensure selected state reflects hidden value (live UL passed)
         onListRestored: (ul) => {
           if (!ul) return;
           const value = (cityHidden.value || "").trim();
@@ -642,9 +572,7 @@ document.addEventListener("DOMContentLoaded", () => {
         clearFormError();
       });
 
-      if (cityHidden.value.trim()) {
-        clearError(cityField, cityCombobox);
-      }
+      if (cityHidden.value.trim()) clearError(cityField, cityCombobox);
     }
   }
 
@@ -663,6 +591,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const phoneSearch = phoneOptions?.querySelector?.('input[role="searchbox"]');
 
     if (phoneField && phoneInput && phoneUI && flagAndCaret && phoneOptions && phoneList) {
+      // ✅ NEW: manual selection lock so shared-code typing logic doesn't override dropdown selection
+      let manualCountryLock = false;
+
       function parseDialCode(text) {
         const m = (text || "").trim().match(/\+[\d]+$/);
         return m ? m[0] : "";
@@ -741,6 +672,14 @@ document.addEventListener("DOMContentLoaded", () => {
         return out.filter(Boolean).join(" ");
       }
 
+      // dynamic dial list
+      let dialCodesSortedDesc = [];
+
+      function findDialMatch(v) {
+        if (!v) return "";
+        return dialCodesSortedDesc.find((dc) => v.startsWith(dc)) || "";
+      }
+
       function formatPhoneDisplayFallback(normalized) {
         if (!normalized) return "";
         const dialCode = findDialMatch(normalized);
@@ -786,7 +725,6 @@ document.addEventListener("DOMContentLoaded", () => {
         };
       }
 
-      // Preference: if multiple countries share dial code, choose this by default
       const PREFERRED_COUNTRY_BY_DIAL = {
         "+1": "United States",
         "+7": "Russia",
@@ -807,9 +745,6 @@ document.addEventListener("DOMContentLoaded", () => {
       };
       const DEFAULT_MIN_NATIONAL_DIGITS = 7;
 
-      // -------------------------
-      // ✅ Shared-country dial code detection (libphonenumber first, then prefix rules)
-      // -------------------------
       function digitsOnly(s) {
         return (s || "").toString().replace(/\D/g, "");
       }
@@ -821,7 +756,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return dAll.slice(dDial.length);
       }
 
-      // --- +1 NANP overrides (your patch) ---
       const CANADA_AREA_CODES = new Set([
         "204","226","236","249","250","263","289","306","343","354","365","367","368",
         "403","416","418","431","437","438","450","468","474","506","514","519","548",
@@ -833,32 +767,26 @@ document.addEventListener("DOMContentLoaded", () => {
         { countryName: "Puerto Rico", areaCodes: new Set(["787", "939"]) },
         { countryName: "Dominican Republic", areaCodes: new Set(["809", "829", "849"]) },
         { countryName: "Canada", areaCodes: CANADA_AREA_CODES }
-        // else -> United States
       ];
 
       const ISO2_TO_COUNTRY_NAME = {
-        // +1 plan
         US: "United States",
         CA: "Canada",
         PR: "Puerto Rico",
         DO: "Dominican Republic",
 
-        // +7
         RU: "Russia",
         KZ: "Kazakhstan",
 
-        // +44
         GB: "United Kingdom",
         JE: "Jersey",
         GG: "Guernsey",
         IM: "Isle of Man",
 
-        // +61
         AU: "Australia",
         CX: "Christmas Island",
         CC: "Cocos (Keeling) Islands",
 
-        // +672 (best-effort)
         NF: "Norfolk Island",
         AQ: "Australian Antarctic Territory",
       };
@@ -872,7 +800,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       function detectCountryNameForDial(dialCode, normalizedPlusDigits) {
-        // 1) Best source-of-truth: libphonenumber (if available)
         if (parsePhoneNumberFromString) {
           try {
             const parsed = parsePhoneNumberFromString(normalizedPlusDigits);
@@ -882,7 +809,6 @@ document.addEventListener("DOMContentLoaded", () => {
           } catch (_) {}
         }
 
-        // 2) Fallback prefix logic by dialCode (works while typing / partial)
         const nat = nationalDigitsFromE164ish(dialCode, normalizedPlusDigits);
 
         if (dialCode === "+1") {
@@ -896,15 +822,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (dialCode === "+7") {
-          // Common heuristic: Kazakhstan uses +7 6xx and +7 7xx ranges; Russia is most other ranges.
           const first = (nat || "")[0] || "";
           if (first === "6" || first === "7") return "Kazakhstan";
           return "Russia";
         }
 
         if (dialCode === "+44") {
-          // Crown dependencies have distinct geographic prefixes:
-          // Jersey: 1534, Guernsey: 1481, Isle of Man: 1624
           if ((nat || "").startsWith("1534")) return "Jersey";
           if ((nat || "").startsWith("1481")) return "Guernsey";
           if ((nat || "").startsWith("1624")) return "Isle of Man";
@@ -912,16 +835,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (dialCode === "+61") {
-          // Territories within +61:
-          // Cocos (Keeling) Islands: 8 9162 xxxx  -> nat starts "89162"
-          // Christmas Island:        8 9164 xxxx  -> nat starts "89164"
           if ((nat || "").startsWith("89162")) return "Cocos (Keeling) Islands";
           if ((nat || "").startsWith("89164")) return "Christmas Island";
           return "Australia";
         }
 
         if (dialCode === "+672") {
-          // Norfolk Island is commonly +672 3xxxxxx; Australian Antarctic Territory often +672 1xxxx
           const first = (nat || "")[0] || "";
           if (first === "1") return "Australian Antarctic Territory";
           if (first === "3") return "Norfolk Island";
@@ -932,15 +851,19 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       function isSharedDialCode(dialCode) {
-        return dialCode === "+1" || dialCode === "+7" || dialCode === "+44" || dialCode === "+61" || dialCode === "+672";
+        return (
+          dialCode === "+1" ||
+          dialCode === "+7" ||
+          dialCode === "+44" ||
+          dialCode === "+61" ||
+          dialCode === "+672"
+        );
       }
 
-      // Dynamic country index (rebuilt when UL is restored)
       let countryLis = [];
       let countries = [];
       let countriesByDial = new Map();
       let countryByLi = new Map();
-      let dialCodesSortedDesc = [];
       let selectedCountry = null;
 
       function rebuildCountryIndex(ul) {
@@ -972,7 +895,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       }
 
-      // initial build
       rebuildCountryIndex(phoneList);
 
       function updateCountrySelectionUI(country) {
@@ -988,11 +910,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (flagSpan) flagSpan.textContent = country?.display || "";
       }
 
-      function findDialMatch(v) {
-        if (!v) return "";
-        return dialCodesSortedDesc.find((dc) => v.startsWith(dc)) || "";
-      }
-
       function pickCountryByNameAndDial(dialCode, countryName) {
         if (!dialCode || !countryName) return null;
         const list = countriesByDial.get(dialCode) || [];
@@ -1004,23 +921,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const list = countriesByDial.get(dialCode) || [];
         if (!list.length) return null;
 
-        // ✅ Shared-country dial codes: resolve by country name (libphonenumber -> prefix fallback)
         if (isSharedDialCode(dialCode)) {
           const name = detectCountryNameForDial(dialCode, normalizedPlusDigits || "");
           const byName = pickCountryByNameAndDial(dialCode, name);
           if (byName) return byName;
 
-          // fallback to preferred default per dial code
           const preferredName = PREFERRED_COUNTRY_BY_DIAL[dialCode];
           if (preferredName) {
             const hit = list.find((c) => (c.text || "").includes(preferredName));
             if (hit) return hit;
           }
-
           return list[0] || null;
         }
 
-        // Normal single-country dial code: keep existing preference rule
         const preferredName = PREFERRED_COUNTRY_BY_DIAL[dialCode];
         if (preferredName) {
           const hit = list.find((c) => (c.text || "").includes(preferredName));
@@ -1073,8 +986,13 @@ document.addEventListener("DOMContentLoaded", () => {
         return { ok: true, message: "" };
       }
 
-      function setSelectedCountry(country, rewriteInputPrefix) {
+      function setSelectedCountry(country, rewriteInputPrefix, isManualPick) {
         selectedCountry = country || null;
+
+        if (isManualPick) {
+          manualCountryLock = true;
+        }
+
         updateCountrySelectionUI(selectedCountry);
 
         if (rewriteInputPrefix && selectedCountry) {
@@ -1108,6 +1026,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const normalized = normalizePhoneE164ish(phoneInput.value || "");
 
         if (!normalized) {
+          manualCountryLock = false;
           selectedCountry = null;
           updateCountrySelectionUI(null);
           return;
@@ -1115,12 +1034,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const dialCode = findDialMatch(normalized);
         if (!dialCode) {
+          manualCountryLock = false;
           selectedCountry = null;
           updateCountrySelectionUI(null);
           return;
         }
 
-        // ✅ Shared dial codes: allow switching within same dial code based on prefix while typing
+        // If user changed dial code, unlock manual selection
+        if (selectedCountry && selectedCountry.dialCode !== dialCode) {
+          manualCountryLock = false;
+        }
+
+        // ✅ Key fix:
+        // If user manually selected a country and dial code is shared,
+        // DO NOT override their selection while dial code remains the same.
+        if (
+          isSharedDialCode(dialCode) &&
+          manualCountryLock &&
+          selectedCountry &&
+          selectedCountry.dialCode === dialCode
+        ) {
+          updateCountrySelectionUI(selectedCountry);
+          return;
+        }
+
+        // Typing-based detection (shared dial codes) only when not locked
         if (isSharedDialCode(dialCode)) {
           const picked = pickDefaultCountryForDial(dialCode, normalized);
           if (picked && (!selectedCountry || selectedCountry.li !== picked.li)) {
@@ -1151,7 +1089,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       };
 
-      // Initial sync
+      // Initial sync (typing logic applies on load)
       {
         const normalized = normalizePhoneE164ish(phoneInput.value || "");
         syncCountryFromInput();
@@ -1170,7 +1108,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         onSelect: (li) => {
           const c = countryByLi.get(li) || null;
-          setSelectedCountry(c, true);
+          // ✅ Manual selection should win; lock it
+          setSelectedCountry(c, true, true);
         },
 
         anchorElForPosition: phoneUI,
@@ -1181,12 +1120,10 @@ document.addEventListener("DOMContentLoaded", () => {
           clearFormError();
         },
 
-        // When UL restores, rebuild indices and reapply selected UI
         onListRestored: (ul) => {
           if (!ul) return;
           rebuildCountryIndex(ul);
 
-          // Re-resolve selection after rebuild (important for shared dial code swaps)
           if (selectedCountry) {
             const match = countries.find(
               (c) =>
@@ -1196,41 +1133,32 @@ document.addEventListener("DOMContentLoaded", () => {
             if (match) selectedCountry = match;
           }
 
-          // ✅ Allow background re-detect to correct shared dial codes based on input
-          const normalized = normalizePhoneE164ish(phoneInput.value || "");
-          const dial = findDialMatch(normalized);
-          if (dial && isSharedDialCode(dial)) {
-            const picked = pickDefaultCountryForDial(dial, normalized);
-            if (picked) selectedCountry = picked;
+          // ✅ Do NOT auto-switch shared-dial selections if user manually picked
+          if (!manualCountryLock) {
+            const normalized = normalizePhoneE164ish(phoneInput.value || "");
+            const dial = findDialMatch(normalized);
+            if (dial && isSharedDialCode(dial)) {
+              const picked = pickDefaultCountryForDial(dial, normalized);
+              if (picked) selectedCountry = picked;
+            }
           }
 
           updateCountrySelectionUI(selectedCountry);
         },
       });
 
-      // Hard block unwanted characters:
       phoneInput.addEventListener("keydown", (e) => {
         if (e.ctrlKey || e.metaKey) return;
 
         const k = e.key;
         const okKeys = [
-          "Backspace",
-          "Delete",
-          "ArrowLeft",
-          "ArrowRight",
-          "ArrowUp",
-          "ArrowDown",
-          "Home",
-          "End",
-          "Tab",
-          "Enter",
-          "Escape",
+          "Backspace","Delete","ArrowLeft","ArrowRight","ArrowUp","ArrowDown",
+          "Home","End","Tab","Enter","Escape",
         ];
         if (okKeys.includes(k)) return;
 
         if (k >= "0" && k <= "9") return;
 
-        // block manual spaces always
         if (k === " ") {
           e.preventDefault();
           return;
@@ -1276,6 +1204,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let next = current.slice(0, start) + insert + current.slice(end);
         const normalized = normalizePhoneE164ish(next);
 
+        // Typing-based behavior applies, but won't override manual lock
         syncCountryFromInput();
 
         const fmt = autoFormatPhone(normalized, "");
@@ -1367,36 +1296,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const COMMON_EMAIL_DOMAINS = [
-    "gmail.com",
-    "yahoo.com",
-    "yahoo.com.ph",
-    "ymail.com",
-    "outlook.com",
-    "hotmail.com",
-    "live.com",
-    "icloud.com",
-    "me.com",
-    "proton.me",
-    "protonmail.com",
-    "aol.com",
-    "gmx.com",
+    "gmail.com","yahoo.com","yahoo.com.ph","ymail.com","outlook.com","hotmail.com",
+    "live.com","icloud.com","me.com","proton.me","protonmail.com","aol.com","gmx.com",
   ];
 
   const COMMON_TLDS = [
-    "com",
-    "net",
-    "org",
-    "edu",
-    "gov",
-    "io",
-    "co",
-    "me",
-    "ph",
-    "asia",
-    "info",
-    "biz",
-    "app",
-    "dev",
+    "com","net","org","edu","gov","io","co","me","ph","asia","info","biz","app","dev",
   ];
 
   function levenshtein(a, b) {
@@ -1532,10 +1437,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (checkboxInput) {
     const field = checkboxInput.closest(".hsfc-CheckboxField");
 
-    checkboxInput.value = checkboxInput.checked ? "true" : "false";
-
     checkboxInput.addEventListener("change", () => {
-      checkboxInput.value = checkboxInput.checked ? "true" : "false";
       if (checkboxInput.checked) clearError(field, checkboxInput);
       clearFormError();
       hidePostSubmit();
@@ -1588,13 +1490,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function hsSubmitToHubSpot() {
-    // Build FormData from form (captures hidden inputs too)
     const fd = new FormData(form);
 
-    // Ensure hs_context exists + fresh
     fd.set("hs_context", hsBuildContextJSON());
 
-    // Make checkbox unambiguous for HS
     if (checkboxInput) {
       fd.set(checkboxInput.name, checkboxInput.checked ? "true" : "false");
     }
@@ -1605,7 +1504,6 @@ document.addEventListener("DOMContentLoaded", () => {
       body: fd,
     });
 
-    // Try JSON first, then text
     let payload = null;
     const contentType = res.headers.get("content-type") || "";
     try {
@@ -1624,11 +1522,9 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener(
     "submit",
     async (e) => {
-      // ALWAYS handle submit here
       e.preventDefault();
       e.stopPropagation();
 
-      // Ensure success screen is hidden while interacting
       hidePostSubmit();
 
       const invalidTargets = [];
@@ -1702,7 +1598,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // ❌ Client validation fail: only show global error (no postsubmit)
       if (invalidTargets.length) {
         closeAllDropdowns(null);
         showFormError(HS_GLOBAL_ERRORS.MISSING_REQUIRED);
@@ -1710,7 +1605,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // ✅ Valid: submit to HubSpot
       closeAllDropdowns(null);
       clearFormError();
       setButtonLoading(true);
@@ -1719,12 +1613,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const { res, payload } = await hsSubmitToHubSpot();
 
         if (res.ok) {
-          // ✅ SUCCESS: hide whole form, show PostSubmit (no in-between messages)
           showPostSubmit();
           return;
         }
 
-        // ❌ ERROR: show ONLY global error (never PostSubmit)
         if (res.status === 429) {
           showFormError(HS_GLOBAL_ERRORS.TOO_MANY_REQUESTS);
           return;
