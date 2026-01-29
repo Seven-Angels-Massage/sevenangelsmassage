@@ -414,7 +414,12 @@
 [data-hsfc-id=Renderer] .hsfc-ErrorAlert {
   margin-top: -10px;
 }
-/* Get Updates - CTA Button */
+[data-hsfc-id=Renderer] .hsfc-LinkButton {
+  color: #00008b !important;
+}
+[data-hsfc-id=Renderer] .hsfc-LinkButton:hover {
+  text-decoration: underline !important;
+}
 [data-hsfc-id=Renderer] .hsfc-NavigationRow {
   margin-top:30px !important;
 }
