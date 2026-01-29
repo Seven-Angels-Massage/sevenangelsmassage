@@ -1,4 +1,12 @@
 // /assets/js/modules/Newsletter.module.js
+// Merged version:
+// ✅ Keeps LIVE script behaviors (incl. First Name listeners + required UX)
+// ✅ Keeps latest improvements:
+//    - showEl/hideEl used consistently (prebuilt HTML nodes, style.display = "")
+//    - Prevent Enter in dropdown search from submitting form
+//    - Email strict validation + typo suggestion: gentle on blur, strict on submit
+//    - DNS MX/A check is "lighter": only for domains NOT in COMMON_EMAIL_DOMAINS
+// ✅ Assumes you removed aria-hidden="true" from HTML; JS relies on hidden + display only.
 
 document.addEventListener("DOMContentLoaded", () => {
   const ROOT = document.querySelector(".newsletter-form");
@@ -54,6 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // -------------------------
   // Display helpers
+  // ✅ HTML is prebuilt with style="display:none;" where needed
+  // ✅ Use style.display = "" when showing prebuilt nodes
   // -------------------------
   function showEl(el) {
     if (!el) return;
@@ -174,6 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.type = "button";
     btn.textContent = `Did you mean ${suggestion}?`;
 
+    // Rebind safely
     const newBtn = btn.cloneNode(true);
     newBtn.type = "button";
     btn.parentNode.replaceChild(newBtn, btn);
@@ -385,7 +396,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         closeAllDropdowns(api);
 
-        optionsEl.style.display = "";
+        showEl(optionsEl);
         setExpanded(true);
 
         positionDropdownOptions(optionsEl, anchorElForPosition || toggleEl, offsetParentEl);
@@ -401,7 +412,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!isOpen) return;
         isOpen = false;
 
-        optionsEl.style.display = "none";
+        hideEl(optionsEl);
         setExpanded(false);
 
         clearSearchAndNormalizeList();
@@ -441,7 +452,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (searchEl) {
       searchEl.addEventListener("input", applyFilter);
+
+      // ✅ Prevent Enter inside dropdown search from submitting the form
       searchEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof e.stopImmediatePropagation === "function")
+            e.stopImmediatePropagation();
+          return;
+        }
+
         if (e.key === "Escape") {
           e.preventDefault();
           api.close();
@@ -591,7 +612,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const phoneSearch = phoneOptions?.querySelector?.('input[role="searchbox"]');
 
     if (phoneField && phoneInput && phoneUI && flagAndCaret && phoneOptions && phoneList) {
-      // ✅ NEW: manual selection lock so shared-code typing logic doesn't override dropdown selection
+      // ✅ manual selection lock so shared-code typing logic doesn't override dropdown selection
       let manualCountryLock = false;
 
       function parseDialCode(text) {
@@ -1045,7 +1066,6 @@ document.addEventListener("DOMContentLoaded", () => {
           manualCountryLock = false;
         }
 
-        // ✅ Key fix:
         // If user manually selected a country and dial code is shared,
         // DO NOT override their selection while dial code remains the same.
         if (
@@ -1108,7 +1128,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         onSelect: (li) => {
           const c = countryByLi.get(li) || null;
-          // ✅ Manual selection should win; lock it
           setSelectedCountry(c, true, true);
         },
 
@@ -1133,7 +1152,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (match) selectedCountry = match;
           }
 
-          // ✅ Do NOT auto-switch shared-dial selections if user manually picked
+          // Do NOT auto-switch shared-dial selections if user manually picked
           if (!manualCountryLock) {
             const normalized = normalizePhoneE164ish(phoneInput.value || "");
             const dial = findDialMatch(normalized);
@@ -1204,7 +1223,6 @@ document.addEventListener("DOMContentLoaded", () => {
         let next = current.slice(0, start) + insert + current.slice(end);
         const normalized = normalizePhoneE164ish(next);
 
-        // Typing-based behavior applies, but won't override manual lock
         syncCountryFromInput();
 
         const fmt = autoFormatPhone(normalized, "");
@@ -1270,7 +1288,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // First Name
+  // First Name (KEEP LIVE BEHAVIOR)
   // -------------------------
   const firstNameInput = form.querySelector('input[name="0-1/firstname"]');
   if (firstNameInput) {
@@ -1286,7 +1304,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -------------------------
-  // Email validation + suggestion
+  // Email: strict format + suggestion + DNS existence check (submit only)
+  // Option B: Gentle on blur (suggest only), strict on submit (block if needed)
+  // ✅ Lighter: DNS check only if domain NOT in COMMON_EMAIL_DOMAINS
   // -------------------------
   function isEmailBasicFormat(v) {
     const s = (v || "").trim();
@@ -1384,6 +1404,74 @@ document.addEventListener("DOMContentLoaded", () => {
     return COMMON_TLDS.includes(tld);
   }
 
+  function getEmailDomain(email) {
+    const v = (email || "").trim();
+    const at = v.lastIndexOf("@");
+    if (at <= 0) return "";
+    return v.slice(at + 1).trim().toLowerCase();
+  }
+
+  function isEmailStrictEnough(email) {
+    const v = (email || "").trim();
+    if (!v) return { ok: false, reason: "required" };
+    if (v.length > 254) return { ok: false, reason: "format" };
+
+    const at = v.lastIndexOf("@");
+    if (at <= 0 || at === v.length - 1) return { ok: false, reason: "format" };
+
+    const local = v.slice(0, at);
+    const domain = v.slice(at + 1);
+
+    if (!local || !domain) return { ok: false, reason: "format" };
+    if (local.length > 64) return { ok: false, reason: "format" };
+
+    if (/\s/.test(v)) return { ok: false, reason: "format" };
+
+    if (local.startsWith(".") || local.endsWith(".")) return { ok: false, reason: "format" };
+    if (domain.startsWith(".") || domain.endsWith(".")) return { ok: false, reason: "format" };
+
+    if (v.includes("..")) return { ok: false, reason: "format" };
+
+    if (!domain.includes(".")) return { ok: false, reason: "format" };
+
+    if (!isEmailBasicFormat(v)) return { ok: false, reason: "format" };
+
+    return { ok: true, reason: "" };
+  }
+
+  async function checkDomainHasMxOrA(domain, timeoutMs = 2500) {
+    if (!domain) return false;
+
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), timeoutMs);
+
+    async function query(type) {
+      const url = `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(
+        domain
+      )}&type=${encodeURIComponent(type)}`;
+      const res = await fetch(url, {
+        method: "GET",
+        headers: { Accept: "application/dns-json" },
+        signal: controller.signal,
+      });
+      if (!res.ok) throw new Error("dns_http");
+      const json = await res.json();
+      if (json && json.Status === 0 && Array.isArray(json.Answer) && json.Answer.length > 0) {
+        return true;
+      }
+      return false;
+    }
+
+    try {
+      const hasMx = await query("MX");
+      if (hasMx) return true;
+      const hasA = await query("A");
+      return !!hasA;
+    } finally {
+      clearTimeout(t);
+    }
+  }
+
   const emailInput = form.querySelector('input[name="0-1/email"]');
   if (emailInput) {
     const field = emailInput.closest(".hsfc-EmailField");
@@ -1399,26 +1487,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const v = emailInput.value.trim();
       clearInfo(field);
 
-      if (!v) {
-        showError(field, emailInput, REQUIRED_MSG);
+      // On blur: only show required/format errors (not the typo as a hard error)
+      const strict = isEmailStrictEnough(v);
+      if (!strict.ok) {
+        if (strict.reason === "required") showError(field, emailInput, REQUIRED_MSG);
+        else showError(field, emailInput, EMAIL_INVALID_FORMAT_MSG);
         return;
       }
 
-      if (typeof emailInput.checkValidity === "function" && !emailInput.checkValidity()) {
-        showError(field, emailInput, EMAIL_INVALID_MSG);
-        return;
-      }
-
-      if (!isEmailBasicFormat(v)) {
-        showError(field, emailInput, EMAIL_INVALID_FORMAT_MSG);
-        return;
-      }
-
+      // Gentle suggestion on blur (no red error)
       const suggestion = getEmailSuggestion(v);
       const tldIsKnown = isKnownCommonTld(v);
 
       if (!tldIsKnown && suggestion) {
-        showError(field, emailInput, `Email address ${v} is invalid`);
+        clearError(field, emailInput);
         showEmailSuggestion(field, emailInput, suggestion);
         return;
       }
@@ -1530,7 +1612,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const invalidTargets = [];
       clearFormError();
 
-      // First Name
+      // First Name (use the already-cached reference from LIVE section)
       if (firstNameInput) {
         const field = firstNameInput.closest(".hsfc-TextField");
         if (!firstNameInput.value.trim()) {
@@ -1559,32 +1641,45 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Email
+      // Email (strict + suggestion gate + lighter DNS)
       if (emailInput) {
         const field = emailInput.closest(".hsfc-EmailField");
         const v = emailInput.value.trim();
 
         clearInfo(field);
 
-        if (!v) {
-          showError(field, emailInput, REQUIRED_MSG);
-          invalidTargets.push(emailInput);
-        } else if (
-          typeof emailInput.checkValidity === "function" &&
-          !emailInput.checkValidity()
-        ) {
-          showError(field, emailInput, EMAIL_INVALID_MSG);
-          invalidTargets.push(emailInput);
-        } else if (!isEmailBasicFormat(v)) {
-          showError(field, emailInput, EMAIL_INVALID_FORMAT_MSG);
+        const strict = isEmailStrictEnough(v);
+        if (!strict.ok) {
+          if (strict.reason === "required") showError(field, emailInput, REQUIRED_MSG);
+          else showError(field, emailInput, EMAIL_INVALID_FORMAT_MSG);
           invalidTargets.push(emailInput);
         } else {
           const suggestion = getEmailSuggestion(v);
           const tldIsKnown = isKnownCommonTld(v);
+
+          // On submit: if strong typo suggestion exists, block until corrected
           if (!tldIsKnown && suggestion) {
-            showError(field, emailInput, `Email address ${v} is invalid`);
+            showError(field, emailInput, EMAIL_INVALID_MSG);
             showEmailSuggestion(field, emailInput, suggestion);
             invalidTargets.push(emailInput);
+          } else {
+            const domain = getEmailDomain(v);
+
+            // ✅ Lighter: only DNS-check unknown domains (skip Gmail/Yahoo/Outlook/etc.)
+            const shouldDnsCheck =
+              !!domain && !COMMON_EMAIL_DOMAINS.includes(domain.toLowerCase());
+
+            if (shouldDnsCheck) {
+              try {
+                const hasMxOrA = await checkDomainHasMxOrA(domain);
+                if (!hasMxOrA) {
+                  showError(field, emailInput, EMAIL_INVALID_MSG);
+                  invalidTargets.push(emailInput);
+                }
+              } catch (_) {
+                // Soft-pass on DNS failures (blocked/timeout) so we don't reject legit users.
+              }
+            }
           }
         }
       }
