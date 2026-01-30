@@ -43,10 +43,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/healthz', (req, res) => {
-  res.type('text/plain').send('OK');
-});
-
 /**
  * 3) Special headers for the vCard file
  *    Matches your _headers block exactly.
