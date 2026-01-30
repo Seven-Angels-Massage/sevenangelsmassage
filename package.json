@@ -1,0 +1,16 @@
+{
+  "name": "sevenangelsmassage",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Seven Angels Massage static site served by Node for Render Web Service backup.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
