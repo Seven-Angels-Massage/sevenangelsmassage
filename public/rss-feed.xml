@@ -13,7 +13,7 @@
     <image>
       <title>Seven Angels Massage (SAM)</title>
       <link>https://www.sevenangelsmassage.com/</link>
-      <!-- TODO: replace IMAGE-URL-GOES-HERE with the actual logo URL on your site -->
+      <!-- Replace this URL if you move or change your logo -->
       <url>https://www.sevenangelsmassage.com/assets/media/Seven%20Angels%20Massage%20Logo.webp</url>
       <width>500</width>
       <height>500</height>
@@ -23,7 +23,7 @@
     <copyright>Copyright © Seven Angels Massage</copyright>
     <generator>Custom RSS feed for Seven Angels Massage</generator>
     <!-- Update this whenever you do a major content change -->
-    <lastBuildDate>Fri, 31 Jan 2025 10:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 31 Jan 2026 12:00:00 GMT</lastBuildDate>
     <ttl>60</ttl>
 
     <!-- Home -->
@@ -31,9 +31,9 @@
       <title>Home – Seven Angels Massage (SAM)</title>
       <link>https://www.sevenangelsmassage.com/</link>
       <guid isPermaLink="true">https://www.sevenangelsmassage.com/</guid>
-      <pubDate>Fri, 31 Jan 2025 10:00:00 GMT</pubDate>
+      <pubDate>Fri, 31 Jan 2026 10:00:00 GMT</pubDate>
       <description>
-        Seven Angels Massage (SAM) – 24/7 mobile massage in Manila &amp; Makati. Relaxation and pleasure within heaven's touch, anywhere in Metro Manila.
+        Seven Angels Massage (SAM) – 24/7 mobile massage in Manila &amp; Makati. Relaxation and pleasure within heaven’s touch, anywhere in Metro Manila.
       </description>
     </item>
 
@@ -42,7 +42,7 @@
       <title>About Us – Meet Seven Angels Massage</title>
       <link>https://www.sevenangelsmassage.com/about-us</link>
       <guid isPermaLink="true">https://www.sevenangelsmassage.com/about-us</guid>
-      <pubDate>Fri, 31 Jan 2025 10:00:00 GMT</pubDate>
+      <pubDate>Fri, 31 Jan 2026 10:00:00 GMT</pubDate>
       <description>
         Learn about Seven Angels Massage (SAM), our professional therapists, our mission, and how we serve guests in Manila &amp; Makati 24 hours a day.
       </description>
@@ -51,9 +51,9 @@
     <!-- Services -->
     <item>
       <title>Services – Mobile Massage Treatments</title>
-      <link>https://www.sevenangelsmassage.com#services</link>
-      <guid isPermaLink="true">https://www.sevenangelsmassage.com#services</guid>
-      <pubDate>Fri, 31 Jan 2025 10:00:00 GMT</pubDate>
+      <link>https://www.sevenangelsmassage.com/#services</link>
+      <guid isPermaLink="true">https://www.sevenangelsmassage.com/#services</guid>
+      <pubDate>Fri, 31 Jan 2026 10:00:00 GMT</pubDate>
       <description>
         Explore our core massage services tailored for hotel, condo, and home visits in Metro Manila – from relaxing full-body sessions to focused stress relief.
       </description>
@@ -64,7 +64,7 @@
       <title>Services Details – Packages, Durations &amp; Rates</title>
       <link>https://www.sevenangelsmassage.com/services-details</link>
       <guid isPermaLink="true">https://www.sevenangelsmassage.com/services-details</guid>
-      <pubDate>Fri, 31 Jan 2025 10:00:00 GMT</pubDate>
+      <pubDate>Fri, 31 Jan 2026 10:00:00 GMT</pubDate>
       <description>
         See detailed information about Seven Angels Massage (SAM) packages, session lengths, inclusions, and pricing for on-call treatments in Metro Manila.
       </description>
@@ -75,7 +75,7 @@
       <title>Contact Us – Book or Inquire</title>
       <link>https://www.sevenangelsmassage.com/contact-us</link>
       <guid isPermaLink="true">https://www.sevenangelsmassage.com/contact-us</guid>
-      <pubDate>Fri, 31 Jan 2025 10:00:00 GMT</pubDate>
+      <pubDate>Fri, 31 Jan 2026 10:00:00 GMT</pubDate>
       <description>
         Contact Seven Angels Massage (SAM) to book your next massage or ask questions about our services. Fast response for on-call sessions within Metro Manila.
       </description>
@@ -84,20 +84,20 @@
     <!-- Reviews -->
     <item>
       <title>Reviews – What Clients Say About Seven Angels Massage</title>
-      <link>https://www.sevenangelsmassage.com#reviews</link>
-      <guid isPermaLink="true">https://www.sevenangelsmassage.com#reviews</guid>
-      <pubDate>Fri, 31 Jan 2025 10:00:00 GMT</pubDate>
+      <link>https://www.sevenangelsmassage.com/#reviews</link>
+      <guid isPermaLink="true">https://www.sevenangelsmassage.com/#reviews</guid>
+      <pubDate>Fri, 31 Jan 2026 10:00:00 GMT</pubDate>
       <description>
         Read feedback and testimonials from real clients who experienced Seven Angels Massage (SAM) mobile services in Manila &amp; Makati.
       </description>
     </item>
 
-    <!-- Articles -->
+    <!-- Articles (index page) -->
     <item>
       <title>Articles – Tips, Guides &amp; Wellness Notes</title>
       <link>https://www.sevenangelsmassage.com/articles</link>
       <guid isPermaLink="true">https://www.sevenangelsmassage.com/articles</guid>
-      <pubDate>Fri, 31 Jan 2025 10:00:00 GMT</pubDate>
+      <pubDate>Fri, 31 Jan 2026 10:00:00 GMT</pubDate>
       <description>
         Articles and resources from Seven Angels Massage (SAM) about massage, relaxation, and wellness for guests in Metro Manila.
       </description>
@@ -106,11 +106,44 @@
     <!-- Book Now -->
     <item>
       <title>Book Now – Schedule a Mobile Massage</title>
-      <link>https://www.sevenangelsmassage.com#book-now</link>
-      <guid isPermaLink="true">https://www.sevenangelsmassage.com#book-now</guid>
-      <pubDate>Fri, 31 Jan 2025 10:00:00 GMT</pubDate>
+      <link>https://www.sevenangelsmassage.com/#book-now</link>
+      <guid isPermaLink="true">https://www.sevenangelsmassage.com/#book-now</guid>
+      <pubDate>Fri, 31 Jan 2026 10:00:00 GMT</pubDate>
       <description>
         Go directly to the booking section to reserve your Seven Angels Massage (SAM) session – 24/7 on-call service for homes, condos, and hotels in Metro Manila.
+      </description>
+    </item>
+
+    <!-- ARTICLE: Swedish vs Deep Tissue -->
+    <item>
+      <title>Swedish vs Deep Tissue Massage – Which Do I Need?</title>
+      <link>https://www.sevenangelsmassage.com/articles/swedish-vs-deep-tissue-which-do-i-need</link>
+      <guid isPermaLink="true">https://www.sevenangelsmassage.com/articles/swedish-vs-deep-tissue-which-do-i-need</guid>
+      <pubDate>Sun, 09 Nov 2025 10:00:00 GMT</pubDate>
+      <description>
+        Not sure whether to book Swedish or deep tissue massage? Learn the differences in pressure, purpose, and ideal use-cases so you can choose the right treatment for your body.
+      </description>
+    </item>
+
+    <!-- ARTICLE: Hotel Outcall Massage – What to Expect -->
+    <item>
+      <title>Hotel Outcall Massage – What to Expect</title>
+      <link>https://www.sevenangelsmassage.com/articles/hotel-outcall-massage-what-to-expect</link>
+      <guid isPermaLink="true">https://www.sevenangelsmassage.com/articles/hotel-outcall-massage-what-to-expect</guid>
+      <pubDate>Sat, 08 Nov 2025 10:00:00 GMT</pubDate>
+      <description>
+        First time booking a hotel outcall massage in Manila or Makati? This guide walks you through how it works, what our therapists bring, and simple etiquette so your session feels smooth and comfortable.
+      </description>
+    </item>
+
+    <!-- ARTICLE: Best Times to Book Mobile Massage in Makati -->
+    <item>
+      <title>Best Times to Book a Mobile Massage in Makati</title>
+      <link>https://www.sevenangelsmassage.com/articles/best-times-to-book-mobile-massage-makati</link>
+      <guid isPermaLink="true">https://www.sevenangelsmassage.com/articles/best-times-to-book-mobile-massage-makati</guid>
+      <pubDate>Fri, 07 Nov 2025 10:00:00 GMT</pubDate>
+      <description>
+        Discover the best times of day and week to schedule a mobile massage in Makati – avoid traffic, secure your preferred time slot, and get the most relaxing experience possible.
       </description>
     </item>
 

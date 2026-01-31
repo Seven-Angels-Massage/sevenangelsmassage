@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Seven Angels Massage (SAM) – Articles &amp; Guides</title>
+  <id>https://www.sevenangelsmassage.com/</id>
+  <link rel="alternate" href="https://www.sevenangelsmassage.com/"/>
+  <link rel="self" href="https://www.sevenangelsmassage.com/atom.xml"/>
+  <updated>2026-01-31T10:00:00Z</updated>
+  <author>
+    <name>Seven Angels Massage (SAM)</name>
+    <uri>https://www.sevenangelsmassage.com/</uri>
+  </author>
+
+  <!-- Entry: Articles index -->
+  <entry>
+    <title>Articles – Tips, Guides &amp; Wellness Notes</title>
+    <id>https://www.sevenangelsmassage.com/articles</id>
+    <link href="https://www.sevenangelsmassage.com/articles"/>
+    <updated>2026-01-31T10:00:00Z</updated>
+    <summary>
+      Browse all massage articles, tips, and wellness guides from Seven Angels Massage (SAM).
+    </summary>
+    <content type="html">
+      <![CDATA[
+        <p>
+          Explore all <strong>Seven Angels Massage (SAM)</strong> guides on
+          mobile massage, hotel outcalls, and relaxation in Metro Manila.
+        </p>
+      ]]>
+    </content>
+  </entry>
+
+  <!-- Entry: Swedish vs Deep Tissue -->
+  <entry>
+    <title>Swedish vs Deep Tissue – Which Massage Do I Need?</title>
+    <id>https://www.sevenangelsmassage.com/articles/swedish-vs-deep-tissue-which-do-i-need</id>
+    <link href="https://www.sevenangelsmassage.com/articles/swedish-vs-deep-tissue-which-do-i-need"/>
+    <updated>2025-11-09T10:00:00Z</updated>
+    <summary>
+      Learn the difference between Swedish and deep tissue massage, and how to pick the best option for your body.
+    </summary>
+    <content type="html">
+      <![CDATA[
+        <p>
+          Unsure whether to choose <strong>Swedish</strong> or
+          <strong>deep tissue</strong> massage? This guide explains how each
+          style works, who it’s for, and when to combine them in one session
+          with Seven Angels Massage (SAM).
+        </p>
+      ]]>
+    </content>
+  </entry>
+
+  <!-- Entry: Hotel Outcall -->
+  <entry>
+    <title>Hotel Outcall Massage – What to Expect</title>
+    <id>https://www.sevenangelsmassage.com/articles/hotel-outcall-massage-what-to-expect</id>
+    <link href="https://www.sevenangelsmassage.com/articles/hotel-outcall-massage-what-to-expect"/>
+    <updated>2025-11-08T10:00:00Z</updated>
+    <summary>
+      A step-by-step look at how hotel outcall massage works in Manila and Makati.
+    </summary>
+    <content type="html">
+      <![CDATA[
+        <p>
+          From booking to check-out, this article walks you through how a
+          <strong>hotel outcall massage</strong> with Seven Angels Massage
+          (SAM) works, what to prepare, and how we keep everything
+          professional and comfortable.
+        </p>
+      ]]>
+    </content>
+  </entry>
+
+  <!-- Entry: Best times to book in Makati -->
+  <entry>
+    <title>Best Times to Book a Mobile Massage in Makati</title>
+    <id>https://www.sevenangelsmassage.com/articles/best-times-to-book-mobile-massage-makati</id>
+    <link href="https://www.sevenangelsmassage.com/articles/best-times-to-book-mobile-massage-makati"/>
+    <updated>2025-11-07T10:00:00Z</updated>
+    <summary>
+      When Makati is buzzing, your body is tired. Here’s when to schedule a mobile massage for maximum calm.
+    </summary>
+    <content type="html">
+      <![CDATA[
+        <p>
+          This guide helps you pick the <strong>best times of day</strong>
+          to book a mobile massage in Makati, taking into account traffic,
+          building quiet hours, and your own work schedule.
+        </p>
+      ]]>
+    </content>
+  </entry>
+</feed>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <!-- Core channel info -->
+    <title>Seven Angels Massage (SAM) – Articles &amp; Guides</title>
+    <link>https://www.sevenangelsmassage.com/</link>
+    <description>
+      Expert articles from Seven Angels Massage (SAM) about mobile massage,
+      hotel outcalls, and relaxation tips for guests in Manila, Makati, and
+      across Metro Manila.
+    </description>
+    <language>en-us</language>
+
+    <!-- Channel image / logo -->
+    <image>
+      <title>Seven Angels Massage (SAM)</title>
+      <link>https://www.sevenangelsmassage.com/</link>
+      <!-- Update this URL if you move or rename the logo -->
+      <url>https://www.sevenangelsmassage.com/assets/media/Seven%20Angels%20Massage%20Logo.webp</url>
+      <width>500</width>
+      <height>500</height>
+    </image>
+
+    <!-- Feed metadata -->
+    <copyright>Copyright © Seven Angels Massage</copyright>
+    <generator>Custom RSS feed for Seven Angels Massage – Articles</generator>
+    <!-- TODO: bump this whenever you update / add articles -->
+    <lastBuildDate>Fri, 31 Jan 2026 10:00:00 GMT</lastBuildDate>
+    <ttl>60</ttl>
+
+    <!-- === ARTICLES INDEX PAGE === -->
+    <item>
+      <title>Articles – Tips, Guides &amp; Wellness Notes</title>
+      <link>https://www.sevenangelsmassage.com/articles</link>
+      <guid isPermaLink="true">https://www.sevenangelsmassage.com/articles</guid>
+      <pubDate>Fri, 31 Jan 2025 10:00:00 GMT</pubDate>
+      <description>
+        Browse all massage articles, tips, and wellness guides from Seven Angels Massage (SAM).
+      </description>
+      <content:encoded><![CDATA[
+        <p>
+          Explore the full library of articles from
+          <strong>Seven Angels Massage (SAM)</strong>, including guides on
+          choosing the right massage, what to expect during a hotel outcall,
+          and timing your bookings for the best experience in Metro Manila.
+        </p>
+      ]]></content:encoded>
+    </item>
+
+    <!-- === ARTICLE 1: Swedish vs Deep Tissue === -->
+    <item>
+      <title>Swedish vs Deep Tissue – Which Massage Do I Need?</title>
+      <link>https://www.sevenangelsmassage.com/articles/swedish-vs-deep-tissue-which-do-i-need</link>
+      <guid isPermaLink="true">
+        https://www.sevenangelsmassage.com/articles/swedish-vs-deep-tissue-which-do-i-need
+      </guid>
+      <!-- TODO: replace with the real publish date if you have it -->
+      <pubDate>Sun, 09 Nov 2025 10:00:00 GMT</pubDate>
+      <description>
+        Not sure whether to book Swedish or deep tissue? Learn the difference,
+        who each style is best for, and how to choose the right massage for
+        your body.
+      </description>
+      <content:encoded><![CDATA[
+        <p>
+          If you’ve ever stared at a menu wondering whether you need
+          <strong>Swedish</strong> or <strong>deep tissue</strong> massage,
+          you’re not alone. Both are full-body treatments, but they work at
+          different depths and have different goals.
+        </p>
+        <ul>
+          <li><strong>Swedish massage</strong> – gentle, flowing strokes to
+              relax the nervous system, improve circulation, and melt away
+              everyday stress.</li>
+          <li><strong>Deep tissue massage</strong> – slower, more focused
+              pressure aimed at stubborn tightness, knots, and chronic
+              tension in the muscles.</li>
+        </ul>
+        <p>
+          As a simple rule: choose <strong>Swedish</strong> for general
+          relaxation, jet lag, or post-work stress. Choose
+          <strong>deep tissue</strong> if you have intense muscle tightness,
+          long hours at a desk, or nagging shoulder and back pain.
+        </p>
+        <p>
+          Our therapists at <strong>Seven Angels Massage (SAM)</strong> can
+          also blend both styles in one session, so you get soothing
+          relaxation where you need it and deeper work where it matters.
+        </p>
+      ]]></content:encoded>
+    </item>
+
+    <!-- === ARTICLE 2: Hotel Outcall Massage === -->
+    <item>
+      <title>Hotel Outcall Massage – What to Expect</title>
+      <link>https://www.sevenangelsmassage.com/articles/hotel-outcall-massage-what-to-expect</link>
+      <guid isPermaLink="true">
+        https://www.sevenangelsmassage.com/articles/hotel-outcall-massage-what-to-expect
+      </guid>
+      <!-- TODO: replace with the real publish date if you have it -->
+      <pubDate>Sat, 08 Nov 2025 10:00:00 GMT</pubDate>
+      <description>
+        First time booking a hotel outcall massage in Manila or Makati?
+        Here’s a simple walkthrough of how it works – from booking to
+        checkout.
+      </description>
+      <content:encoded><![CDATA[
+        <p>
+          A <strong>hotel outcall massage</strong> brings the spa straight
+          to your room, so you never have to fight traffic or queue for an
+          appointment. Perfect after flights, events, or long workdays.
+        </p>
+        <ol>
+          <li><strong>Book your session</strong> – choose your hotel, room
+              number, time, and preferred massage style.</li>
+          <li><strong>Therapist arrival</strong> – your therapist arrives
+              discreetly with the essentials, confirms your details, and
+              sets up quickly so you can relax.</li>
+          <li><strong>Session flow</strong> – you enjoy your chosen
+              treatment in the comfort of your own room, with the freedom to
+              shower and rest right after.</li>
+        </ol>
+        <p>
+          With <strong>Seven Angels Massage (SAM)</strong>, all sessions are
+          handled by professional, trained therapists who respect your
+          privacy, time, and hotel rules – so your only job is to relax.
+        </p>
+      ]]></content:encoded>
+    </item>
+
+    <!-- === ARTICLE 3: Best Times to Book in Makati === -->
+    <item>
+      <title>Best Times to Book a Mobile Massage in Makati</title>
+      <link>https://www.sevenangelsmassage.com/articles/best-times-to-book-mobile-massage-makati</link>
+      <guid isPermaLink="true">
+        https://www.sevenangelsmassage.com/articles/best-times-to-book-mobile-massage-makati
+      </guid>
+      <!-- TODO: replace with the real publish date if you have it -->
+      <pubDate>Fri, 07 Nov 2025 10:00:00 GMT</pubDate>
+      <description>
+        Planning a massage around Makati’s traffic and your schedule?
+        Discover the best times of day to book a mobile massage for maximum
+        calm and minimal hassle.
+      </description>
+      <content:encoded><![CDATA[
+        <p>
+          Makati never really sleeps – but your body still needs rest.
+          Choosing the <strong>right time to book</strong> a mobile massage
+          can make the difference between a rushed session and a deeply
+          restorative one.
+        </p>
+        <ul>
+          <li><strong>Early evenings</strong> – perfect after work, before
+              dinner or drinks, while traffic calms down.</li>
+          <li><strong>Late nights</strong> – ideal for post-shift workers,
+              BPO schedules, and guests heading into a reset day.</li>
+          <li><strong>Weekday off-peak hours</strong> – quieter building
+              hallways and faster therapist travel times.</li>
+        </ul>
+        <p>
+          At <strong>Seven Angels Massage (SAM)</strong>, we operate
+          <strong>24/7</strong>, so you can schedule a session when it fits
+          your energy, your work cycle, and Makati’s traffic life.
+        </p>
+      ]]></content:encoded>
+    </item>
+
+  </channel>
+</rss>
