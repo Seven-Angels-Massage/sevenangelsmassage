@@ -322,11 +322,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }) {
     let isOpen = false;
 
-    // IMPORTANT:
-    // To make the highlight visible even if your CSS doesn't know "--active",
-    // we apply BOTH:
-    // - ACTIVE_CLASS (new)
-    // - and aria-current="true" (often styled by existing CSS)
     const ACTIVE_CLASS = "hsfc-DropdownOptions__List__ListItem--active";
 
     const originalListTemplate = listEl ? listEl.cloneNode(true) : null;
@@ -361,6 +356,34 @@ document.addEventListener("DOMContentLoaded", () => {
       activeIndex = -1;
     }
 
+    function focusActiveIfInsideList() {
+      // ✅ KEY FIX:
+      // If the user is navigating with ArrowUp/Down while focus is already inside the dropdown,
+      // we move focus to the active <li> so your existing CSS (:focus) highlights it.
+      const ae = document.activeElement;
+      if (!ae) return;
+
+      // If user is typing in search, NEVER steal focus.
+      if (searchEl && ae === searchEl) return;
+
+      // Only do this if focus is inside this dropdown options panel
+      if (!optionsEl || !optionsEl.contains(ae)) return;
+
+      const visible = getVisibleOptionItems();
+      if (!visible.length) return;
+
+      const target = activeIndex >= 0 ? visible[activeIndex] : visible[0];
+      if (!target || typeof target.focus !== "function") return;
+
+      try {
+        target.focus({ preventScroll: true });
+      } catch (_) {
+        try {
+          target.focus();
+        } catch (_) {}
+      }
+    }
+
     function setActiveByIndex(idx) {
       const items = getVisibleOptionItems();
       if (!items.length) {
@@ -376,6 +399,8 @@ document.addEventListener("DOMContentLoaded", () => {
         li.removeAttribute("aria-current");
       });
 
+      // ✅ Make sure the li ends up like:
+      // "hsfc-DropdownOptions__List__ListItem hsfc-DropdownOptions__List__ListItem--active"
       items[clamped].classList.add(ACTIVE_CLASS);
       items[clamped].setAttribute("aria-current", "true");
       activeIndex = clamped;
@@ -383,6 +408,8 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         items[clamped].scrollIntoView({ block: "nearest" });
       } catch (_) {}
+
+      focusActiveIfInsideList();
     }
 
     function setActiveToSelectedOrFirst() {
@@ -426,6 +453,13 @@ document.addEventListener("DOMContentLoaded", () => {
         li.dataset.newsletterBound = "1";
 
         li.addEventListener("pointermove", () => {
+          const vis = getVisibleOptionItems();
+          const idx = vis.indexOf(li);
+          if (idx >= 0) setActiveByIndex(idx);
+        });
+
+        // ✅ When a user tabs/focuses an item, sync active marker too
+        li.addEventListener("focus", () => {
           const vis = getVisibleOptionItems();
           const idx = vis.indexOf(li);
           if (idx >= 0) setActiveByIndex(idx);
@@ -495,7 +529,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Reset highlight after filtering
       setActiveToSelectedOrFirst();
     }
 
@@ -506,7 +539,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const items = getOptionItems();
       items.forEach((li) => (li.style.display = ""));
 
-      // Only set active when OPENING (not when closing)
       if (opening) setActiveToSelectedOrFirst();
       else clearActive();
     }
@@ -596,6 +628,60 @@ document.addEventListener("DOMContentLoaded", () => {
         if (didSelect) api.close();
       }
     });
+
+    // ✅ KEY FIX (your missing piece):
+    // ArrowUp/ArrowDown must work even when focus is on <li> / list area.
+    // We capture it at the dropdown options container.
+    optionsEl.addEventListener(
+      "keydown",
+      (e) => {
+        if (!isOpen) return;
+
+        // If typing in the search box, let the search handler manage it
+        if (searchEl && e.target === searchEl) return;
+
+        // Don’t interfere with Tab navigation
+        if (e.key === "Tab") return;
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof e.stopImmediatePropagation === "function")
+            e.stopImmediatePropagation();
+          moveActive(+1);
+          return;
+        }
+
+        if (e.key === "ArrowUp") {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof e.stopImmediatePropagation === "function")
+            e.stopImmediatePropagation();
+          moveActive(-1);
+          return;
+        }
+
+        if (e.key === "Enter" || e.key === " ") {
+          // ✅ Enter selects active option, never submits form
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof e.stopImmediatePropagation === "function")
+            e.stopImmediatePropagation();
+          const didSelect = selectActive();
+          if (didSelect) api.close();
+          return;
+        }
+
+        if (e.key === "Escape") {
+          e.preventDefault();
+          api.close();
+          try {
+            toggleEl.focus();
+          } catch (_) {}
+        }
+      },
+      true // capture
+    );
 
     if (searchEl) {
       searchEl.addEventListener("input", applyFilter);
@@ -865,7 +951,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!normalized) return "";
         const dialCode = findDialMatch(normalized);
 
-        // ✅ FIXED: this line used to be a syntax error: "remember normalized;"
         // If we can't detect dial code, just show what we have.
         if (!dialCode) return normalized;
 
@@ -1519,7 +1604,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return { best, score: bestScore };
   }
 
-  // ✅ This is where provider-typo suggestions come from (gmal.com -> gmail.com)
   function getEmailSuggestion(email) {
     const v = (email || "").trim();
     const at = v.lastIndexOf("@");
@@ -1529,16 +1613,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const domain = v.slice(at + 1).toLowerCase();
     if (!local || !domain) return null;
 
-    // already correct common domain? no suggestion.
     if (COMMON_EMAIL_DOMAINS.includes(domain)) return null;
 
-    // 1) provider-domain typo fix
     const domainMatch = bestCloseMatch(domain, COMMON_EMAIL_DOMAINS);
     if (domainMatch.best && domainMatch.score <= 2) {
       return `${local}@${domainMatch.best}`;
     }
 
-    // 2) tld typo fix (gmal.con -> gmail.com)
     const parts = domain.split(".");
     if (parts.length >= 2) {
       const tld = parts[parts.length - 1];
@@ -1637,7 +1718,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const v = emailInput.value.trim();
       clearInfo(field);
 
-      // On blur: required/format errors only
       const strict = isEmailStrictEnough(v);
       if (!strict.ok) {
         if (strict.reason === "required") showError(field, emailInput, REQUIRED_MSG);
@@ -1645,8 +1725,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // ✅ Gentle suggestion on blur (no red error)
-      // This now covers BOTH provider typos (gmal.com) and tld typos (gmail.con)
       const suggestion = getEmailSuggestion(v);
 
       if (suggestion && suggestion.toLowerCase() !== v.toLowerCase()) {
