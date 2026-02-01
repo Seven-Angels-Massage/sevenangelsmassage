@@ -322,6 +322,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }) {
     let isOpen = false;
 
+    // IMPORTANT:
+    // To make the highlight visible even if your CSS doesn't know "--active",
+    // we apply BOTH:
+    // - ACTIVE_CLASS (new)
+    // - and aria-current="true" (often styled by existing CSS)
     const ACTIVE_CLASS = "hsfc-DropdownOptions__List__ListItem--active";
 
     const originalListTemplate = listEl ? listEl.cloneNode(true) : null;
@@ -349,7 +354,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function clearActive() {
       const items = getOptionItems();
-      items.forEach((li) => li.classList.remove(ACTIVE_CLASS));
+      items.forEach((li) => {
+        li.classList.remove(ACTIVE_CLASS);
+        li.removeAttribute("aria-current");
+      });
       activeIndex = -1;
     }
 
@@ -360,25 +368,39 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const clamped =
-        ((idx % items.length) + items.length) % items.length;
+      const clamped = ((idx % items.length) + items.length) % items.length;
 
-      // remove on all
-      getOptionItems().forEach((li) => li.classList.remove(ACTIVE_CLASS));
+      // Remove active from all
+      getOptionItems().forEach((li) => {
+        li.classList.remove(ACTIVE_CLASS);
+        li.removeAttribute("aria-current");
+      });
 
       items[clamped].classList.add(ACTIVE_CLASS);
+      items[clamped].setAttribute("aria-current", "true");
       activeIndex = clamped;
 
-      // keep it visible if list scrolls
       try {
         items[clamped].scrollIntoView({ block: "nearest" });
       } catch (_) {}
     }
 
+    function setActiveToSelectedOrFirst() {
+      const visible = getVisibleOptionItems();
+      if (!visible.length) {
+        clearActive();
+        return;
+      }
+      const selectedIdx = visible.findIndex(
+        (li) => li.getAttribute("aria-selected") === "true"
+      );
+      setActiveByIndex(selectedIdx >= 0 ? selectedIdx : 0);
+    }
+
     function moveActive(delta) {
       const items = getVisibleOptionItems();
       if (!items.length) return;
-      if (activeIndex < 0) setActiveByIndex(0);
+      if (activeIndex < 0) setActiveToSelectedOrFirst();
       else setActiveByIndex(activeIndex + delta);
     }
 
@@ -386,7 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const items = getVisibleOptionItems();
       if (!items.length) return false;
 
-      if (activeIndex < 0) setActiveByIndex(0);
+      if (activeIndex < 0) setActiveToSelectedOrFirst();
       const target = items[Math.max(0, activeIndex)];
 
       if (target && typeof onSelect === "function") {
@@ -404,7 +426,6 @@ document.addEventListener("DOMContentLoaded", () => {
         li.dataset.newsletterBound = "1";
 
         li.addEventListener("pointermove", () => {
-          // hover updates active for better UX
           const vis = getVisibleOptionItems();
           const idx = vis.indexOf(li);
           if (idx >= 0) setActiveByIndex(idx);
@@ -474,19 +495,20 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // reset active to first visible after filtering
-      setActiveByIndex(0);
+      // Reset highlight after filtering
+      setActiveToSelectedOrFirst();
     }
 
-    function clearSearchAndNormalizeList() {
+    function clearSearchAndNormalizeList(opening = false) {
       if (searchEl) searchEl.value = "";
       restoreFullList();
 
       const items = getOptionItems();
       items.forEach((li) => (li.style.display = ""));
 
-      // default active to first option when opening
-      setActiveByIndex(0);
+      // Only set active when OPENING (not when closing)
+      if (opening) setActiveToSelectedOrFirst();
+      else clearActive();
     }
 
     const api = {
@@ -501,7 +523,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         positionDropdownOptions(optionsEl, anchorElForPosition || toggleEl, offsetParentEl);
 
-        clearSearchAndNormalizeList();
+        clearSearchAndNormalizeList(true);
         bindOptionItems();
         if (typeof onListRestored === "function") onListRestored(currentListEl);
 
@@ -515,7 +537,7 @@ document.addEventListener("DOMContentLoaded", () => {
         hideEl(optionsEl);
         setExpanded(false);
 
-        clearSearchAndNormalizeList();
+        clearSearchAndNormalizeList(false);
         bindOptionItems();
         if (typeof onListRestored === "function") onListRestored(currentListEl);
 
@@ -564,9 +586,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Enter/Space:
-      // - if open: select active option and close
-      // - if closed: open
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         if (!isOpen) {
@@ -755,7 +774,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const phoneSearch = phoneOptions?.querySelector?.('input[role="searchbox"]');
 
     if (phoneField && phoneInput && phoneUI && flagAndCaret && phoneOptions && phoneList) {
-      // ✅ manual selection lock so shared-code typing logic doesn't override dropdown selection
       let manualCountryLock = false;
 
       function parseDialCode(text) {
@@ -836,7 +854,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return out.filter(Boolean).join(" ");
       }
 
-      // dynamic dial list
       let dialCodesSortedDesc = [];
 
       function findDialMatch(v) {
@@ -847,7 +864,10 @@ document.addEventListener("DOMContentLoaded", () => {
       function formatPhoneDisplayFallback(normalized) {
         if (!normalized) return "";
         const dialCode = findDialMatch(normalized);
-        if (!dialCode) remember normalized;
+
+        // ✅ FIXED: this line used to be a syntax error: "remember normalized;"
+        // If we can't detect dial code, just show what we have.
+        if (!dialCode) return normalized;
 
         const digitsAll = normalized.replace(/\D/g, "");
         const dialDigits = dialCode.replace(/\D/g, "");
@@ -1204,13 +1224,10 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // If user changed dial code, unlock manual selection
         if (selectedCountry && selectedCountry.dialCode !== dialCode) {
           manualCountryLock = false;
         }
 
-        // If user manually selected a country and dial code is shared,
-        // DO NOT override their selection while dial code remains the same.
         if (
           isSharedDialCode(dialCode) &&
           manualCountryLock &&
@@ -1221,7 +1238,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Typing-based detection (shared dial codes) only when not locked
         if (isSharedDialCode(dialCode)) {
           const picked = pickDefaultCountryForDial(dialCode, normalized);
           if (picked && (!selectedCountry || selectedCountry.li !== picked.li)) {
@@ -1233,7 +1249,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Normal behavior for non-shared dial codes
         if (selectedCountry && selectedCountry.dialCode === dialCode) {
           updateCountrySelectionUI(selectedCountry);
           return;
@@ -1252,7 +1267,6 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       };
 
-      // Initial sync (typing logic applies on load)
       {
         const normalized = normalizePhoneE164ish(phoneInput.value || "");
         syncCountryFromInput();
@@ -1295,7 +1309,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (match) selectedCountry = match;
           }
 
-          // Do NOT auto-switch shared-dial selections if user manually picked
           if (!manualCountryLock) {
             const normalized = normalizePhoneE164ish(phoneInput.value || "");
             const dial = findDialMatch(normalized);
@@ -1450,7 +1463,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Email: strict format + suggestion + DNS existence check (submit only)
   // Option B: Gentle on blur (suggest only), strict on submit (block if needed)
   // ✅ Lighter: DNS check only if domain NOT in COMMON_EMAIL_DOMAINS
-  // ✅ FIX: suggestion now shows for gmal.com / hotnail.com etc on blur
+  // ✅ FIX: suggestion shows for provider typos (gmal.com, hotnail.com, etc.)
   // -------------------------
   function isEmailBasicFormat(v) {
     const s = (v || "").trim();
@@ -1506,6 +1519,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return { best, score: bestScore };
   }
 
+  // ✅ This is where provider-typo suggestions come from (gmal.com -> gmail.com)
   function getEmailSuggestion(email) {
     const v = (email || "").trim();
     const at = v.lastIndexOf("@");
@@ -1515,13 +1529,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const domain = v.slice(at + 1).toLowerCase();
     if (!local || !domain) return null;
 
+    // already correct common domain? no suggestion.
     if (COMMON_EMAIL_DOMAINS.includes(domain)) return null;
 
+    // 1) provider-domain typo fix
     const domainMatch = bestCloseMatch(domain, COMMON_EMAIL_DOMAINS);
     if (domainMatch.best && domainMatch.score <= 2) {
       return `${local}@${domainMatch.best}`;
     }
 
+    // 2) tld typo fix (gmal.con -> gmail.com)
     const parts = domain.split(".");
     if (parts.length >= 2) {
       const tld = parts[parts.length - 1];
@@ -1629,9 +1646,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // ✅ Gentle suggestion on blur (no red error)
+      // This now covers BOTH provider typos (gmal.com) and tld typos (gmail.con)
       const suggestion = getEmailSuggestion(v);
 
-      // Show suggestion whenever we have one (fixes gmal.com case)
       if (suggestion && suggestion.toLowerCase() !== v.toLowerCase()) {
         clearError(field, emailInput);
         showEmailSuggestion(field, emailInput, suggestion);
@@ -1751,7 +1768,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const invalidTargets = [];
       clearFormError();
 
-      // First Name (use the already-cached reference from LIVE section)
+      // First Name
       if (firstNameInput) {
         const field = firstNameInput.closest(".hsfc-TextField");
         if (!firstNameInput.value.trim()) {
