@@ -349,37 +349,60 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function clearActive() {
       const items = getOptionItems();
-      items.forEach((li) => li.classList.remove(ACTIVE_CLASS));
+      items.forEach((li) => {
+        li.classList.remove(ACTIVE_CLASS);
+        li.tabIndex = -1;
+      });
       activeIndex = -1;
     }
 
-    function setActiveByIndex(idx) {
+    function focusActiveOption() {
+      const items = getVisibleOptionItems();
+      if (!items.length) return;
+
+      const li = items[Math.max(0, activeIndex)];
+      if (!li) return;
+
+      try {
+        li.focus({ preventScroll: true });
+      } catch (_) {
+        try { li.focus(); } catch (_) {}
+      }
+    }
+
+    function setActiveByIndex(idx, { focus = false } = {}) {
       const items = getVisibleOptionItems();
       if (!items.length) {
         clearActive();
         return;
       }
 
-      const clamped =
-        ((idx % items.length) + items.length) % items.length;
+      const clamped = ((idx % items.length) + items.length) % items.length;
 
-      // remove on all
-      getOptionItems().forEach((li) => li.classList.remove(ACTIVE_CLASS));
+      // reset all options
+      getOptionItems().forEach((li) => {
+       li.classList.remove(ACTIVE_CLASS);
+        li.tabIndex = -1;
+      });
 
+      // set active
       items[clamped].classList.add(ACTIVE_CLASS);
+      items[clamped].tabIndex = 0;
       activeIndex = clamped;
 
       // keep it visible if list scrolls
       try {
         items[clamped].scrollIntoView({ block: "nearest" });
       } catch (_) {}
+
+      if (focus) focusActiveOption();
     }
 
-    function moveActive(delta) {
+    function moveActive(delta, { focus = false } = {}) {
       const items = getVisibleOptionItems();
       if (!items.length) return;
-      if (activeIndex < 0) setActiveByIndex(0);
-      else setActiveByIndex(activeIndex + delta);
+      if (activeIndex < 0) setActiveByIndex(0, { focus });
+      else setActiveByIndex(activeIndex + delta, { focus });
     }
 
     function selectActive() {
@@ -403,8 +426,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (li.dataset.newsletterBound === "1") return;
         li.dataset.newsletterBound = "1";
 
+        // ensure programmatic focus works
+        if (typeof li.tabIndex !== "number" || li.tabIndex >= 0) li.tabIndex = -1;
+
         li.addEventListener("pointermove", () => {
-          // hover updates active for better UX
           const vis = getVisibleOptionItems();
           const idx = vis.indexOf(li);
           if (idx >= 0) setActiveByIndex(idx);
@@ -417,6 +442,22 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         li.addEventListener("keydown", (e) => {
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            moveActive(+1, { focus: true });
+            return;
+          }
+          if (e.key === "ArrowUp") {
+            e.preventDefault();
+            moveActive(-1, { focus: true });
+            return;
+          }
+          if (e.key === "Escape") {
+            e.preventDefault();
+            api.close();
+            toggleEl.focus();
+            return;
+          }
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             if (typeof onSelect === "function") onSelect(li);
@@ -474,7 +515,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // reset active to first visible after filtering
       setActiveByIndex(0);
     }
 
@@ -485,7 +525,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const items = getOptionItems();
       items.forEach((li) => (li.style.display = ""));
 
-      // default active to first option when opening
       setActiveByIndex(0);
     }
 
@@ -506,6 +545,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (typeof onListRestored === "function") onListRestored(currentListEl);
 
         if (typeof onOpen === "function") onOpen();
+
+        // keep current behavior: focus search if present
         if (searchEl) setTimeout(() => searchEl.focus(), 0);
       },
       close() {
@@ -515,7 +556,7 @@ document.addEventListener("DOMContentLoaded", () => {
         hideEl(optionsEl);
         setExpanded(false);
 
-        clearSearchAndNormalizeList();
+       clearSearchAndNormalizeList();
         bindOptionItems();
         if (typeof onListRestored === "function") onListRestored(currentListEl);
 
@@ -553,20 +594,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
         if (!isOpen) api.open();
-        else moveActive(+1);
+        moveActive(+1, { focus: true });
         return;
       }
 
       if (e.key === "ArrowUp") {
         e.preventDefault();
         if (!isOpen) api.open();
-        else moveActive(-1);
+        moveActive(-1, { focus: true });
         return;
       }
 
-      // Enter/Space:
-      // - if open: select active option and close
-      // - if closed: open
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         if (!isOpen) {
@@ -578,10 +616,31 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
+    // Also support arrow keys if focus is anywhere inside the dropdown panel
+    optionsEl.addEventListener("keydown", (e) => {
+      if (!isOpen) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        moveActive(+1, { focus: true });
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        moveActive(-1, { focus: true });
+        return;
+      }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        api.close();
+        toggleEl.focus();
+      }
+    });
+
     if (searchEl) {
       searchEl.addEventListener("input", applyFilter);
 
-      // ✅ Enter selects highlighted option (but never submits form)
+      // ✅ Enter selects active option and NEVER submits the form
       searchEl.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
@@ -596,13 +655,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (e.key === "ArrowDown") {
           e.preventDefault();
-          moveActive(+1);
+          moveActive(+1, { focus: true }); // focus so highlight is visible with your existing CSS
           return;
         }
 
         if (e.key === "ArrowUp") {
           e.preventDefault();
-          moveActive(-1);
+          moveActive(-1, { focus: true });
           return;
         }
 
@@ -1512,25 +1571,46 @@ document.addEventListener("DOMContentLoaded", () => {
     if (at <= 0) return null;
 
     const local = v.slice(0, at);
-    const domain = v.slice(at + 1).toLowerCase();
-    if (!local || !domain) return null;
+    const domainRaw = v.slice(at + 1).toLowerCase().trim();
+    if (!local || !domainRaw) return null;
 
-    if (COMMON_EMAIL_DOMAINS.includes(domain)) return null;
+    // Already correct common domain? no suggestion needed.
+    if (COMMON_EMAIL_DOMAINS.includes(domainRaw)) return null;
 
-    const domainMatch = bestCloseMatch(domain, COMMON_EMAIL_DOMAINS);
+    // --- Provider typo detection (gmal.com -> gmail.com, hotnail.com -> hotmail.com, etc.)
+    // Only do this when domain looks like "something.tld"
+    const parts = domainRaw.split(".");
+    if (parts.length >= 2) {
+      const tld = parts[parts.length - 1];
+      const provider = parts.slice(0, -1).join("."); // supports rare multi-label providers
+
+      // If TLD is common, try matching provider portion against common providers with same TLD
+      if (COMMON_TLDS.includes(tld)) {
+        const sameTldCandidates = COMMON_EMAIL_DOMAINS.filter((d) => d.endsWith("." + tld));
+        const providerCandidates = sameTldCandidates.map((d) => d.slice(0, -(tld.length + 1)));
+
+        const providerMatch = bestCloseMatch(provider, providerCandidates);
+        if (providerMatch.best && providerMatch.score <= 2) {
+          return `${local}@${providerMatch.best}.${tld}`;
+        }
+      }
+    }
+
+    // --- Full-domain fallback (covers odd cases)
+    const domainMatch = bestCloseMatch(domainRaw, COMMON_EMAIL_DOMAINS);
     if (domainMatch.best && domainMatch.score <= 2) {
       return `${local}@${domainMatch.best}`;
     }
 
-    const parts = domain.split(".");
+    // --- TLD typo (gmal.con -> gmail.com)
     if (parts.length >= 2) {
       const tld = parts[parts.length - 1];
       const base = parts.slice(0, -1).join(".");
       const tldMatch = bestCloseMatch(tld, COMMON_TLDS);
 
       if (tldMatch.best && tldMatch.score <= 2) {
-        const suggested = `${base}.${tldMatch.best}`;
-        if (base) return `${local}@${suggested}`;
+        const suggestedDomain = `${base}.${tldMatch.best}`;
+        if (base) return `${local}@${suggestedDomain}`;
       }
     }
 
