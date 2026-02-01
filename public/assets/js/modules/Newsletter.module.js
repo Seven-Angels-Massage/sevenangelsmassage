@@ -1,11 +1,16 @@
 // /assets/js/modules/Newsletter.module.js
-// Merged version:
+// Merged + upgraded version:
 // ✅ Keeps LIVE script behaviors (incl. First Name listeners + required UX)
 // ✅ Keeps latest improvements:
 //    - showEl/hideEl used consistently (prebuilt HTML nodes, style.display = "")
-//    - Prevent Enter in dropdown search from submitting form
+//    - Enter inside dropdown search does NOT submit the form
 //    - Email strict validation + typo suggestion: gentle on blur, strict on submit
 //    - DNS MX/A check is "lighter": only for domains NOT in COMMON_EMAIL_DOMAINS
+// ✅ Adds requested upgrades:
+//    - Arrow-key navigation + Enter-to-select inside dropdown lists
+//    - Soft fallback if HubSpot is blocked (ad blockers/privacy extensions)
+//    - Honeypot field anti-spam (no user friction)
+//
 // ✅ Assumes you removed aria-hidden="true" from HTML; JS relies on hidden + display only.
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -39,6 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
     MISSING_REQUIRED: FORM_REQUIRED_MSG,
     TOO_MANY_REQUESTS:
       "There was an issue submitting your form. Please wait a few seconds and try again.",
+    BLOCKED_ENDPOINT:
+      "We couldn’t submit the form. If you’re using an ad blocker or privacy extension, please try disabling it for a moment, then submit again. You can also try another browser, or message us on Viber/WhatsApp.",
   };
 
   const openDropdowns = new Set();
@@ -46,6 +53,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const norm = (s) => (s || "").toString().trim().toLowerCase();
 
   let phoneCtx = null;
+
+  // -------------------------
+  // Honeypot (anti-spam, zero friction)
+  // -------------------------
+  const honeypot = document.createElement("input");
+  honeypot.type = "text";
+  honeypot.name = "website";
+  honeypot.autocomplete = "off";
+  honeypot.tabIndex = -1;
+  honeypot.setAttribute("aria-hidden", "true");
+  honeypot.style.position = "absolute";
+  honeypot.style.left = "-10000px";
+  honeypot.style.top = "auto";
+  honeypot.style.width = "1px";
+  honeypot.style.height = "1px";
+  honeypot.style.overflow = "hidden";
+  form.appendChild(honeypot);
 
   // -------------------------
   // Optional: libphonenumber-js hooks (if present)
@@ -298,9 +322,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }) {
     let isOpen = false;
 
+    const ACTIVE_CLASS = "hsfc-DropdownOptions__List__ListItem--active";
+
     const originalListTemplate = listEl ? listEl.cloneNode(true) : null;
     let showingNoMatches = false;
     let currentListEl = listEl;
+
+    let activeIndex = -1;
 
     function setExpanded(v) {
       const val = v ? "true" : "false";
@@ -308,14 +336,79 @@ document.addEventListener("DOMContentLoaded", () => {
       if (toggleEl) toggleEl.setAttribute("aria-expanded", val);
     }
 
-    function bindOptionItems() {
-      const items = currentListEl
+    function getOptionItems() {
+      return currentListEl
         ? toArray(currentListEl.querySelectorAll('li[role="option"]'))
         : [];
+    }
+
+    function getVisibleOptionItems() {
+      const items = getOptionItems();
+      return items.filter((li) => li && li.style.display !== "none");
+    }
+
+    function clearActive() {
+      const items = getOptionItems();
+      items.forEach((li) => li.classList.remove(ACTIVE_CLASS));
+      activeIndex = -1;
+    }
+
+    function setActiveByIndex(idx) {
+      const items = getVisibleOptionItems();
+      if (!items.length) {
+        clearActive();
+        return;
+      }
+
+      const clamped =
+        ((idx % items.length) + items.length) % items.length;
+
+      // remove on all
+      getOptionItems().forEach((li) => li.classList.remove(ACTIVE_CLASS));
+
+      items[clamped].classList.add(ACTIVE_CLASS);
+      activeIndex = clamped;
+
+      // keep it visible if list scrolls
+      try {
+        items[clamped].scrollIntoView({ block: "nearest" });
+      } catch (_) {}
+    }
+
+    function moveActive(delta) {
+      const items = getVisibleOptionItems();
+      if (!items.length) return;
+      if (activeIndex < 0) setActiveByIndex(0);
+      else setActiveByIndex(activeIndex + delta);
+    }
+
+    function selectActive() {
+      const items = getVisibleOptionItems();
+      if (!items.length) return false;
+
+      if (activeIndex < 0) setActiveByIndex(0);
+      const target = items[Math.max(0, activeIndex)];
+
+      if (target && typeof onSelect === "function") {
+        onSelect(target);
+        return true;
+      }
+      return false;
+    }
+
+    function bindOptionItems() {
+      const items = getOptionItems();
 
       items.forEach((li) => {
         if (li.dataset.newsletterBound === "1") return;
         li.dataset.newsletterBound = "1";
+
+        li.addEventListener("pointermove", () => {
+          // hover updates active for better UX
+          const vis = getVisibleOptionItems();
+          const idx = vis.indexOf(li);
+          if (idx >= 0) setActiveByIndex(idx);
+        });
 
         li.addEventListener("click", (e) => {
           e.preventDefault();
@@ -360,15 +453,15 @@ document.addEventListener("DOMContentLoaded", () => {
       currentListEl.replaceWith(noUl);
       currentListEl = noUl;
       showingNoMatches = true;
+
+      clearActive();
     }
 
     function applyFilter() {
       restoreFullList();
 
       const query = norm(searchEl?.value || "");
-      const items = currentListEl
-        ? toArray(currentListEl.querySelectorAll('li[role="option"]'))
-        : [];
+      const items = getOptionItems();
 
       items.forEach((li) => {
         const hit = !query || norm(li.textContent).includes(query);
@@ -376,17 +469,24 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const anyVisible = items.some((li) => li && li.style.display !== "none");
-      if (!anyVisible) showNoMatchesList();
+      if (!anyVisible) {
+        showNoMatchesList();
+        return;
+      }
+
+      // reset active to first visible after filtering
+      setActiveByIndex(0);
     }
 
     function clearSearchAndNormalizeList() {
       if (searchEl) searchEl.value = "";
       restoreFullList();
 
-      const items = currentListEl
-        ? toArray(currentListEl.querySelectorAll('li[role="option"]'))
-        : [];
+      const items = getOptionItems();
       items.forEach((li) => (li.style.display = ""));
+
+      // default active to first option when opening
+      setActiveByIndex(0);
     }
 
     const api = {
@@ -421,6 +521,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (typeof onClose === "function") onClose();
         openDropdowns.delete(api);
+
+        clearActive();
       },
       toggle() {
         isOpen ? api.close() : api.open();
@@ -443,23 +545,64 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     toggleEl.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        api.close();
+        return;
+      }
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (!isOpen) api.open();
+        else moveActive(+1);
+        return;
+      }
+
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (!isOpen) api.open();
+        else moveActive(-1);
+        return;
+      }
+
+      // Enter/Space:
+      // - if open: select active option and close
+      // - if closed: open
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        api.toggle();
+        if (!isOpen) {
+          api.open();
+          return;
+        }
+        const didSelect = selectActive();
+        if (didSelect) api.close();
       }
-      if (e.key === "Escape") api.close();
     });
 
     if (searchEl) {
       searchEl.addEventListener("input", applyFilter);
 
-      // ✅ Prevent Enter inside dropdown search from submitting the form
+      // ✅ Enter selects highlighted option (but never submits form)
       searchEl.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
           e.stopPropagation();
           if (typeof e.stopImmediatePropagation === "function")
             e.stopImmediatePropagation();
+
+          const didSelect = selectActive();
+          if (didSelect) api.close();
+          return;
+        }
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          moveActive(+1);
+          return;
+        }
+
+        if (e.key === "ArrowUp") {
+          e.preventDefault();
+          moveActive(-1);
           return;
         }
 
@@ -704,7 +847,7 @@ document.addEventListener("DOMContentLoaded", () => {
       function formatPhoneDisplayFallback(normalized) {
         if (!normalized) return "";
         const dialCode = findDialMatch(normalized);
-        if (!dialCode) return normalized;
+        if (!dialCode) remember normalized;
 
         const digitsAll = normalized.replace(/\D/g, "");
         const dialDigits = dialCode.replace(/\D/g, "");
@@ -1307,6 +1450,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Email: strict format + suggestion + DNS existence check (submit only)
   // Option B: Gentle on blur (suggest only), strict on submit (block if needed)
   // ✅ Lighter: DNS check only if domain NOT in COMMON_EMAIL_DOMAINS
+  // ✅ FIX: suggestion now shows for gmal.com / hotnail.com etc on blur
   // -------------------------
   function isEmailBasicFormat(v) {
     const s = (v || "").trim();
@@ -1393,17 +1537,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return null;
   }
 
-  function isKnownCommonTld(email) {
-    const v = (email || "").trim().toLowerCase();
-    const at = v.lastIndexOf("@");
-    if (at <= 0) return false;
-    const domain = v.slice(at + 1);
-    const parts = domain.split(".");
-    if (parts.length < 2) return false;
-    const tld = parts[parts.length - 1];
-    return COMMON_TLDS.includes(tld);
-  }
-
   function getEmailDomain(email) {
     const v = (email || "").trim();
     const at = v.lastIndexOf("@");
@@ -1487,7 +1620,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const v = emailInput.value.trim();
       clearInfo(field);
 
-      // On blur: only show required/format errors (not the typo as a hard error)
+      // On blur: required/format errors only
       const strict = isEmailStrictEnough(v);
       if (!strict.ok) {
         if (strict.reason === "required") showError(field, emailInput, REQUIRED_MSG);
@@ -1495,11 +1628,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Gentle suggestion on blur (no red error)
+      // ✅ Gentle suggestion on blur (no red error)
       const suggestion = getEmailSuggestion(v);
-      const tldIsKnown = isKnownCommonTld(v);
 
-      if (!tldIsKnown && suggestion) {
+      // Show suggestion whenever we have one (fixes gmal.com case)
+      if (suggestion && suggestion.toLowerCase() !== v.toLowerCase()) {
         clearError(field, emailInput);
         showEmailSuggestion(field, emailInput, suggestion);
         return;
@@ -1609,6 +1742,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       hidePostSubmit();
 
+      // Honeypot filled? Treat as bot and "succeed" silently (reduces spam retries)
+      if (honeypot && honeypot.value && honeypot.value.trim()) {
+        showPostSubmit();
+        return;
+      }
+
       const invalidTargets = [];
       clearFormError();
 
@@ -1655,10 +1794,9 @@ document.addEventListener("DOMContentLoaded", () => {
           invalidTargets.push(emailInput);
         } else {
           const suggestion = getEmailSuggestion(v);
-          const tldIsKnown = isKnownCommonTld(v);
 
-          // On submit: if strong typo suggestion exists, block until corrected
-          if (!tldIsKnown && suggestion) {
+          // ✅ On submit: if suggestion exists, block until user applies it
+          if (suggestion && suggestion.toLowerCase() !== v.toLowerCase()) {
             showError(field, emailInput, EMAIL_INVALID_MSG);
             showEmailSuggestion(field, emailInput, suggestion);
             invalidTargets.push(emailInput);
@@ -1725,8 +1863,9 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           showFormError(HS_GLOBAL_ERRORS.FIELD_ERRORS);
         }
-      } catch (_) {
-        showFormError(HS_GLOBAL_ERRORS.TOO_MANY_REQUESTS);
+      } catch (err) {
+        // ✅ soft fallback: ad blockers / privacy extensions can block HubSpot resources
+        showFormError(HS_GLOBAL_ERRORS.BLOCKED_ENDPOINT);
       } finally {
         setButtonLoading(false);
       }
