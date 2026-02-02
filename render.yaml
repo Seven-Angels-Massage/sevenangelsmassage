@@ -1,0 +1,84 @@
+services:
+  - type: static_site
+    name: sevenangelsmassage
+    branch: main
+    staticPublishPath: ./public
+
+    # Optional but nice: tell Render your canonical domain.
+    # If you list only the www domain here, Render will
+    # automatically add the apex and redirect apex → www
+    # with a 301, similar to Netlify. :contentReference[oaicite:0]{index=0}
+    domains:
+      - www.sevenangelsmassage.com
+
+    routes:
+      # -------- Home normalization --------
+      # /home, /home/, /home/jp, /home/kr, /home/cn … → /
+      - type: redirect
+        source: /home
+        destination: /
+      - type: redirect
+        source: /home/*
+        destination: /
+
+      # -------- About us --------
+      # /about-us/, /about-us/jp, /about-us/kr, /about-us/cn … → /about-us
+      - type: redirect
+        source: /about-us/
+        destination: /about-us
+      - type: redirect
+        source: /about-us/*
+        destination: /about-us
+
+      # -------- Articles --------
+      # /articles/ → /articles
+      - type: redirect
+        source: /articles/
+        destination: /articles
+
+      # -------- Services (homecondo + hotel massage) --------
+      # /homecondo-massage*, /hotel-massage* → /services-details
+      - type: redirect
+        source: /homecondo-massage
+        destination: /services-details
+      - type: redirect
+        source: /homecondo-massage/*
+        destination: /services-details
+      - type: redirect
+        source: /hotel-massage
+        destination: /services-details
+      - type: redirect
+        source: /hotel-massage/*
+        destination: /services-details
+
+      # /services-details/ → /services-details
+      - type: redirect
+        source: /services-details/
+        destination: /services-details
+
+      # -------- Contact us --------
+      # /contact-us/, /contact-us/jp, /contact-us/kr, /contact-us/cn … → /contact-us
+      - type: redirect
+        source: /contact-us/
+        destination: /contact-us
+      - type: redirect
+        source: /contact-us/*
+        destination: /contact-us
+
+      # -------- Privacy policy --------
+      # /privacy-policy/, /privacy-policy/jp, … → /privacy-policy
+      - type: redirect
+        source: /privacy-policy/
+        destination: /privacy-policy
+      - type: redirect
+        source: /privacy-policy/*
+        destination: /privacy-policy
+
+      # -------- Terms & Conditions --------
+      # /terms-and-conditions/, /terms-and-conditions/jp, … → /terms-and-conditions
+      - type: redirect
+        source: /terms-and-conditions/
+        destination: /terms-and-conditions
+      - type: redirect
+        source: /terms-and-conditions/*
+        destination: /terms-and-conditions
