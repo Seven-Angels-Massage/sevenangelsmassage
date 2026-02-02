@@ -1,5 +1,5 @@
 // /assets/js/modules/Newsletter.module.js
-// Merged + upgraded version:
+// Merged + upgraded version: Newsletter module v1.0 (02.Feb.2026)
 // ✅ Keeps LIVE script behaviors (incl. First Name listeners + required UX)
 // ✅ Keeps latest improvements:
 //    - showEl/hideEl used consistently (prebuilt HTML nodes, style.display = "")
@@ -10,6 +10,9 @@
 //    - Arrow-key navigation + Enter-to-select inside dropdown lists
 //    - Soft fallback if HubSpot is blocked (ad blockers/privacy extensions)
 //    - Honeypot field anti-spam (no user friction)
+// ✅ NEW (additive):
+//    - Touch/mobile swipe scroll inside dropdown lists is preserved (no lockups)
+//    - Lightweight conversion tracking event on successful submit (dataLayer + Zaraz)
 //
 // ✅ Assumes you removed aria-hidden="true" from HTML; JS relies on hidden + display only.
 
@@ -53,6 +56,33 @@ document.addEventListener("DOMContentLoaded", () => {
   const norm = (s) => (s || "").toString().trim().toLowerCase();
 
   let phoneCtx = null;
+
+  // -------------------------
+  // Lightweight conversion tracking
+  // - dataLayer push (GTM/GA4 if you have it)
+  // - Zaraz custom event (if enabled)
+  // -------------------------
+  function trackNewsletterSuccess(meta = {}) {
+    const payload = {
+      event: "newsletter_submit_success",
+      page: window.location.pathname || "",
+      ...meta,
+    };
+
+    // 1) GTM / GA4 via dataLayer (if present)
+    try {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(payload);
+    } catch (_) {}
+
+    // 2) Cloudflare Zaraz custom event (if present)
+    // Docs: zaraz.track() supports custom events. :contentReference[oaicite:1]{index=1}
+    try {
+      if (window.zaraz && typeof window.zaraz.track === "function") {
+        window.zaraz.track("newsletter_submit_success", payload);
+      }
+    } catch (_) {}
+  }
 
   // -------------------------
   // Honeypot (anti-spam, zero friction)
@@ -330,6 +360,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let activeIndex = -1;
 
+    // ✅ NEW: detect coarse pointer (touch screens)
+    const IS_COARSE_POINTER =
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(pointer: coarse)").matches;
+
+    // ✅ NEW: apply touch-friendly scroll behavior to dropdown panels
+    function enableTouchScroll() {
+      if (!optionsEl) return;
+
+      // Allow vertical pan inside the dropdown without JS fighting it
+      try {
+        optionsEl.style.touchAction = "pan-y";
+        optionsEl.style.overscrollBehavior = "contain";
+        optionsEl.style.webkitOverflowScrolling = "touch";
+      } catch (_) {}
+
+      if (currentListEl) {
+        try {
+          currentListEl.style.touchAction = "pan-y";
+          currentListEl.style.overscrollBehavior = "contain";
+          currentListEl.style.webkitOverflowScrolling = "touch";
+        } catch (_) {}
+      }
+    }
+
     function setExpanded(v) {
       const val = v ? "true" : "false";
       if (ariaExpandedEl) ariaExpandedEl.setAttribute("aria-expanded", val);
@@ -357,14 +413,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function focusActiveIfInsideList() {
-      // ✅ KEY FIX:
-      // If the user is navigating with ArrowUp/Down while focus is already inside the dropdown,
-      // we move focus to the active <li> so your existing CSS (:focus) highlights it.
+      // ✅ Only focus-shift for keyboard navigation
       const ae = document.activeElement;
       if (!ae) return;
 
       // If user is typing in search, NEVER steal focus.
       if (searchEl && ae === searchEl) return;
+
+      // On coarse pointer devices, never force-focus list items (it can fight swipe scrolling).
+      if (IS_COARSE_POINTER) return;
 
       // Only do this if focus is inside this dropdown options panel
       if (!optionsEl || !optionsEl.contains(ae)) return;
@@ -384,7 +441,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    function setActiveByIndex(idx) {
+    function setActiveByIndex(idx, opts = {}) {
       const items = getVisibleOptionItems();
       if (!items.length) {
         clearActive();
@@ -399,17 +456,20 @@ document.addEventListener("DOMContentLoaded", () => {
         li.removeAttribute("aria-current");
       });
 
-      // ✅ Make sure the li ends up like:
-      // "hsfc-DropdownOptions__List__ListItem hsfc-DropdownOptions__List__ListItem--active"
       items[clamped].classList.add(ACTIVE_CLASS);
       items[clamped].setAttribute("aria-current", "true");
       activeIndex = clamped;
 
-      try {
-        items[clamped].scrollIntoView({ block: "nearest" });
-      } catch (_) {}
+      // ✅ Only auto-scroll into view for keyboard nav / programmatic open.
+      // Avoid doing this during touch interactions.
+      const allowScrollIntoView = opts.allowScrollIntoView !== false;
+      if (allowScrollIntoView) {
+        try {
+          items[clamped].scrollIntoView({ block: "nearest" });
+        } catch (_) {}
+      }
 
-      focusActiveIfInsideList();
+      if (opts.focus === true) focusActiveIfInsideList();
     }
 
     function setActiveToSelectedOrFirst() {
@@ -421,14 +481,23 @@ document.addEventListener("DOMContentLoaded", () => {
       const selectedIdx = visible.findIndex(
         (li) => li.getAttribute("aria-selected") === "true"
       );
-      setActiveByIndex(selectedIdx >= 0 ? selectedIdx : 0);
+      // On open, don’t force focus; just mark active and keep list stable
+      setActiveByIndex(selectedIdx >= 0 ? selectedIdx : 0, {
+        focus: false,
+        allowScrollIntoView: true,
+      });
     }
 
     function moveActive(delta) {
       const items = getVisibleOptionItems();
       if (!items.length) return;
-      if (activeIndex < 0) setActiveToSelectedOrFirst();
-      else setActiveByIndex(activeIndex + delta);
+      if (activeIndex < 0) {
+        setActiveToSelectedOrFirst();
+        // Keyboard move should focus and keep in view
+        setActiveByIndex(activeIndex < 0 ? 0 : activeIndex, { focus: true });
+      } else {
+        setActiveByIndex(activeIndex + delta, { focus: true, allowScrollIntoView: true });
+      }
     }
 
     function selectActive() {
@@ -452,17 +521,24 @@ document.addEventListener("DOMContentLoaded", () => {
         if (li.dataset.newsletterBound === "1") return;
         li.dataset.newsletterBound = "1";
 
-        li.addEventListener("pointermove", () => {
+        // ✅ Mouse hover highlight is great on desktop…
+        // ✅ …but it can BREAK swipe scrolling on touch screens (pointermove fires while scrolling).
+        li.addEventListener("pointermove", (ev) => {
+          // Only react to mouse pointer moves
+          if (ev && ev.pointerType && ev.pointerType !== "mouse") return;
+
           const vis = getVisibleOptionItems();
           const idx = vis.indexOf(li);
-          if (idx >= 0) setActiveByIndex(idx);
+          if (idx >= 0) {
+            setActiveByIndex(idx, { focus: false, allowScrollIntoView: false });
+          }
         });
 
-        // ✅ When a user tabs/focuses an item, sync active marker too
+        // ✅ When a user tabs/focuses an item, sync active marker too (keyboard)
         li.addEventListener("focus", () => {
           const vis = getVisibleOptionItems();
           const idx = vis.indexOf(li);
-          if (idx >= 0) setActiveByIndex(idx);
+          if (idx >= 0) setActiveByIndex(idx, { focus: false, allowScrollIntoView: true });
         });
 
         li.addEventListener("click", (e) => {
@@ -553,6 +629,9 @@ document.addEventListener("DOMContentLoaded", () => {
         showEl(optionsEl);
         setExpanded(true);
 
+        // ✅ NEW: ensure touch scroll is enabled whenever dropdown opens
+        enableTouchScroll();
+
         positionDropdownOptions(optionsEl, anchorElForPosition || toggleEl, offsetParentEl);
 
         clearSearchAndNormalizeList(true);
@@ -629,18 +708,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // ✅ KEY FIX (your missing piece):
-    // ArrowUp/ArrowDown must work even when focus is on <li> / list area.
-    // We capture it at the dropdown options container.
+    // ✅ ArrowUp/ArrowDown works even when focus is on <li> / list area.
     optionsEl.addEventListener(
       "keydown",
       (e) => {
         if (!isOpen) return;
 
-        // If typing in the search box, let the search handler manage it
         if (searchEl && e.target === searchEl) return;
-
-        // Don’t interfere with Tab navigation
         if (e.key === "Tab") return;
 
         if (e.key === "ArrowDown") {
@@ -662,7 +736,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (e.key === "Enter" || e.key === " ") {
-          // ✅ Enter selects active option, never submits form
           e.preventDefault();
           e.stopPropagation();
           if (typeof e.stopImmediatePropagation === "function")
@@ -680,13 +753,12 @@ document.addEventListener("DOMContentLoaded", () => {
           } catch (_) {}
         }
       },
-      true // capture
+      true
     );
 
     if (searchEl) {
       searchEl.addEventListener("input", applyFilter);
 
-      // ✅ Enter selects highlighted option (but never submits form)
       searchEl.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
@@ -739,9 +811,20 @@ document.addEventListener("DOMContentLoaded", () => {
     for (const dd of openDropdowns) dd.reposition();
   });
 
+  // ✅ NEW: Ignore scroll events that originate INSIDE dropdown panels
+  // Because window scroll listener is capture=true, it will "see" element scroll events too.
+  // Repositioning on every internal list scroll can cause mobile swipe scroll to feel locked.
   window.addEventListener(
     "scroll",
-    () => {
+    (e) => {
+      const t = e && e.target ? e.target : null;
+      if (t) {
+        const insideDropdown =
+          (t.classList && t.classList.contains("hsfc-DropdownOptions")) ||
+          (typeof t.closest === "function" && t.closest(".hsfc-DropdownOptions"));
+        if (insideDropdown) return;
+      }
+
       for (const dd of openDropdowns) dd.reposition();
     },
     true
@@ -951,7 +1034,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!normalized) return "";
         const dialCode = findDialMatch(normalized);
 
-        // If we can't detect dial code, just show what we have.
         if (!dialCode) return normalized;
 
         const digitsAll = normalized.replace(/\D/g, "");
@@ -1941,6 +2023,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const { res, payload } = await hsSubmitToHubSpot();
 
         if (res.ok) {
+          // ✅ NEW: conversion event (no PII)
+          const cityVal =
+            (form.querySelector('input[type="hidden"][name="0-1/location_"]')?.value || "")
+              .trim();
+          trackNewsletterSuccess({
+            has_city: !!cityVal,
+            city: cityVal || undefined,
+          });
+
           showPostSubmit();
           return;
         }
@@ -1959,7 +2050,6 @@ document.addEventListener("DOMContentLoaded", () => {
           showFormError(HS_GLOBAL_ERRORS.FIELD_ERRORS);
         }
       } catch (err) {
-        // ✅ soft fallback: ad blockers / privacy extensions can block HubSpot resources
         showFormError(HS_GLOBAL_ERRORS.BLOCKED_ENDPOINT);
       } finally {
         setButtonLoading(false);
