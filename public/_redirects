@@ -55,13 +55,5 @@
 /terms-and-conditions/cn     /terms-and-conditions  302
 /terms-and-conditions/cn/    /terms-and-conditions  302
 
-
-
-# --- Verification files: force exact path, no pretty-URL rewrite ---
-/google0158f259e1c21c4d.html                      /google0158f259e1c21c4d.html                      200
-/naver2d0c87cd558ffc7f12560e98f87a3565.html       /naver2d0c87cd558ffc7f12560e98f87a3565.html       200
-/naver3533fb1a9b9046d46da6d86c1a72e530.html       /naver3533fb1a9b9046d46da6d86c1a72e530.html       200
-/yandex_e114cbb8763a0424.html                     /yandex_e114cbb8763a0424.html                     200
-
 # SPA-style fallback (ONLY if you actually need it)
 # /*       /404.html       404
