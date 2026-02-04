@@ -315,7 +315,7 @@
 }
 .thumbnail a.category:hover {
   background:#ff69b4 !important;
-  color:#00008B !important;
+  color:#00008b !important;
 }
 .info a.link {
   color: #212529;
@@ -545,7 +545,7 @@
 }
 .video-section .section-heading p.sam-session-button a:hover {
   background: #ff69b4;
-  color: #00008B;
+  color: #00008b;
 }
 
 /* === ABOUT US – Team Section (Our Therapists, Our Promise) */
@@ -719,7 +719,7 @@
 }
 .testimonial-section .section-heading p.sam-career-button a:hover {
   background: #ff69b4;
-  color: #00008B;
+  color: #00008b;
 }
 #hs_cos_wrapper_widget_1764373663964 .section-heading {
   margin-bottom: 0px;
@@ -1660,6 +1660,14 @@ footer h4, footer h5 {
   .footer-social-items .footer-social-icons a {
     margin:0 12px !important;
   }
+}
+
+/* === FOOTER COPYRIGHT TEXT === */
+.footer-copyright p a {
+  color:#0000ff !important;
+}
+.footer-copyright p a:hover {
+  color:#ff69b4 !important;
 }
 
 /* === HTML/BODY - Force body and html to clip horizontal overflow === */
