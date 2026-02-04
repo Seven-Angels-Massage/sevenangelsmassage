@@ -1197,6 +1197,12 @@
     font-size:24px !important;
   }
 }
+.blog .info h2 a {
+  color:#212529 !important;
+}
+.blog .info h2 a:hover {
+  color:#ff69b4 !important;
+}
 
 /* === ARTICLES - Blog: Comment Button Customization === */
 .actions .hs-button {
