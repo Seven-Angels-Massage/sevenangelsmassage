@@ -1188,6 +1188,16 @@
   height: 500px;
 }
 
+/* === ARTICLES - Blog Listing Page === */
+.blog .info h2 {
+  font-size:26px !important;
+}
+@media (max-width: 767px) {
+  .blog .info h2 {
+    font-size:24px !important;
+  }
+}
+
 /* === ARTICLES - Blog: Comment Button Customization === */
 .actions .hs-button {
   font-size: 14px;
@@ -1663,11 +1673,20 @@ footer h4, footer h5 {
 }
 
 /* === FOOTER COPYRIGHT TEXT === */
+.footer-copyright p {
+  font-size:12px !important;
+  color:#ffffff !important;
+}
 .footer-copyright p a {
   color:#0096ff !important;
 }
 .footer-copyright p a:hover {
   color:#ff69b4 !important;
+}
+
+/* === YANDEX METRICA DEBUGGER OVERRIDE === */
+.__ymDebuggerOpener {
+  display: none;
 }
 
 /* === HTML/BODY - Force body and html to clip horizontal overflow === */
