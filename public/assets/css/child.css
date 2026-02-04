@@ -272,7 +272,7 @@
 }
 /* For desktop layout */
 .poular-package-section .content a h4  {
-  color:#212529 !important;
+  color:#151d28 !important;
 }
 .poular-package-section .content a h4:hover {
   color:#ff69b4 !important;
@@ -309,7 +309,7 @@
 }
 .thumbnail a.category {
   background:#e38e6a !important;
-  color:#000000 !important;
+  color:#151d28 !important;
   text-decoration:none !important;
   font-weight:500 !important;
 }
@@ -318,7 +318,7 @@
   color:#00008b !important;
 }
 .info a.link {
-  color: #212529;
+  color: #151d28;
 }
 .info a.link:hover {
   color: #ff69b4;
@@ -348,7 +348,7 @@
   color: #ff69b4;
 }
 .author-name a {
-  color: #212529;
+  color: #151d28;
 }
 .author-name a:hover {
   color: #ff69b4;
@@ -391,7 +391,7 @@
   margin: auto 0px;
 }
 .newsletter-section span p a {
-  color:#212529;
+  color:#151d28;
 }
 .newsletter-section span p a:hover {
   color:#ff69b4;
@@ -436,7 +436,7 @@
   border:1px !important;
   border-color:#e38e6a !important;
   border-radius:5px !important;
-  color:#000000 !important;
+  color:#151d28 !important;
   font-size:14px !important;
 }
 [data-hsfc-id=Renderer] .hsfc-Button:hover {
@@ -484,7 +484,7 @@
   max-width:1000px !important;
 }
 .about-section .section-heading p a {
-  color:#212529;
+  color:#151d28;
 }
 .about-section .section-heading p a:hover {
   color:#ff69b4;
@@ -537,7 +537,7 @@
   display: inline-block;
   padding: 12px 28px;
   background: #e38e6a;
-  color: #212529;
+  color: #151d28;
   font-size: 14px;
   border-radius: 6px;
   text-decoration: none;
@@ -711,7 +711,7 @@
   display: inline-block;
   padding: 12px 28px;
   background: #e38e6a;
-  color: #212529;
+  color: #151d28;
   font-size: 14px;
   border-radius: 6px;
   text-decoration: none;
@@ -747,7 +747,7 @@
   margin-bottom: 0px !important;
 }
 .features-box .content h3 a {
-  color:#212529 !important;
+  color:#151d28 !important;
 }
 .features-box .content h3 a:hover {
   color:#ff69b4 !important;
@@ -1198,7 +1198,7 @@
   }
 }
 .blog .info h2 a {
-  color:#212529 !important;
+  color:#151d28 !important;
 }
 .blog .info h2 a:hover {
   color:#ff69b4 !important;
@@ -1209,7 +1209,7 @@
   font-size: 14px;
   padding: 13px 23px;
   background: #e38e6a;
-  color: #000000;
+  color: #151d28;
   border: 1px;
   border-color: #e38e6a;
 }
@@ -1241,7 +1241,7 @@
   margin-bottom: 24px;
 }
 .hs_cos_wrapper_type_rich_text a {
-  color:#212529;
+  color:#151d28;
 }
 .hs_cos_wrapper_type_rich_text a:hover {
   color:#ff69b4;
@@ -1285,7 +1285,7 @@
   justify-content: center;
 }
 .comment-form .hs-input {
-  color:#212529;
+  color:#151d28;
   background-color:#f5f8fa;
   line-height: normal;
   width:100% !important;
@@ -1321,7 +1321,7 @@ form label {
 
 /* Website Cookies Buttons (HubSpot) */
 #hs-eu-cookie-confirmation #hs-eu-confirmation-button {
-  color:#000000 !important;
+  color:#151d28 !important;
   background-color:#e38e6a !important;
   border:1px solid #e38e6a !important;
 }
@@ -1508,6 +1508,18 @@ form label {
   }
 }
 
+/* === TABLET DEVICES VIEWPORT COPYRIGHT BREAK === */
+/* Hide the break by default (mobile) */
+.tablet-break {
+  display: none;
+}
+/* Show the break on tablet */
+@media screen and (min-width: 768px) {
+  .tablet-break {
+    display: inline;
+  }
+}
+
 /* ===== FOOTER's TEXTS (H4s, & H5s) ===== */
 footer h4, footer h5 {
   color:#ffffff !important;
@@ -1552,7 +1564,7 @@ footer h4, footer h5 {
 .footer-cta-button a {
   background-color: #e38e6a;   /* your gold accent */
   border-color: #e38e6a;       /* your gold accent */
-  color: #000000;
+  color: #151d28;
 }
 .footer-cta-button a:hover {
   background-color: #ff69b4;
