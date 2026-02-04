@@ -1626,11 +1626,6 @@ footer h4, footer h5 {
 }
 
 /* ===== FOOTER SOCIAL ITEMS ===== */
-@media (min-width: 1024px) {
-  .footer-social {
-    margin-top: 15px;
-  }
-}
 .social-item li a svg {
   width:20px !important;
   height:20px !important;
