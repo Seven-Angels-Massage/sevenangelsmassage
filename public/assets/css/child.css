@@ -1190,18 +1190,18 @@
 
 /* === ARTICLES - Blog Listing Page === */
 .blog .info h2 {
-  font-size:26px !important;
+  font-size: 26px;
 }
 @media (max-width: 767px) {
   .blog .info h2 {
-    font-size:24px !important;
+    font-size: 24px;
   }
 }
 .blog .info h2 a {
-  color:#151d28 !important;
+  color: #151d28;
 }
 .blog .info h2 a:hover {
-  color:#ff69b4 !important;
+  color: #ff69b4;
 }
 
 /* === ARTICLES - Blog: Comment Button Customization === */

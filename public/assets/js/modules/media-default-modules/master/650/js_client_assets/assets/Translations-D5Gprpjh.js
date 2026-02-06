@@ -1,0 +1,1 @@
+import{createContext as s,useContext as o,jsx as a}from"https://static.hsappstatic.net/cms-js-static/ex/js/react/v18/react-combined.mjs";function u(){const n=s({translations:{}});return{TranslationContext:n,TranslationProvider:({children:t,translations:r})=>a(n.Provider,{value:{translations:r},children:t}),useTranslations:()=>{const{translations:t}=o(n);return t}}}export{u as s};
