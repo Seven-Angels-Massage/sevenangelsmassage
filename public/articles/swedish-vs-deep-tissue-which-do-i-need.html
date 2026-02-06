@@ -1148,7 +1148,7 @@ _hsp.push(['addPrivacyConsentListener', function(consent){
               aria-label="Play blog post audio: Swedish vs. Deep Tissue: Which Do I Need Today?"
               data-status="initial"
               data-testid="audio-player"
-              style="display:flex;align-items:center;height:60px;--primary:#0091ae;--secondary:#ffbcac;--tertiary:#7fded2;--primary-alt:#2099b6;--tertiary-translucent:#7fded250"
+              style="display:flex;align-items:center;height:60px;--primary:#0091ae;--secondary:#ffbcac;--tertiary:#7fded2;--primary-alt:#2099b6;--tertiary-translucent:#7fded250;"
             >
               <div class="_play-pause-skip_1nxo7_117 hs-audio-player__controls">
                 <div
@@ -1419,7 +1419,7 @@ _hsp.push(['addPrivacyConsentListener', function(consent){
                   />
                 </div>
 
-                <ul class="no-list hs-error-msgs inputs-list" role="alert">
+                <ul class="no-list hs-error-msgs inputs-list" role="alert" style="display:none;">
                   <li>
                     <label class="hs-error-msg hs-main-font-element">Please complete this required field.</label>
                   </li>
@@ -1483,7 +1483,7 @@ _hsp.push(['addPrivacyConsentListener', function(consent){
                   </select>
                 </div>
 
-                <ul class="no-list hs-error-msgs inputs-list" role="alert">
+                <ul class="no-list hs-error-msgs inputs-list" role="alert" style="display:none;">
                   <li>
                     <label class="hs-error-msg hs-main-font-element">Please complete this required field.</label>
                   </li>
@@ -1763,7 +1763,7 @@ _hsp.push(['addPrivacyConsentListener', function(consent){
                   </div>
                 </div>
 
-                <ul class="no-list hs-error-msgs inputs-list" role="alert">
+                <ul class="no-list hs-error-msgs inputs-list" role="alert" style="display:none;">
                   <li>
                     <label class="hs-error-msg hs-main-font-element">Please complete this required field.</label>
                   </li>
@@ -1795,7 +1795,7 @@ _hsp.push(['addPrivacyConsentListener', function(consent){
                   />
                 </div>
 
-                <ul class="no-list hs-error-msgs inputs-list" role="alert">
+                <ul class="no-list hs-error-msgs inputs-list" role="alert" style="display:none;">
                   <li>
                     <label class="hs-error-msg hs-main-font-element">Please complete this required field.</label>
                   </li>
@@ -1823,7 +1823,7 @@ _hsp.push(['addPrivacyConsentListener', function(consent){
                   ></textarea>
                 </div>
 
-                <ul class="no-list hs-error-msgs inputs-list" role="alert">
+                <ul class="no-list hs-error-msgs inputs-list" role="alert" style="display:none;">
                   <li>
                     <label class="hs-error-msg hs-main-font-element">Please complete this required field.</label>
                   </li>
@@ -1844,8 +1844,7 @@ _hsp.push(['addPrivacyConsentListener', function(consent){
                       frameborder="0"
                       scrolling="no"
                       sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"
-                      src="https://www.google.com/recaptcha/e
-                      nterprise/anchor?ar=1&k=6Ld_ad8ZAAAAAAqr0ePo1dUfAi0m4KPkCMQYwPPm&co=aHR0cHM6Ly9zcGEuc2V2ZW5hbmdlbHNtYXNzYWdlLmNvbTo0NDM.&hl=en&v=N67nZn4AqZkNcbeMu4prBgzg&size=invisible&badge=inline&anchor-ms=20000&execute-ms=30000&cb=u4z5swh3qysn"
+                      src="https://www.google.com/recaptcha/enterprise/anchor?ar=1&k=6Ld_ad8ZAAAAAAqr0ePo1dUfAi0m4KPkCMQYwPPm&co=aHR0cHM6Ly9zcGEuc2V2ZW5hbmdlbHNtYXNzYWdlLmNvbTo0NDM.&hl=en&v=N67nZn4AqZkNcbeMu4prBgzg&size=invisible&badge=inline&anchor-ms=20000&execute-ms=30000&cb=u4z5swh3qysn"
                     ></iframe>
                   </div>
                   <div class="grecaptcha-error"></div>
@@ -1859,6 +1858,14 @@ _hsp.push(['addPrivacyConsentListener', function(consent){
                 <iframe style="display: none;"></iframe>
               </div>
               <input type="hidden" name="g-recaptcha-response" id="hs-recaptcha-response" value="" />
+            </div>
+            <div class="hs_error_rollup">
+              <ul class="no-list hs-error-msgs inputs-list" role="alert"  style="display: none;">
+                <li>
+                  <label class="hs-error-msg hs-main-font-element">Please complete all required fields.
+                  </label>
+                </li>
+              </ul>
             </div>
 
             <div class="hs_submit hs-submit">
