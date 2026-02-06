@@ -1204,22 +1204,6 @@
   color: #ff69b4;
 }
 
-/* === ARTICLES - Blog: Comment Button Customization === */
-.actions .hs-button {
-  font-size: 14px;
-  padding: 13px 23px;
-  background: #e38e6a;
-  color: #151d28;
-  border: 1px;
-  border-color: #e38e6a;
-}
-.actions .hs-button:hover {
-  background: #ff69b4;
-  color: #00008b;
-  border: 1px;
-  border-color:#ff69b4;
-}
-
 /* === ARTICLES - Blog Details === */
 .blog-section .section-heading h2 {
   font-size: 32px;
@@ -1317,6 +1301,25 @@ form label {
 }
 .hs-error-msg {
   margin-top: -15px;
+}
+.submitted-message {
+  color: #008000;
+}
+
+/* === ARTICLES - Blog: Comment Button Customization === */
+.actions .hs-button {
+  font-size: 14px;
+  padding: 13px 23px;
+  background: #e38e6a;
+  color: #151d28;
+  border: 1px;
+  border-color: #e38e6a;
+}
+.actions .hs-button:hover {
+  background: #ff69b4;
+  color: #00008b;
+  border: 1px;
+  border-color:#ff69b4;
 }
 
 /* Website Cookies Buttons (HubSpot) */
