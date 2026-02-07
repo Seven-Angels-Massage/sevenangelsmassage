@@ -57,3 +57,5 @@
 
 # SPA-style fallback (ONLY if you actually need it)
 # /*       /404.html       404
+
+/_hcms/*  https://spa.sevenangelsmassage.com/_hcms/:splat  200
