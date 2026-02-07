@@ -1,16 +1,16 @@
 export async function onRequest(context) {
   const { request, params } = context;
 
-  // Catch-all path after /_hcms/
-  const pathParts = params.path || [];
-  const path = Array.isArray(pathParts) ? pathParts.join("/") : String(pathParts);
+  // Cloudflare Pages will put the rest of the path into params.path
+  // It can be a string or array depending on runtime.
+  const raw = params.path ?? "";
+  const rest = Array.isArray(raw) ? raw.join("/") : String(raw);
 
   const upstream = new URL(request.url);
-  upstream.hostname = "spa.sevenangelsmassage.com";
   upstream.protocol = "https:";
-  upstream.pathname = `/_hcms/${path}`;
+  upstream.hostname = "spa.sevenangelsmassage.com";
+  upstream.pathname = `/_hcms/${rest}`;
 
-  // Clone headers, but drop hop-by-hop headers that can break proxies
   const headers = new Headers(request.headers);
   headers.delete("host");
   headers.delete("connection");
@@ -19,16 +19,17 @@ export async function onRequest(context) {
   const init = {
     method: request.method,
     headers,
-    body: ["GET", "HEAD"].includes(request.method) ? undefined : await request.arrayBuffer(),
+    body: ["GET", "HEAD"].includes(request.method)
+      ? undefined
+      : await request.arrayBuffer(),
     redirect: "manual",
   };
 
   const resp = await fetch(upstream.toString(), init);
 
-  // Copy response headers (and keep Set-Cookie if HubSpot sends it)
   const outHeaders = new Headers(resp.headers);
 
-  // If upstream returns absolute redirects to spa, rewrite them back to www
+  // Rewrite Location redirects back to current host (optional but helpful)
   const loc = outHeaders.get("location");
   if (loc) {
     try {
@@ -37,11 +38,10 @@ export async function onRequest(context) {
         u.hostname = new URL(request.url).hostname;
         outHeaders.set("location", u.toString());
       }
-    } catch (_) {}
+    } catch {}
   }
 
-  // Cache static-ish assets a bit (optional but nice)
-  // You can tune this later.
+  // Light caching for static assets
   if (upstream.pathname.endsWith(".js") || upstream.pathname.endsWith(".css")) {
     outHeaders.set("cache-control", "public, max-age=3600");
   }
