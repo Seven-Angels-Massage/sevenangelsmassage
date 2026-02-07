@@ -2210,182 +2210,6 @@ _hsp.push(['addPrivacyConsentListener', function(consent){
       
     </div>
 
-<script>
-  // ====== CONFIG (per article) ======
-  const HS_COMMENTS = {
-    portalId: "243726556",
-    contentId: "256851561194",
-    collectionId: "256030708464",
-    maxDepthWithReplyButton: 2, // show button for depth 0-2, NOT for depth 3
-    containerId: "comments-listing",
-  };
-
-  // Expose for your onFormSubmitted refresh hook
-  window.loadHubspotComments = loadHubspotComments;
-
-  async function loadHubspotComments() {
-    const { portalId, contentId, collectionId, containerId } = HS_COMMENTS;
-
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    // Fetch normalized JSON from your Pages Function (NOT JSONP)
-    const url =
-      `/api/comments?portalId=${encodeURIComponent(portalId)}` +
-      `&contentId=${encodeURIComponent(contentId)}` +
-      `&collectionId=${encodeURIComponent(collectionId)}` +
-      `&limit=10000&offset=0`;
-
-    const res = await fetch(url, { headers: { accept: "application/json" } });
-    if (!res.ok) {
-      container.setAttribute("data-has-comments", "false");
-      container.innerHTML = "";
-      console.warn("Comments API failed:", res.status);
-      return;
-    }
-
-    const data = await res.json();
-    renderHubspotThread(container, data);
-  }
-
-  function renderHubspotThread(container, apiData) {
-    // HubSpot returns { objects: [...] }
-    const objects = Array.isArray(apiData?.objects) ? apiData.objects : [];
-
-    // Set wrapper attributes EXACTLY like HubSpot
-    container.id = "comments-listing";
-    container.className = "new-comments";
-    container.setAttribute("data-has-comments", objects.length ? "true" : "false");
-
-    // Clear and rebuild
-    container.innerHTML = "";
-
-    // Sort by threadInfo then created (keeps threading stable)
-    const sorted = objects
-      .slice()
-      .sort((a, b) => {
-        const ta = String(a.threadInfo || "");
-        const tb = String(b.threadInfo || "");
-        if (ta < tb) return -1;
-        if (ta > tb) return 1;
-        const ca = Number(a.created || 0);
-        const cb = Number(b.created || 0);
-        return ca - cb;
-      });
-
-    for (const c of sorted) {
-      const threadInfo = String(c.threadInfo || "").trim();
-      if (!threadInfo) continue;
-
-      const depth = getDepthFromThreadInfo(threadInfo); // 0..9
-      const commentId = `c${threadInfo}`; // EXACT match: id="c0001.0000...."
-
-      // Build EXACT markup
-      const commentEl = document.createElement("div");
-      commentEl.id = commentId;
-      commentEl.className = `comment depth-${depth}`;
-      commentEl.setAttribute("data-threadid", threadInfo);
-
-      const fromEl = document.createElement("div");
-      fromEl.className = "comment-from";
-      const h4 = document.createElement("h4");
-      h4.textContent = (c.userName || "Anonymous").trim();
-      fromEl.appendChild(h4);
-
-      const dateEl = document.createElement("div");
-      dateEl.className = "comment-date";
-      dateEl.textContent = formatHubspotDate(c.created);
-
-      const bodyEl = document.createElement("div");
-      bodyEl.className = "comment-body";
-
-      // HubSpot typically stores commentText as plain text; CMS wraps it in <p>...</p>.
-      // We'll render exactly as <p>...</p>, but if HubSpot already returns HTML, we keep it.
-      bodyEl.innerHTML = normalizeToHubspotParagraph(c.commentText);
-
-      commentEl.appendChild(fromEl);
-      commentEl.appendChild(dateEl);
-      commentEl.appendChild(bodyEl);
-
-      // Reply button rule: present for depth 0-2, NOT for depth 3+
-      if (depth <= HS_COMMENTS.maxDepthWithReplyButton) {
-        const btn = document.createElement("button");
-        btn.className = "comment-reply-to hs-button secondary";
-        btn.innerHTML = `Reply to <em>${escapeHtml((c.userName || "Anonymous").trim())}</em>`;
-
-        // Optional: wire up reply behavior (safe no-op if you don't want it yet)
-        btn.addEventListener("click", () => {
-          // Set a global "reply target" you can use when submitting form metadata
-          window.__hsReplyTo = {
-            threadInfo,
-            replyToName: (c.userName || "Anonymous").trim(),
-            depth,
-          };
-
-          // If you have a “Reply To …” label on the page, you can update it here
-          // and scroll to form:
-          const formTarget = document.querySelector('[id^="hs_form_target_"]');
-          if (formTarget) formTarget.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
-
-        commentEl.appendChild(btn);
-      }
-
-      container.appendChild(commentEl);
-    }
-  }
-
-  function getDepthFromThreadInfo(threadInfo) {
-    // Example:
-    // 0001.0000.0000.... => depth 0
-    // 0001.0001.0000.... => depth 1
-    // 0001.0001.0001.... => depth 2
-    // depth = count of non-zero segments AFTER the first segment
-    const parts = threadInfo.split(".");
-    let depth = 0;
-    for (let i = 1; i < parts.length; i++) {
-      if (parts[i] !== "0000") depth++;
-      else break; // HubSpot pads the rest with 0000; stop early
-    }
-    return depth;
-  }
-
-  function formatHubspotDate(ms) {
-    const n = Number(ms);
-    if (!Number.isFinite(n) || n <= 0) return "";
-    try {
-      // HubSpot CMS example shows: 2/7/2026, 2:51:33 AM
-      return new Date(n).toLocaleString();
-    } catch {
-      return "";
-    }
-  }
-
-  function normalizeToHubspotParagraph(commentText) {
-    // If it already looks like HTML with a <p>, keep it.
-    const s = String(commentText ?? "").trim();
-    if (!s) return "<p></p>";
-    if (s.startsWith("<p") || s.startsWith("<div") || s.startsWith("<span")) return s;
-
-    // Otherwise wrap in <p> exactly like HubSpot CMS does
-    return `<p>${escapeHtml(s)}</p>`;
-  }
-
-  function escapeHtml(s) {
-    return String(s)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  // Initial load
-  loadHubspotComments();
-</script>
-
-
-
     <script>
     /**
      * Fix Chrome "Deprecated feature used" for overflow:visible on img/video/canvas.
@@ -2454,29 +2278,6 @@ _hsp.push(['addPrivacyConsentListener', function(consent){
 <script>
 var hsVars = hsVars || {}; hsVars['language'] = 'en';
 </script>
-<script>
-  function hsOnReadyPopulateCommentsFeed() {
-    var options = {
-      commentsUrl: "https://api-na2.hubapi.com/comments/v3/comments/thread/public?portalId=243726556&offset=0&limit=10000&contentId=256851561194&collectionId=256030708464",
-      maxThreadDepth: 3,
-      showForm: true,
-      
-      target: "hs_form_target_6f4b000e-90b2-43eb-9398-8ea4db11eb41",
-      replyTo: "Reply to <em>{{user}}</em>",
-      replyingTo: "Replying to {{user}}"
-    };
-    window.hsPopulateCommentsFeed(options);
-  }
-
-  if (document.readyState === "complete" ||
-      (document.readyState !== "loading" && !document.documentElement.doScroll)
-  ) {
-    hsOnReadyPopulateCommentsFeed();
-  } else {
-    document.addEventListener("DOMContentLoaded", hsOnReadyPopulateCommentsFeed);
-  }
-
-</script>
 
 
           <!--[if lte IE 8]>
@@ -2506,20 +2307,6 @@ var hsVars = hsVars || {}; hsVars['language'] = 'en';
                 formInstanceId: '5374',
                 getExtraMetaDataBeforeSubmit: window.hsPopulateCommentFormGetExtraMetaDataBeforeSubmit
             });
-
-            window.addEventListener('message', function(event) {
-              var origin = event.origin; var data = event.data;
-              if ((origin != null && (origin === 'null' || document.location.href.toLowerCase().indexOf(origin.toLowerCase()) === 0)) && data !== null && data.type === 'hsFormCallback' && data.id == '6f4b000e-90b2-43eb-9398-8ea4db11eb41') {
-                if (data.eventName === 'onFormReady') {
-                  window.hsPopulateCommentFormOnFormReady({
-                    successMessage: "Your comment has been received.",
-                    target: "#hs_form_target_6f4b000e-90b2-43eb-9398-8ea4db11eb41"
-                  });
-                } else if (data.eventName === 'onFormSubmitted') {
-                  window.hsPopulateCommentFormOnFormSubmitted();
-                }
-              }
-            });
         </script>
 
 <!-- Start of HubSpot Embed Code -->
@@ -2546,6 +2333,280 @@ var hsVars = {
     folder_id: 0,
     is_hubspot_user: false
 }
+</script>
+
+
+
+<script>
+  // ====== CONFIG (per article) ======
+  const HS_COMMENTS = {
+    portalId: "243726556",
+    contentId: "256851561194",
+    collectionId: "256030708464",
+
+    // show reply button for depth 0..2 (NOT for depth 3+)
+    maxDepthWithReplyButton: 2,
+
+    // where the thread renders
+    containerId: "comments-listing",
+
+    // where the HubSpot form exists on page (the "target" behavior)
+    formTargetId: "hs_form_target_6f4b000e-90b2-43eb-9398-8ea4db11eb41",
+
+    // text templates (same intent as HubSpot)
+    replyToTpl: 'Reply to <em>{{user}}</em>',
+    replyingToTpl: "Replying to {{user}}",
+  };
+
+  // Expose for your onFormSubmitted refresh hook
+  window.loadHubspotComments = loadHubspotComments;
+
+  // Reply context you can use later for submit metadata
+  // (e.g., parent/thread info when posting a reply)
+  window.__hsReplyContext = null;
+
+  async function loadHubspotComments() {
+    const { portalId, contentId, collectionId, containerId } = HS_COMMENTS;
+
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Fetch normalized JSON from your Pages Function (NOT JSONP)
+    const url =
+      `/api/comments?portalId=${encodeURIComponent(portalId)}` +
+      `&contentId=${encodeURIComponent(contentId)}` +
+      `&collectionId=${encodeURIComponent(collectionId)}` +
+      `&limit=10000&offset=0`;
+
+    const res = await fetch(url, { headers: { accept: "application/json" } });
+    if (!res.ok) {
+      container.setAttribute("data-has-comments", "false");
+      container.innerHTML = "";
+      console.warn("Comments API failed:", res.status);
+      return;
+    }
+
+    const data = await res.json();
+    renderHubspotThread(container, data);
+  }
+
+  function renderHubspotThread(container, apiData) {
+    // HubSpot returns { objects: [...] }
+    const objects = Array.isArray(apiData?.objects) ? apiData.objects : [];
+
+    // Set wrapper attributes EXACTLY like HubSpot
+    container.id = "comments-listing";
+    container.className = "new-comments";
+    container.setAttribute("data-has-comments", objects.length ? "true" : "false");
+
+    // Clear and rebuild
+    container.innerHTML = "";
+
+    // Sort by threadInfo then created (keeps threading stable)
+    const sorted = objects
+      .slice()
+      .sort((a, b) => {
+        const ta = String(a.threadInfo || "");
+        const tb = String(b.threadInfo || "");
+        if (ta < tb) return -1;
+        if (ta > tb) return 1;
+        const ca = Number(a.created || 0);
+        const cb = Number(b.created || 0);
+        return ca - cb;
+      });
+
+    for (const c of sorted) {
+      const threadInfo = String(c.threadInfo || "").trim();
+      if (!threadInfo) continue;
+
+      const depth = getDepthFromThreadInfo(threadInfo); // 0..9
+      const commentId = `c${threadInfo}`; // EXACT match: id="c0001.0000...."
+
+      // Build EXACT markup
+      const commentEl = document.createElement("div");
+      commentEl.id = commentId;
+      commentEl.className = `comment depth-${depth}`;
+      commentEl.setAttribute("data-threadid", threadInfo);
+
+      const fromEl = document.createElement("div");
+      fromEl.className = "comment-from";
+      const h4 = document.createElement("h4");
+      const userName = (c.userName || "Anonymous").trim();
+      h4.textContent = userName;
+      fromEl.appendChild(h4);
+
+      const dateEl = document.createElement("div");
+      dateEl.className = "comment-date";
+      dateEl.textContent = formatHubspotDate(c.created);
+
+      const bodyEl = document.createElement("div");
+      bodyEl.className = "comment-body";
+      bodyEl.innerHTML = normalizeToHubspotParagraph(c.commentText);
+
+      commentEl.appendChild(fromEl);
+      commentEl.appendChild(dateEl);
+      commentEl.appendChild(bodyEl);
+
+      // Reply button rule: present for depth 0-2, NOT for depth 3+
+      if (depth <= HS_COMMENTS.maxDepthWithReplyButton) {
+        const btn = document.createElement("button");
+        btn.className = "comment-reply-to hs-button secondary";
+        btn.innerHTML = renderReplyButtonLabel(userName);
+
+        // Wire up reply behavior (sets reply mode + scroll to form target)
+        btn.addEventListener("click", () => {
+          setReplyingTo({
+            userName,
+            threadInfo,
+            depth,
+            commentId,
+            // if your API returns a stable comment ID, include it here:
+            // commentObjectId: c.id
+          });
+        });
+
+        commentEl.appendChild(btn);
+      }
+
+      container.appendChild(commentEl);
+    }
+  }
+
+  // ====== REPLY UI (target / replyTo / replyingTo replacement) ======
+
+  function renderReplyButtonLabel(userName) {
+    const tpl = HS_COMMENTS.replyToTpl;
+    // tpl contains HTML (em), so only escape the user variable:
+    return tpl.replace("{{user}}", escapeHtml(userName));
+  }
+
+  function renderReplyingBannerText(userName) {
+    const tpl = HS_COMMENTS.replyingToTpl; // plain text template
+    return tpl.replace("{{user}}", userName);
+  }
+
+  function setReplyingTo({ userName, threadInfo, depth, commentId }) {
+    // store reply context for later (submit metadata hook)
+    window.__hsReplyContext = {
+      userName,
+      threadInfo,
+      depth,
+      commentId,
+      // commentObjectId, // add if your API provides one
+      setAt: Date.now(),
+    };
+
+    // Show banner above the form target
+    const formTarget = document.getElementById(HS_COMMENTS.formTargetId);
+    if (!formTarget) {
+      console.warn("Form target not found:", HS_COMMENTS.formTargetId);
+      return;
+    }
+
+    // Create/replace banner
+    let banner = document.getElementById("hs-replying-banner");
+    if (!banner) {
+      banner = document.createElement("div");
+      banner.id = "hs-replying-banner";
+      banner.className = "hs-replying-banner";
+      banner.style.margin = "10px 0";
+      banner.style.display = "flex";
+      banner.style.alignItems = "center";
+      banner.style.gap = "10px";
+      banner.style.flexWrap = "wrap";
+      banner.style.padding = "10px 12px";
+      banner.style.border = "1px solid #cbd6e2";
+      banner.style.borderRadius = "3px";
+      banner.style.background = "#f5f8fa";
+      banner.style.color = "#33475b";
+      banner.style.fontFamily = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+      banner.style.fontSize = "14px";
+
+      // Insert banner at top of form target container
+      formTarget.prepend(banner);
+    }
+
+    banner.innerHTML = `
+      <span>${escapeHtml(renderReplyingBannerText(userName))}</span>
+      <button type="button" id="hs-cancel-reply" class="hs-button secondary" style="padding: 8px 12px; line-height: 12px;">
+        Cancel
+      </button>
+    `;
+
+    const cancelBtn = document.getElementById("hs-cancel-reply");
+    if (cancelBtn) {
+      cancelBtn.onclick = () => clearReplyingTo();
+    }
+
+    // Scroll to form target (this is the "target" behavior)
+    formTarget.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    // Best-effort focus: find the textarea or first input inside the form target
+    setTimeout(() => {
+      const textarea = formTarget.querySelector("textarea, input, select");
+      if (textarea && typeof textarea.focus === "function") textarea.focus();
+    }, 250);
+  }
+
+  function clearReplyingTo() {
+    window.__hsReplyContext = null;
+    const banner = document.getElementById("hs-replying-banner");
+    if (banner) banner.remove();
+  }
+
+  // Optional helper: call this after successful submit
+  // (your safe postMessage listener can call loadHubspotComments)
+  window.__hsClearReplyingTo = clearReplyingTo;
+
+  // ====== THREADING HELPERS ======
+
+  function getDepthFromThreadInfo(threadInfo) {
+    // Example:
+    // 0001.0000.0000.... => depth 0
+    // 0001.0001.0000.... => depth 1
+    // 0001.0001.0001.... => depth 2
+    // depth = count of non-zero segments AFTER the first segment
+    const parts = threadInfo.split(".");
+    let depth = 0;
+    for (let i = 1; i < parts.length; i++) {
+      if (parts[i] !== "0000") depth++;
+      else break; // HubSpot pads the rest with 0000; stop early
+    }
+    return depth;
+  }
+
+  function formatHubspotDate(ms) {
+    const n = Number(ms);
+    if (!Number.isFinite(n) || n <= 0) return "";
+    try {
+      // HubSpot CMS example shows: 2/7/2026, 2:51:33 AM
+      return new Date(n).toLocaleString();
+    } catch {
+      return "";
+    }
+  }
+
+  function normalizeToHubspotParagraph(commentText) {
+    // If it already looks like HTML with a <p>, keep it.
+    const s = String(commentText ?? "").trim();
+    if (!s) return "<p></p>";
+    if (s.startsWith("<p") || s.startsWith("<div") || s.startsWith("<span")) return s;
+
+    // Otherwise wrap in <p> exactly like HubSpot CMS does
+    return `<p>${escapeHtml(s)}</p>`;
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  // ====== Initial load ======
+  loadHubspotComments();
 </script>
 
 
