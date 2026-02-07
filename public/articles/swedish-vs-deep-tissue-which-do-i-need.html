@@ -1241,7 +1241,11 @@ _hsp.push(['addPrivacyConsentListener', function(consent){
       window.__islands = newIslands;
     }
   </script>
-
+  <script type="module" crossorigin>
+    import { initConfigSingletonFromJSON, setupIslandHydration } from "https://static.hsappstatic.net/cms-js-static/ex/js/island-runtime/v1/island-runtime.mjs"
+    initConfigSingletonFromJSON(window.__hsEnvConfig)
+    setupIslandHydration();
+  </script>
       </div>
                 
                   <div class="post-tag-share" data-aos="fade-up">
