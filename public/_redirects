@@ -59,3 +59,6 @@
 # /*       /404.html       404
 
 /_hcms/*  https://spa.sevenangelsmassage.com/_hcms/:splat  200
+
+# Netlify: map /api/comments to a Netlify Function
+/api/comments         /.netlify/functions/comments         200

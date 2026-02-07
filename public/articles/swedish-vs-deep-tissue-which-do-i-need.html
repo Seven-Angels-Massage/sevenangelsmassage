@@ -2209,6 +2209,183 @@ _hsp.push(['addPrivacyConsentListener', function(consent){
 </div></div>
       
     </div>
+
+<script>
+  // ====== CONFIG (per article) ======
+  const HS_COMMENTS = {
+    portalId: "243726556",
+    contentId: "256851561194",
+    collectionId: "256030708464",
+    maxDepthWithReplyButton: 2, // show button for depth 0-2, NOT for depth 3
+    containerId: "comments-listing",
+  };
+
+  // Expose for your onFormSubmitted refresh hook
+  window.loadHubspotComments = loadHubspotComments;
+
+  async function loadHubspotComments() {
+    const { portalId, contentId, collectionId, containerId } = HS_COMMENTS;
+
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Fetch normalized JSON from your Pages Function (NOT JSONP)
+    const url =
+      `/api/comments?portalId=${encodeURIComponent(portalId)}` +
+      `&contentId=${encodeURIComponent(contentId)}` +
+      `&collectionId=${encodeURIComponent(collectionId)}` +
+      `&limit=10000&offset=0`;
+
+    const res = await fetch(url, { headers: { accept: "application/json" } });
+    if (!res.ok) {
+      container.setAttribute("data-has-comments", "false");
+      container.innerHTML = "";
+      console.warn("Comments API failed:", res.status);
+      return;
+    }
+
+    const data = await res.json();
+    renderHubspotThread(container, data);
+  }
+
+  function renderHubspotThread(container, apiData) {
+    // HubSpot returns { objects: [...] }
+    const objects = Array.isArray(apiData?.objects) ? apiData.objects : [];
+
+    // Set wrapper attributes EXACTLY like HubSpot
+    container.id = "comments-listing";
+    container.className = "new-comments";
+    container.setAttribute("data-has-comments", objects.length ? "true" : "false");
+
+    // Clear and rebuild
+    container.innerHTML = "";
+
+    // Sort by threadInfo then created (keeps threading stable)
+    const sorted = objects
+      .slice()
+      .sort((a, b) => {
+        const ta = String(a.threadInfo || "");
+        const tb = String(b.threadInfo || "");
+        if (ta < tb) return -1;
+        if (ta > tb) return 1;
+        const ca = Number(a.created || 0);
+        const cb = Number(b.created || 0);
+        return ca - cb;
+      });
+
+    for (const c of sorted) {
+      const threadInfo = String(c.threadInfo || "").trim();
+      if (!threadInfo) continue;
+
+      const depth = getDepthFromThreadInfo(threadInfo); // 0..9
+      const commentId = `c${threadInfo}`; // EXACT match: id="c0001.0000...."
+
+      // Build EXACT markup
+      const commentEl = document.createElement("div");
+      commentEl.id = commentId;
+      commentEl.className = `comment depth-${depth}`;
+      commentEl.setAttribute("data-threadid", threadInfo);
+
+      const fromEl = document.createElement("div");
+      fromEl.className = "comment-from";
+      const h4 = document.createElement("h4");
+      h4.textContent = (c.userName || "Anonymous").trim();
+      fromEl.appendChild(h4);
+
+      const dateEl = document.createElement("div");
+      dateEl.className = "comment-date";
+      dateEl.textContent = formatHubspotDate(c.created);
+
+      const bodyEl = document.createElement("div");
+      bodyEl.className = "comment-body";
+
+      // HubSpot typically stores commentText as plain text; CMS wraps it in <p>...</p>.
+      // We'll render exactly as <p>...</p>, but if HubSpot already returns HTML, we keep it.
+      bodyEl.innerHTML = normalizeToHubspotParagraph(c.commentText);
+
+      commentEl.appendChild(fromEl);
+      commentEl.appendChild(dateEl);
+      commentEl.appendChild(bodyEl);
+
+      // Reply button rule: present for depth 0-2, NOT for depth 3+
+      if (depth <= HS_COMMENTS.maxDepthWithReplyButton) {
+        const btn = document.createElement("button");
+        btn.className = "comment-reply-to hs-button secondary";
+        btn.innerHTML = `Reply to <em>${escapeHtml((c.userName || "Anonymous").trim())}</em>`;
+
+        // Optional: wire up reply behavior (safe no-op if you don't want it yet)
+        btn.addEventListener("click", () => {
+          // Set a global "reply target" you can use when submitting form metadata
+          window.__hsReplyTo = {
+            threadInfo,
+            replyToName: (c.userName || "Anonymous").trim(),
+            depth,
+          };
+
+          // If you have a “Reply To …” label on the page, you can update it here
+          // and scroll to form:
+          const formTarget = document.querySelector('[id^="hs_form_target_"]');
+          if (formTarget) formTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        commentEl.appendChild(btn);
+      }
+
+      container.appendChild(commentEl);
+    }
+  }
+
+  function getDepthFromThreadInfo(threadInfo) {
+    // Example:
+    // 0001.0000.0000.... => depth 0
+    // 0001.0001.0000.... => depth 1
+    // 0001.0001.0001.... => depth 2
+    // depth = count of non-zero segments AFTER the first segment
+    const parts = threadInfo.split(".");
+    let depth = 0;
+    for (let i = 1; i < parts.length; i++) {
+      if (parts[i] !== "0000") depth++;
+      else break; // HubSpot pads the rest with 0000; stop early
+    }
+    return depth;
+  }
+
+  function formatHubspotDate(ms) {
+    const n = Number(ms);
+    if (!Number.isFinite(n) || n <= 0) return "";
+    try {
+      // HubSpot CMS example shows: 2/7/2026, 2:51:33 AM
+      return new Date(n).toLocaleString();
+    } catch {
+      return "";
+    }
+  }
+
+  function normalizeToHubspotParagraph(commentText) {
+    // If it already looks like HTML with a <p>, keep it.
+    const s = String(commentText ?? "").trim();
+    if (!s) return "<p></p>";
+    if (s.startsWith("<p") || s.startsWith("<div") || s.startsWith("<span")) return s;
+
+    // Otherwise wrap in <p> exactly like HubSpot CMS does
+    return `<p>${escapeHtml(s)}</p>`;
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  // Initial load
+  loadHubspotComments();
+</script>
+
+
+
     <script>
     /**
      * Fix Chrome "Deprecated feature used" for overflow:visible on img/video/canvas.
