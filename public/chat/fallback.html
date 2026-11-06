@@ -1,335 +1,122 @@
-<!doctype html><html lang="en-ph"><head>
-    <meta charset="utf-8">
+<!doctype html>
+<html lang="en-PH">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,follow">
+  <meta name="description" content="Open your preferred messaging app to contact Seven Angels Massage. Alternative contact methods are available 24/7.">
+  <title>Opening Your Chat | Seven Angels Massage</title>
+  <link rel="canonical" href="https://www.sevenangelsmassage.com/chat/fallback">
+  <link rel="icon" href="/assets/media/Seven%20Angels%20Massage%20Logo.webp" type="image/webp">
+  <style>
+    :root { color-scheme: light; font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; min-height: 100vh; min-height: 100svh; background: #faf9fb; color: #1c2028; }
+    main { min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: 24px 16px; }
+    .panel { width: 100%; max-width: 480px; padding: clamp(24px, 5vw, 40px); background: #fff;
+      border: 1px solid #e9e5ec; border-radius: 18px; box-shadow: 0 12px 38px rgba(26,22,30,.06); }
+    .brand { margin: 0 0 20px; color: #922167; font-size: .76rem; font-weight: 750; letter-spacing: .10em; text-transform: uppercase; }
+    h1 { font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.7rem, 5.5vw, 2.25rem);
+      line-height: 1.15; margin: 0 0 12px; }
+    p { line-height: 1.55; }
+    .subtext { margin: 0 0 24px; color: #565966; font-size: .99rem; }
+    .button { display: block; padding: 14px 20px; width: 100%; text-align: center;
+      border-radius: 10px; background: #161616; color: white; font-weight: 700; text-decoration: none; }
+    .button:focus-visible, .alternative:focus-visible { outline: 3px solid #c71585; outline-offset: 3px; }
+    .button:hover { background: #343039; }
+    .alternative { display: block; margin-top: 20px; color: #922167; font-size: .92rem;
+      font-weight: 650; text-align: center; text-underline-offset: 3px; }
+    .note { color: #565966; font-size: .9rem; }
+    #vcardBox { display: none; margin: 0 0 10px; }
+    #vcardBox .vcard-title { font-weight: 700; }
+    #wechatQR { display: none; position: fixed; inset: 0; z-index: 10; padding: 20px;
+      background: rgba(15,17,24,.7); align-items: center; justify-content: center; overflow: auto; }
+    .wechat-qr-content { width: min(100%, 370px); margin: auto; padding: 28px 24px; text-align: center;
+      background: #fff; border-radius: 16px; box-shadow: 0 16px 50px rgba(0,0,0,.22); }
+    .wechat-user-id { font-weight: 750; margin: 0 0 14px; }
+    .wechat-qr { display: block; width: min(100%, 240px); height: auto; margin: 0 auto 16px; }
+    .wechat-desc { margin: 0 0 8px; }
+    .wechat-save-hint { margin: 0 0 20px; color: #565966; font-size: .85rem; }
+    #openBtnWeChat { display: none; }
+    .wechat-qr-content .alternative { margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="panel" id="fallbackRoot" aria-labelledby="fallbackTitle">
+      <p class="brand">Seven Angels Massage · Available 24/7</p>
+      <h1 id="fallbackTitle">Opening your chat…</h1>
+      <p id="fallbackDescription" class="subtext">If your preferred app doesn't open, use the button below.</p>
+      <a class="button" id="openBtn" href="#" rel="nofollow">Open messaging app</a>
 
-    
-    
-      <title>Seven Angels Massage | Chat - Fallback</title>
-    
+      <!-- Preserved IDs: child.js shows this only when ?app=vcard. -->
+      <div id="vcardBox">
+        <p class="vcard-title">Save Seven Angels Massage to your contacts</p>
+        <a class="button" id="openBtnVcard" href="#" rel="nofollow">Download contact card</a>
+        <p class="note">After downloading, open the contact card and choose Save or Add Contact.</p>
+      </div>
 
-    
-    <meta name="description" content="This is Seven Angels Massage - Chat Apps Fallback page.">
+      <a class="alternative" href="/contact-us">Other ways to contact us</a>
+    </section>
+  </main>
 
-    
-    
-      <link rel="shortcut icon" href="/assets/media/Seven%20Angels%20Massage%20Logo.webp?width=149&quality=high">
-    
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    
-    
-    
-    
-    
-    
-    
-
-    <!-- Font Awesome 5 Free (async, consumes preload properly) -->
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-
-    <noscript>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    </noscript>
-
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="robots" content="noindex,follow">
-
-    
-    <meta property="og:description" content="This is Seven Angels Massage - Chat Apps Fallback page.">
-    <meta property="og:title" content="Seven Angels Massage | Chat - Fallback">
-    <meta name="twitter:description" content="This is Seven Angels Massage - Chat Apps Fallback page.">
-    <meta name="twitter:title" content="Seven Angels Massage | Chat - Fallback">
-
-    
-
-    
-    <style>
-a.cta_button{-moz-box-sizing:content-box !important;-webkit-box-sizing:content-box !important;box-sizing:content-box !important;vertical-align:middle}.hs-breadcrumb-menu{list-style-type:none;margin:0px 0px 0px 0px;padding:0px 0px 0px 0px}.hs-breadcrumb-menu-item{float:left;padding:10px 0px 10px 10px}.hs-breadcrumb-menu-divider:before{content:'›';padding-left:10px}.hs-featured-image-link{border:0}.hs-featured-image{float:right;margin:0 0 20px 20px;max-width:50%}@media (max-width: 568px){.hs-featured-image{float:none;margin:0;width:100%;max-width:100%}}.hs-screen-reader-text{clip:rect(1px, 1px, 1px, 1px);height:1px;overflow:hidden;position:absolute !important;width:1px}
-</style>
-
-<link class="hs-async-css" rel="preload" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Poppins:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Poppins:wght@400;500;600;700&display=swap"></noscript>
-<link class="hs-async-css" rel="preload" href="/assets/css/vendor/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="/assets/css/vendor/bootstrap.min.css"></noscript>
-<link class="hs-async-css" rel="preload" href="/assets/css/plugins/animate.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="/assets/css/plugins/animate.css"></noscript>
-<link class="hs-async-css" rel="preload" href="/assets/css/plugins/aos.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="/assets/css/plugins/aos.min.css"></noscript>
-<link class="hs-async-css" rel="preload" href="/assets/css/plugins/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="/assets/css/plugins/swiper-bundle.min.css"></noscript>
-<link class="hs-async-css" rel="preload" href="/assets/css/plugins/venobox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="/assets/css/plugins/venobox.min.css"></noscript>
-<link class="hs-async-css" rel="preload" href="/assets/css/main.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="/assets/css/main.min.css"></noscript>
-<link rel="stylesheet" href="/assets/css/child.css">
-<style>
-  @font-face {
-    font-family: "Poppins";
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-    src: url("/fonts/googlefonts/Poppins/regular.woff2") format("woff2"), url("/fonts/googlefonts/Poppins/regular.woff") format("woff");
-  }
-  @font-face {
-    font-family: "Poppins";
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-    src: url("/fonts/googlefonts/Poppins/regular.woff2") format("woff2"), url("/fonts/googlefonts/Poppins/regular.woff") format("woff");
-  }
-  @font-face {
-    font-family: "Poppins";
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-    src: url("/fonts/googlefonts/Poppins/700.woff2") format("woff2"), url("/fonts/googlefonts/Poppins/700.woff") format("woff");
-  }
-  @font-face {
-    font-family: "DM Serif Display";
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-    src: url("/fonts/googlefonts/DM_Serif_Display/regular.woff2") format("woff2"), url("/fonts/googlefonts/DM_Serif_Display/regular.woff") format("woff");
-  }
-  @font-face {
-    font-family: "DM Serif Display";
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-    src: url("/fonts/googlefonts/DM_Serif_Display/regular.woff2") format("woff2"), url("/fonts/googlefonts/DM_Serif_Display/regular.woff") format("woff");
-  }
-</style>
-
-<!-- Editor Styles -->
-<style id="hs_editor_style" type="text/css">
-/* HubSpot Styles (default) */
-.cell_17671663389652-padding {
-  padding-left: 10px !important;
-  padding-right: 10px !important;
-}
-.widget_1767075957332-hidden {
-  display: block !important;
-}
-</style>
-    
-
-    
-<!--  Added by GoogleAnalytics4 integration -->
-<script>
-var _hsp = window._hsp = window._hsp || [];
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-
-var useGoogleConsentModeV2 = true;
-var waitForUpdateMillis = 1000;
-
-
-if (!window._hsGoogleConsentRunOnce) {
-  window._hsGoogleConsentRunOnce = true;
-
-  gtag('consent', 'default', {
-    'ad_storage': 'denied',
-    'analytics_storage': 'denied',
-    'ad_user_data': 'denied',
-    'ad_personalization': 'denied',
-    'wait_for_update': waitForUpdateMillis
-  });
-
-  if (useGoogleConsentModeV2) {
-    _hsp.push(['useGoogleConsentModeV2'])
-  } else {
-    _hsp.push(['addPrivacyConsentListener', function(consent){
-      var hasAnalyticsConsent = consent && (consent.allowed || (consent.categories && consent.categories.analytics));
-      var hasAdsConsent = consent && (consent.allowed || (consent.categories && consent.categories.advertisement));
-
-      gtag('consent', 'update', {
-        'ad_storage': hasAdsConsent ? 'granted' : 'denied',
-        'analytics_storage': hasAnalyticsConsent ? 'granted' : 'denied',
-        'ad_user_data': hasAdsConsent ? 'granted' : 'denied',
-        'ad_personalization': hasAdsConsent ? 'granted' : 'denied'
-      });
-    }]);
-  }
-}
-
-gtag('js', new Date());
-gtag('set', 'developer_id.dZTQ1Zm', true);
-gtag('config', 'G-XRTWWC19W7');
-</script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XRTWWC19W7"></script>
-
-<!-- /Added by GoogleAnalytics4 integration -->
-
-<!--  Added by GoogleTagManager integration -->
-<script>
-var _hsp = window._hsp = window._hsp || [];
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-
-var useGoogleConsentModeV2 = true;
-var waitForUpdateMillis = 1000;
-
-
-
-var hsLoadGtm = function loadGtm() {
-    if(window._hsGtmLoadOnce) {
-      return;
-    }
-
-    if (useGoogleConsentModeV2) {
-
-      gtag('set','developer_id.dZTQ1Zm',true);
-
-      gtag('consent', 'default', {
-      'ad_storage': 'denied',
-      'analytics_storage': 'denied',
-      'ad_user_data': 'denied',
-      'ad_personalization': 'denied',
-      'wait_for_update': waitForUpdateMillis
-      });
-
-      _hsp.push(['useGoogleConsentModeV2'])
-    }
-
-    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-5C4W79Z');
-
-    window._hsGtmLoadOnce = true;
-};
-
-_hsp.push(['addPrivacyConsentListener', function(consent){
-  if(consent.allowed || (consent.categories && consent.categories.analytics)){
-    hsLoadGtm();
-  }
-}]);
-
-</script>
-
-<!-- /Added by GoogleTagManager integration -->
-
-    <link rel="canonical" href="https://www.sevenangelsmassage.com/chat/fallback">
-
-
-<meta property="og:url" content="https://www.sevenangelsmassage.com/chat/fallback">
-<meta name="twitter:card" content="summary">
-<meta http-equiv="content-language" content="en-ph">
-
-
-
-
-
-
-    
-  <meta name="generator" content="HubSpot"></head>
-
-  <body>
-<!--  Added by GoogleTagManager integration -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5C4W79Z" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-
-<!-- /Added by GoogleTagManager integration -->
-
-    <div class="body-wrapper fallback-center   hs-content-id-285935754981 hs-landing-page hs-page ">
-      <main id="main-content" class="body-container-wrapper">
-        <div class="container-fluid">
-<div class="row-fluid-wrapper">
-<div class="row-fluid">
-<div class="span12 widget-span widget-type-cell " style="" data-widget-type="cell" data-x="0" data-w="12">
-
-<div class="row-fluid-wrapper row-depth-1 row-number-1 dnd-section">
-<div class="row-fluid ">
-<div class="span12 widget-span widget-type-cell cell_17671663389652-padding dnd-column" style="" data-widget-type="cell" data-x="0" data-w="12">
-
-<div class="row-fluid-wrapper row-depth-1 row-number-2 dnd-row">
-<div class="row-fluid ">
-<div class="span12 widget-span widget-type-custom_widget dnd-module widget_1767075957332-hidden" style="" data-widget-type="custom_widget" data-x="0" data-w="12">
-<div id="hs_cos_wrapper_widget_1767075957332" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module widget-type-rich_text" style="" data-hs-cos-general-type="widget" data-hs-cos-type="module"><span id="hs_cos_wrapper_widget_1767075957332_" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_rich_text" style="" data-hs-cos-general-type="widget" data-hs-cos-type="rich_text"><div id="fallbackRoot">
-<h1>Opening chat...</h1>
-<p class="fallback-subtext">If nothing happens, tap the button below.</p>
-<a id="openBtn" href="#">Tap to Open</a> <!-- vCard fallback (hidden by default) -->
-<div id="vcardBox">
-<p class="vcard-title">Save our contact in your phone</p>
-<!-- Optional: if you want a static QR image shown during failover, host it and set src --> <!--
-<img
-id="vcardQRImg"
-src="/assets/media/vCard-QR.webp"
-alt="Seven Angels Massage vCard QR"
-loading="lazy"
->
---> <a id="openBtnVcard" href="#">Tap to Download vCard</a>
-<p class="vcard-hint">If the download doesn’t start, tap the button above. Then add/save the contact.</p>
-</div>
-<!-- WeChat QR (hidden by default) -->
-<div id="wechatQR" class="wechat-fallback" aria-hidden="true" aria-label="WeChat QR Code" role="dialog">
-<div class="wechat-qr-content" role="document">
-<p class="wechat-user-id">WeChat ID: sevenangels003</p>
-<img class="wechat-qr" src="/assets/media/WeChat-QR.webp" alt="Add us on WeChat for bookings and questions" loading="lazy">
-<p class="wechat-desc">Scan this QR using WeChat to add Seven Angels Massage and chat with us.</p>
-<p class="wechat-save-hint">Tip: Press and hold the QR image to save it. Then open WeChat and scan from your Photos/Album as needed.</p>
-<a id="openBtnWeChat" href="#">Tap to Open WeChat</a></div>
-</div>
-</div></span></div>
-
-</div><!--end widget-span -->
-</div><!--end row-->
-</div><!--end row-wrapper -->
-
-</div><!--end widget-span -->
-</div><!--end row-->
-</div><!--end row-wrapper -->
-
-</div><!--end widget-span -->
-</div>
-</div>
-</div>
-      </main>
-
+  <!-- Preserved IDs: child.js shows this only when ?app=wechat-qr. -->
+  <div id="wechatQR" class="wechat-fallback" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Seven Angels Massage WeChat QR code">
+    <div class="wechat-qr-content" role="document">
+      <p class="wechat-user-id">WeChat ID: sevenangels003</p>
+      <img id="wechatQRImage" class="wechat-qr" data-src="/assets/media/WeChat-QR.webp"
+        alt="WeChat QR code for Seven Angels Massage" width="240" height="240">
+      <p class="wechat-desc">Scan this QR code with WeChat to contact us.</p>
+      <p class="wechat-save-hint">On one phone? Save the QR image, then open WeChat and scan it from your photos.</p>
+      <a class="button" id="openBtnWeChat" href="#" rel="nofollow">Open WeChat</a>
+      <a class="alternative" href="/contact-us">Choose another contact method</a>
     </div>
-<!-- HubSpot performance collection script -->
-<script src="/assets/js/child.js"></script>
-<script src="/assets/js/vendor/modernizr-3.11.7.min.js"></script>
-<script src="/assets/js/vendor/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/plugins/aos.min.js"></script>
-<script src="/assets/js/plugins/svg-inject.min.js"></script>
-<script src="/assets/js/plugins/vivus.min.js"></script>
-<script src="/assets/js/plugins/parallax.min.js"></script>
-<script src="/assets/js/plugins/swiper-bundle.min.js"></script>
-<script src="/assets/js/plugins/venobox.min.js"></script>
-<script defer src="/assets/js/main.js"></script>
-<script>
-var hsVars = hsVars || {}; hsVars['language'] = 'en-ph';
-</script>
+  </div>
 
-<!-- Start of HubSpot Embed Code -->
-<script type="text/javascript" id="hs-script-loader" async defer src="https://js-na2.hs-scripts.com/243726556.js"></script>
-<!-- End of HubSpot Embed Code -->
-
-
-<script type="text/javascript">
-var hsVars = {
-    render_id: "5339890a-4802-4a28-b907-31f2557f74b8",
-    ticks: 1769052274593,
-    page_id: 285935754981,
-    
-    content_group_id: 0,
-    portal_id: 243726556,
-    app_hs_base_url: "https://app-na2.hubspot.com",
-    cp_hs_base_url: "https://cp-na2.hubspot.com",
-    language: "en-ph",
-    analytics_page_type: "landing-page",
-    scp_content_type: "",
-    
-    analytics_page_id: "285935754981",
-    category_id: 1,
-    folder_id: 0,
-    is_hubspot_user: false
-}
-</script>
-
-
-
-</body></html>
+  <!-- Presentation only. The app links, tracking and automatic opening remain in child.js. -->
+  <script>
+    (() => {
+      const app = (new URLSearchParams(location.search).get("app") || "").toLowerCase();
+      const names = {
+        "whatsapp": "WhatsApp", "viber": "Viber", "telegram": "Telegram",
+        "messenger": "Messenger", "signal": "Signal", "line": "LINE",
+        "kakao": "KakaoTalk", "kakaotalk": "KakaoTalk", "sms-globe": "SMS",
+        "sms-smart": "SMS", "email": "Email", "vcard": "Contact Card",
+        "wechat-qr": "WeChat"
+      };
+      const name = names[app];
+      if (!name) return; // Existing child.js / Cloudflare rules validate the app.
+      const title = document.getElementById("fallbackTitle");
+      const description = document.getElementById("fallbackDescription");
+      const open = document.getElementById("openBtn");
+      const wechat = document.getElementById("wechatQRImage");
+      document.title = `${name} | Seven Angels Massage`;
+      if (app === "wechat-qr") {
+        title.textContent = "Connect with us on WeChat";
+        description.textContent = "Scan our QR code to add Seven Angels Massage.";
+        open.hidden = true;
+        wechat.src = wechat.dataset.src; // Fetch QR image only for WeChat.
+        const onMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (!onMobile) document.getElementById("openBtnWeChat").hidden = true;
+      } else if (app === "vcard") {
+        title.textContent = "Save our contact details";
+        description.textContent = "Download our contact card so you can reach us anytime.";
+        open.hidden = true;
+      } else if (app === "email") {
+        title.textContent = "Preparing your booking email…";
+        description.textContent = "Your email app may ask permission to open. Review your booking details before sending.";
+        open.textContent = "Compose Email";
+      } else {
+        title.textContent = (app.startsWith("sms-") ? "Opening your messaging app…" : `Opening ${name}…`);
+        description.textContent = `Your browser may ask permission to open ${name}. If nothing happens, use the button below.`;
+        open.textContent = app.startsWith("sms-") ? "Open SMS" : `Open ${name}`;
+      }
+    })();
+  </script>
+  <script src="/assets/js/child.js"></script>
+  <noscript>
+    <p style="text-align:center;padding:12px">JavaScript is required to open your preferred app. <a href="/contact-us">Contact us here instead.</a></p>
+  </noscript>
+</body>
+</html>
