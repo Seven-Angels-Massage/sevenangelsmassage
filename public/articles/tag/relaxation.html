@@ -1,4 +1,17 @@
 <!doctype html><html lang="en"><head>
+<!-- SAM browser-specific GA4 opt-out: must execute before any tracking tags -->
+<script>
+(function () {
+  var disabled = false;
+  try { disabled = localStorage.getItem('sam_ga4_optout') === '1'; } catch (e) {}
+  if (!disabled) disabled = document.cookie.split(';').some(function (c) {
+    return c.trim() === 'sam_ga4_optout=1';
+  });
+  window.samAnalyticsOptOut = disabled;
+  if (disabled) window['ga-disable-G-XRTWWC19W7'] = true;
+})();
+</script>
+
     <meta charset="utf-8">
     <title>Seven Angels Massage Blog | Wellness Insights & Massage Tips Articles</title>
     <link rel="shortcut icon" href="/assets/media/Seven%20Angels%20Massage%20Logo.webp?width=149&quality=high">
@@ -351,9 +364,16 @@ if (!window._hsGoogleConsentRunOnce) {
 
 gtag('js', new Date());
 gtag('set', 'developer_id.dZTQ1Zm', true);
-gtag('config', 'G-XRTWWC19W7');
+if (!window.samAnalyticsOptOut) gtag('config', 'G-XRTWWC19W7');
 </script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XRTWWC19W7"></script>
+<script>
+if (!window.samAnalyticsOptOut) {
+  var samGa4Loader = document.createElement('script');
+  samGa4Loader.async = true;
+  samGa4Loader.src = 'https://www.googletagmanager.com/gtag/js?id=G-XRTWWC19W7';
+  document.head.appendChild(samGa4Loader);
+}
+</script>
 
 <!-- /Added by GoogleAnalytics4 integration -->
 
@@ -369,6 +389,7 @@ var waitForUpdateMillis = 1000;
 
 
 var hsLoadGtm = function loadGtm() {
+    if (window.samAnalyticsOptOut) return;
     if(window._hsGtmLoadOnce) {
       return;
     }
