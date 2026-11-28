@@ -1,6 +1,8 @@
 name: deSEC apex AAAA controller
 
 on:
+  push:
+    branches: [dns/apex-aaaa-queue-validation]
   issues:
     types: [closed, reopened]
   schedule:
@@ -27,7 +29,7 @@ jobs:
     # The issue filter is evaluated before this job enters the shared queue.
     # Unrelated public issue events cannot displace pending controller jobs.
     concurrency:
-      group: sevenangelsmassage-desec-apex-aaaa
+      group: sevenangelsmassage-desec-apex-aaaa-queue-validation
       cancel-in-progress: false
       # Keep a queued explicit deletion from being replaced by a scheduled check.
       queue: max
