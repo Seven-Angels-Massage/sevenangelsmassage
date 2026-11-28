@@ -1,0 +1,68 @@
+name: deSEC apex AAAA controller
+
+on:
+  issues:
+    types: [closed, reopened]
+  schedule:
+    # GitHub's minimum is five minutes; schedules can still be delayed.
+    - cron: "2-57/5 * * * *"
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Apply changes to the deSEC apex AAAA (requires configured secret and ownership guard)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: read
+
+jobs:
+  controller:
+    if: >-
+      github.repository == 'Seven-Angels-Massage/sevenangelsmassage' &&
+      github.event.repository.private == false &&
+      (github.event_name != 'issues' || github.event.issue.number == 4) &&
+      (vars.APEX_AAAA_PAUSED != 'true' || (github.event_name == 'issues' && github.event.action == 'closed'))
+    # The issue filter is evaluated before this job enters the shared queue.
+    # Unrelated public issue events cannot displace pending controller jobs.
+    concurrency:
+      group: sevenangelsmassage-desec-apex-aaaa
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out controller only
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: ops/apex-aaaa
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install controller dependencies
+        run: python -m pip install --disable-pip-version-check --no-input -r ops/apex-aaaa/requirements.txt
+      - name: Observe or apply the AAAA decision
+        env:
+          PYTHONUNBUFFERED: "1"
+          GITHUB_TOKEN: ${{ github.token }}
+          DESEC_APEX_AAAA_TOKEN: ${{ github.ref == 'refs/heads/main' && secrets.DESEC_APEX_AAAA_TOKEN || '' }}
+          EXCLUSIVE_APEX_AAAA_OWNER: ${{ vars.EXCLUSIVE_APEX_AAAA_OWNER }}
+          MAINTENANCE_REQUEST: ${{ github.event_name == 'issues' && github.event.action == 'closed' }}
+          APPLY_REQUESTED: ${{ (github.event_name == 'issues' && github.event.action == 'closed') || ((github.event_name == 'schedule' || github.event_name == 'issues') && vars.APEX_AAAA_MODE == 'apply') || (github.event_name == 'workflow_dispatch' && inputs.apply) }}
+        shell: bash
+        run: |
+          if [[ "$APPLY_REQUESTED" == "true" ]]; then
+            if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+              echo "Live writes are restricted to the main branch."
+              exit 1
+            fi
+            if [[ "$MAINTENANCE_REQUEST" == "true" ]]; then
+              python ops/apex-aaaa/controller.py --apply --maintenance-only
+            else
+              python ops/apex-aaaa/controller.py --apply
+            fi
+          else
+            python ops/apex-aaaa/controller.py
+          fi

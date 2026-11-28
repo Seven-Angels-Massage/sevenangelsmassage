@@ -1,0 +1,37 @@
+--- a/worker.js
++++ b/worker.js
+@@ -190,6 +190,14 @@
+     }
+   }
+ 
++  // GitHub owns only the apex AAAA RRset when this guard is enabled.
++  // Remove it from both sides so this Worker neither creates nor deletes it.
++  if (env.PAUSE_APEX_AAAA_SYNC === "true") {
++    const apexAAAA = `${zoneApex}|AAAA`;
++    desired.delete(apexAAAA);
++    current.delete(apexAAAA);
++  }
++
+   // UPDATED: diff needs delegatedNs + zoneApex to decide which NS is deletable
+   const plan = diff(env, desired, current, { delegatedNs, zoneApex });
+ 
+@@ -530,6 +538,9 @@
+ 
+   // Delete first, then create/update (prevents RRset conflicts like CNAME→NS)
+   for (const rr of plan.toDelete) {
++    if (env.PAUSE_APEX_AAAA_SYNC === "true" &&
++        rr.type === "AAAA" && normalizeFqdn(rr.name) === zoneApex) continue;
++
+     // BELT & SUSPENDERS:
+     // Only allow NS deletions if they are tagged as Worker-managed delegation NS
+     if (rr.type === "NS") {
+@@ -554,6 +565,9 @@
+   }
+ 
+   for (const rr of plan.toCreateOrUpdate) {
++    if (env.PAUSE_APEX_AAAA_SYNC === "true" &&
++        rr.type === "AAAA" && normalizeFqdn(rr.name) === zoneApex) continue;
++
+     const sub = makeSubname(rr.name, domain);
+ 
+     // Extra guard: never write apex NS (we should never have it anyway)
