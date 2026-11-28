@@ -67,7 +67,9 @@ for the verified deSEC API result. Wait out the prior AAAA TTL before expecting
 cached IPv6 answers to disappear. Cloudflare's generated AAAA and proxy settings
 remain separate; deleting deSEC's AAAA alone does not guarantee certificate renewal.
 
-All controller jobs share one queue and read current issue state, including
+All controller jobs share one queue that preserves pending requests (up to
+GitHub's 100-job limit), so a scheduled observation cannot replace a queued
+manual deletion. Jobs read current issue state, including
 immediately before a write. Unrelated issue events do not enter that queue.
 Issue title, body, comments, and labels are not executed or interpreted as commands.
 Keep this issue in this repository and avoid automatic PR-closing references to it.
