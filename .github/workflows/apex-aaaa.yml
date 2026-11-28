@@ -1,0 +1,54 @@
+name: deSEC apex AAAA controller
+
+on:
+  schedule:
+    # GitHub's minimum is five minutes; schedules can still be delayed.
+    - cron: "2-57/5 * * * *"
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Apply changes to the deSEC apex AAAA (requires configured secret and ownership guard)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sevenangelsmassage-desec-apex-aaaa
+  cancel-in-progress: false
+
+jobs:
+  controller:
+    if: github.repository == 'Seven-Angels-Massage/sevenangelsmassage' && vars.APEX_AAAA_PAUSED != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out controller only
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: ops/apex-aaaa
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install controller dependencies
+        run: python -m pip install --disable-pip-version-check --no-input -r ops/apex-aaaa/requirements.txt
+      - name: Observe or apply the AAAA decision
+        env:
+          PYTHONUNBUFFERED: "1"
+          DESEC_APEX_AAAA_TOKEN: ${{ github.ref == 'refs/heads/main' && secrets.DESEC_APEX_AAAA_TOKEN || '' }}
+          EXCLUSIVE_APEX_AAAA_OWNER: ${{ vars.EXCLUSIVE_APEX_AAAA_OWNER }}
+          APPLY_REQUESTED: ${{ (github.event_name == 'schedule' && vars.APEX_AAAA_MODE == 'apply') || (github.event_name == 'workflow_dispatch' && inputs.apply) }}
+        shell: bash
+        run: |
+          if [[ "$APPLY_REQUESTED" == "true" ]]; then
+            if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+              echo "Live writes are restricted to the main branch."
+              exit 1
+            fi
+            python ops/apex-aaaa/controller.py --apply
+          else
+            python ops/apex-aaaa/controller.py
+          fi
