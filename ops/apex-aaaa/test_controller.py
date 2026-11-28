@@ -8,6 +8,7 @@ import dns.flags
 import dns.message
 import dns.rcode
 import dns.rrset
+import httpx
 import requests
 
 import controller as c
@@ -157,6 +158,112 @@ class DNSTests(unittest.TestCase):
         self.assertEqual(c.validate_publish(AAAA, NETWORKS), AAAA)
         with self.assertRaises(c.ControllerError):
             c.validate_publish(("2001:4860:4860::8888",), NETWORKS)
+
+
+class DiscoveryTests(unittest.TestCase):
+    def doh_response(self, address="162.159.38.157"):
+        query = dns.message.make_query(c.CF_NS[0], "A", want_dnssec=True)
+        answer = dns.message.make_response(query)
+        answer.answer.append(dns.rrset.from_text(c.CF_NS[0] + ".", 300, "IN", "A", address))
+        return query, answer
+
+    def call_discovery(self, response, query=None, failure=None):
+        with patch.object(c.httpx, "Client") as constructor, \
+                patch.object(c.requests, "get", side_effect=AssertionError("DoH must not use HTTP/1.1 requests")):
+            client = constructor.return_value.__enter__.return_value
+            client.get.return_value = response
+            client.get.side_effect = failure
+            if query is None:
+                result = c.discover_at(c.DOH_RESOLVERS[1], c.CF_NS[0])
+            else:
+                with patch.object(c.dns.message, "make_query", return_value=query):
+                    result = c.discover_at(c.DOH_RESOLVERS[1], c.CF_NS[0])
+            settings = constructor.call_args.kwargs
+        return result, settings
+
+    def test_quad9_discovery_negotiates_http2_and_parses_wire_dns(self):
+        query, answer = self.doh_response()
+        response = httpx.Response(200, content=answer.to_wire(),
+                                  headers={"Content-Type": "application/dns-message"},
+                                  extensions={"http_version": b"HTTP/2"})
+        result, settings = self.call_discovery(response, query)
+        self.assertEqual(result.addresses, ("162.159.38.157",))
+        self.assertEqual(result.http_version, "HTTP/2")
+        self.assertEqual(result.detail, "ok")
+        self.assertIs(settings["http2"], True)
+        self.assertIs(settings["verify"], True)
+        self.assertIs(settings["follow_redirects"], False)
+
+    def test_http_protocol_rejection_is_diagnostic_and_not_trusted(self):
+        response = httpx.Response(505, text="untrusted remote body SECRET", extensions={"http_version": b"HTTP/1.1"})
+        result, _ = self.call_discovery(response)
+        self.assertEqual(result.addresses, ())
+        self.assertEqual(result.http_status, 505)
+        self.assertEqual(result.http_version, "HTTP/1.1")
+        self.assertEqual(result.detail, "DoH HTTP 505")
+        self.assertNotIn("SECRET", str(result))
+
+    def test_doh_message_mismatch_is_diagnostic_and_rejected(self):
+        query, answer = self.doh_response()
+        answer.id ^= 1
+        response = httpx.Response(200, content=answer.to_wire(),
+                                  headers={"Content-Type": "application/dns-message"})
+        result, _ = self.call_discovery(response, query)
+        self.assertEqual(result.addresses, ())
+        self.assertIn("does not match", result.detail)
+
+    def test_non_dns_media_type_and_non_cloudflare_endpoint_are_rejected(self):
+        result, _ = self.call_discovery(httpx.Response(200, text="not DNS", headers={"Content-Type": "text/html"}))
+        self.assertEqual(result.addresses, ())
+        self.assertIn("media type", result.detail)
+        query, answer = self.doh_response("8.8.8.8")
+        response = httpx.Response(200, content=answer.to_wire(), headers={"Content-Type": "application/dns-message"})
+        result, _ = self.call_discovery(response, query)
+        self.assertEqual(result.addresses, ())
+        self.assertIn("outside reviewed Cloudflare", result.detail)
+
+    def test_transport_diagnostic_does_not_include_exception_text(self):
+        result, _ = self.call_discovery(None, failure=httpx.ConnectError("secret-token in remote exception"))
+        self.assertEqual(result.addresses, ())
+        self.assertEqual(result.detail, "DoH failure: ConnectError")
+        self.assertNotIn("secret-token", str(result))
+
+    def test_provider_agreement_still_required_and_diagnostics_show_failure(self):
+        def answer(resolver, hostname):
+            if resolver == c.DOH_RESOLVERS[1]:
+                return c.Discovery(detail="DoH HTTP 505", http_status=505, http_version="HTTP/1.1")
+            values = tuple(sorted(c.BOOTSTRAP.get(hostname, ("45.54.76.1",))))
+            return c.Discovery(values, "ok", 200, "HTTP/2")
+        diagnostics = {}
+        with patch.object(c, "discover_at", side_effect=answer):
+            endpoints, trusted = c.discover(diagnostics)
+        self.assertFalse(trusted)
+        self.assertEqual(endpoints[c.CF_NS[0]], c.BOOTSTRAP[c.CF_NS[0]])
+        self.assertEqual(endpoints[c.DESEC_NS[0]], ())
+        self.assertFalse(diagnostics[c.CF_NS[0]]["agreed"])
+        self.assertEqual(diagnostics[c.CF_NS[0]]["resolvers"][1]["http_status"], 505)
+        self.assertEqual(c.decide(rounds(DOWN, DOWN), trusted).action, "hold")
+
+    def test_success_requires_address_agreement_not_identical_http_metadata(self):
+        def answer(resolver, hostname):
+            values = tuple(sorted(c.BOOTSTRAP.get(hostname, ("45.54.76.1",))))
+            protocol = "HTTP/1.1" if resolver == c.DOH_RESOLVERS[0] else "HTTP/2"
+            return c.Discovery(values, "ok", 200, protocol)
+        diagnostics = {}
+        with patch.object(c, "discover_at", side_effect=answer):
+            endpoints, trusted = c.discover(diagnostics)
+        self.assertTrue(trusted)
+        self.assertEqual(endpoints[c.CF_NS[0]], tuple(sorted(c.BOOTSTRAP[c.CF_NS[0]])))
+        self.assertEqual(endpoints[c.DESEC_NS[0]], ("45.54.76.1",))
+        self.assertTrue(diagnostics[c.CF_NS[0]]["agreed"])
+
+    def test_conflicting_successful_providers_remain_untrusted(self):
+        def answer(resolver, hostname):
+            values = ("162.159.38.157",) if resolver == c.DOH_RESOLVERS[0] else ("172.64.34.157",)
+            return c.Discovery(values, "ok", 200, "HTTP/2")
+        with patch.object(c, "discover_at", side_effect=answer):
+            _, trusted = c.discover({})
+        self.assertFalse(trusted)
 
 
 class APITests(unittest.TestCase):

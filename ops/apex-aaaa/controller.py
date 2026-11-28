@@ -28,6 +28,7 @@ import dns.name
 import dns.query
 import dns.rcode
 import dns.rdatatype
+import httpx
 import requests
 
 
@@ -92,6 +93,14 @@ class Snapshot:
     records: tuple[str, ...]
     ttl: int
     touched: str | None = None
+
+
+@dataclass(frozen=True)
+class Discovery:
+    addresses: tuple[str, ...] = ()
+    detail: str = ""
+    http_status: int | None = None
+    http_version: str | None = None
 
 
 def ipv6_records(values) -> tuple[str, ...]:
@@ -180,15 +189,26 @@ def control_address(address: str) -> bool:
         return False
 
 
-def discover_at(resolver: str, hostname: str) -> tuple[str, ...]:
+def discover_at(resolver: str, hostname: str) -> Discovery:
     query = dns.message.make_query(hostname, "A", want_dnssec=True)
     wire = base64.urlsafe_b64encode(query.to_wire()).rstrip(b"=").decode("ascii")
+    status = None
+    protocol = None
     try:
-        response = requests.get(resolver, params={"dns": wire},
-                                headers={"Accept": "application/dns-message"},
-                                timeout=(4, 6), allow_redirects=False, verify=True)
-        if response.status_code != 200 or len(response.content) > 65535:
-            return ()
+        # Quad9 retired DoH over HTTP/1.1 in December 2025. requests cannot
+        # negotiate HTTP/2; use an HTTP/2-capable client for these DNS lookups.
+        with httpx.Client(http2=True, verify=True, follow_redirects=False,
+                          timeout=httpx.Timeout(6, connect=4)) as client:
+            response = client.get(resolver, params={"dns": wire},
+                                  headers={"Accept": "application/dns-message"})
+        status = response.status_code
+        protocol = response.http_version
+        if status != 200:
+            return Discovery(detail=f"DoH HTTP {status}", http_status=status, http_version=protocol)
+        if len(response.content) > 65535:
+            return Discovery(detail="DoH response exceeds DNS message size", http_status=status, http_version=protocol)
+        if response.headers.get("content-type", "").split(";", 1)[0].strip().lower() != "application/dns-message":
+            return Discovery(detail="DoH response has unexpected media type", http_status=status, http_version=protocol)
         answer = checked_response(query, dns.message.from_wire(response.content), False)
         wanted = dns.name.from_text(hostname)
         addresses = set()
@@ -198,16 +218,22 @@ def discover_at(resolver: str, hostname: str) -> tuple[str, ...]:
             for item in rrset:
                 address = ipaddress.ip_address(item.address)
                 if address.version != 4 or not address.is_global:
-                    return ()
+                    return Discovery(detail="Non-public nameserver IPv4 address", http_status=status, http_version=protocol)
                 if hostname in CF_NS and not any(address in net for net in CF_V4):
-                    return ()
+                    return Discovery(detail="Nameserver address outside reviewed Cloudflare IPv4 prefixes", http_status=status, http_version=protocol)
                 addresses.add(address.compressed)
-        return tuple(sorted(addresses)) if 0 < len(addresses) <= 12 else ()
-    except (requests.RequestException, dns.exception.DNSException, ControllerError, ValueError):
-        return ()
+        if not 0 < len(addresses) <= 12:
+            return Discovery(detail="No usable exact-name A RRset or unexpected address count", http_status=status, http_version=protocol)
+        return Discovery(tuple(sorted(addresses)), "ok", status, protocol)
+    except ControllerError as exc:
+        return Discovery(detail=str(exc), http_status=status, http_version=protocol)
+    except (httpx.HTTPError, dns.exception.DNSException, ValueError, ImportError) as exc:
+        # Exception text and HTTP bodies can contain remote input. Log only the
+        # bounded exception class, never request credentials or response bodies.
+        return Discovery(detail="DoH failure: " + type(exc).__name__, http_status=status, http_version=protocol)
 
 
-def discover() -> tuple[dict[str, tuple[str, ...]], bool]:
+def discover(diagnostics: dict | None = None) -> tuple[dict[str, tuple[str, ...]], bool]:
     jobs = [(hostname, resolver) for hostname in (*CF_NS, *DESEC_NS)
             for resolver in DOH_RESOLVERS]
     with ThreadPoolExecutor(max_workers=8) as pool:
@@ -216,13 +242,21 @@ def discover() -> tuple[dict[str, tuple[str, ...]], bool]:
     trusted_cf = True
     for index, hostname in enumerate((*CF_NS, *DESEC_NS)):
         left, right = answers[2 * index:2 * index + 2]
-        agreed = bool(left) and left == right
+        agreed = bool(left.addresses) and left.addresses == right.addresses
         if hostname in CF_NS:
-            endpoints[hostname] = left if agreed else BOOTSTRAP[hostname]
+            endpoints[hostname] = left.addresses if agreed else BOOTSTRAP[hostname]
             trusted_cf = trusted_cf and agreed
         else:
             # A control is useful only when two independent resolvers agree on it.
-            endpoints[hostname] = left if agreed else ()
+            endpoints[hostname] = left.addresses if agreed else ()
+        if diagnostics is not None:
+            diagnostics[hostname] = {
+                "agreed": agreed,
+                "source": "independent-resolver agreement" if agreed else
+                          "pinned fallback (observation only)" if hostname in CF_NS else "unavailable",
+                "resolvers": [{"resolver": resolver, **asdict(answer)}
+                              for resolver, answer in zip(DOH_RESOLVERS, (left, right))],
+            }
     return endpoints, trusted_cf
 
 
@@ -451,7 +485,8 @@ def run(apply: bool = False, environ=None) -> dict:
     # Read before the sampling window, and check again just before mutation.
     ttl = api.minimum_ttl() if api else None
     initial = api.snapshot() if api else None
-    endpoints, trusted = discover()
+    discovery_diagnostics = {}
+    endpoints, trusted = discover(discovery_diagnostics)
     rounds = collect_rounds(endpoints)
     decision = decide(rounds, trusted)
     if decision.action == "sync":
@@ -461,7 +496,8 @@ def run(apply: bool = False, environ=None) -> dict:
             decision = Decision("hold", reason=str(exc))
     result = reconcile(api, initial, decision, ttl, apply)
     result.update(domain=DOMAIN, rrtype="AAAA", subname="", trusted_bootstrap=trusted,
-                  rounds=[asdict(sample) for sample in rounds])
+                  rounds=[asdict(sample) for sample in rounds],
+                  bootstrap_diagnostics=discovery_diagnostics)
     if result["changed"]:
         result["authoritative_checks"] = publication_status(endpoints, decision.records)
     return result
@@ -479,6 +515,14 @@ def write_summary(result: dict):
              f"- Decision: `{decision.get('action', 'hold')}` — {decision.get('reason', '')}",
              f"- Target TTL: `{result.get('target_ttl')}` (unknown without API access)",
              "", "Cloudflare Pages and HTTP status are not decision inputs."]
+    if result.get("bootstrap_diagnostics"):
+        lines += ["", "### Nameserver discovery", "",
+                  "| Nameserver | Provider | Result | Protocol | Agreement |",
+                  "| --- | --- | --- | --- | --- |"]
+        for hostname, diagnostic in result["bootstrap_diagnostics"].items():
+            for source in diagnostic["resolvers"]:
+                provider = "Google" if source["resolver"] == DOH_RESOLVERS[0] else "Quad9"
+                lines.append(f"| `{hostname}` | {provider} | {source['detail']} | {source['http_version'] or 'unknown'} | {diagnostic['agreed']} |")
     if result.get("changed"):
         lines += ["", "API state was verified. Recursive caches may still retain previous answers.",
                   "Authoritative checks: `" + json.dumps(result.get("authoritative_checks", {})) + "`"]

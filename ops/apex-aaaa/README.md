@@ -50,18 +50,22 @@ The checks workflow runs unit tests and a public DNS observation on the proposed
 changes without receiving any deSEC secret. Its logs and job summary explain the
 observations and proposed action.
 
+Nameserver addresses are independently resolved through Google and Quad9 using
+DNS over HTTPS with HTTP/2 support. The report shows each resolver's transport
+and result, so a failed lookup is distinguishable from failed authoritative DNS.
+
 ## Before enabling writes
 
 ### 1. Give this controller exclusive ownership of apex AAAA
 
-The live `cf-to-desec-sync` Worker inspected on November 29, 2026 includes AAAA in
-its managed types and deletes records that are absent from Cloudflare's DNS
+The `cf-to-desec-sync` Worker originally included AAAA in its managed types and
+deleted records that were absent from Cloudflare's DNS
 management API. Cloudflare's automatically generated proxy AAAA answers are not
 ordinary API records. Without an exclusion, the Worker would delete the record
 that this controller creates.
 
-Apply `worker-apex-aaaa-exclusion.patch` to that Worker's current `worker.js` and
-add its plain-text binding:
+The exclusion in `worker-apex-aaaa-exclusion.patch` was deployed and verified on
+November 29, 2026 (Philippine time), together with this plain-text binding:
 
 ```text
 PAUSE_APEX_AAAA_SYNC=true
@@ -69,7 +73,13 @@ PAUSE_APEX_AAAA_SYNC=true
 
 This removes only apex AAAA from the Worker's comparison and write plans. It does
 not alter `PAUSE_WWW_SYNC` or any other record's ownership. Review the current
-Worker source before applying the patch if it has changed since the inspection.
+Worker source before reapplying the patch after a future Worker replacement.
+The deployed source, existing bindings, and other settings were verified.
+
+Worker version: `84c0ad80-b3a4-4ba5-b972-e0e5ff0ebf9e`.
+Previous version for rollback: `cabc84fb-4f73-4ede-b682-d41ec3687d40`.
+The exclusion is a prerequisite; its deployment alone does not enable GitHub
+writes or create a deSEC AAAA record.
 
 Only after the exclusion is deployed and verified, set this GitHub repository
 variable under Settings > Secrets and variables > Actions > Variables:
