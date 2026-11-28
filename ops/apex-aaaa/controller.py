@@ -3,6 +3,7 @@
 
 No Pages/HTTP health check is a decision input. A Cloudflare DNS outage can
 withdraw this RRset; Cloudflare proxy/Pages failures while DNS works cannot.
+The pinned maintenance issue overrides automatic decisions while closed.
 Direct DNS probes do not perform local DNSSEC validation. See the runbook for
 the single-vantage-point, polling, ownership, and cached-answer limitations.
 """
@@ -53,6 +54,11 @@ CF_V6_URL = "https://www.cloudflare.com/ips-v6"
 API_DOMAIN = f"https://desec.io/api/v1/domains/{DOMAIN}/"
 API_RRSET = API_DOMAIN + "rrsets/@/AAAA/"
 API_BULK = API_DOMAIN + "rrsets/"
+MAINTENANCE_ISSUE_NUMBER = 4
+MAINTENANCE_ISSUE_ID = 6669544465
+MAINTENANCE_ISSUE_URL = "https://github.com/Seven-Angels-Massage/sevenangelsmassage/issues/4"
+MAINTENANCE_API_URL = "https://api.github.com/repos/Seven-Angels-Massage/sevenangelsmassage/issues/4"
+MAINTENANCE_RESPONSE_LIMIT = 65536
 ROUNDS = 4  # Initial check plus three retries, as requested.
 ROUND_INTERVAL = 5
 DNS_TIMEOUT = 2.0
@@ -101,6 +107,66 @@ class Discovery:
     detail: str = ""
     http_status: int | None = None
     http_version: str | None = None
+
+
+@dataclass(frozen=True)
+class MaintenanceState:
+    state: str  # open permits automatic policy; closed withdraws; unknown holds
+    detail: str = ""
+
+
+def read_maintenance_state(token: str = "", session=None) -> MaintenanceState:
+    """Read only the pinned issue's state; its title and body are never commands."""
+    if not isinstance(token, str) or "\n" in token or "\r" in token:
+        return MaintenanceState("unknown", "Invalid GitHub authentication configuration")
+    headers = {"Accept": "application/vnd.github+json", "Cache-Control": "no-cache, no-store",
+               "Pragma": "no-cache", "User-Agent": "sam-apex-aaaa-controller"}
+    if token:
+        headers["Authorization"] = "Bearer " + token
+    request = session.request if session is not None else requests.request
+    response = None
+    started = time.monotonic()
+    try:
+        response = request("GET", MAINTENANCE_API_URL, headers=headers,
+                           timeout=(4, 8), allow_redirects=False, verify=True, stream=True)
+        if response.status_code != 200:
+            return MaintenanceState("unknown", "Maintenance issue request did not return HTTP 200")
+        media = response.headers.get("content-type", "").split(";", 1)[0].strip().lower()
+        if media not in ("application/json", "application/vnd.github+json"):
+            return MaintenanceState("unknown", "Maintenance issue returned an unexpected media type")
+        content = bytearray()
+        # Small reads make the wall-clock budget effective even if a peer sends
+        # a slow trickle instead of finishing a larger buffered chunk.
+        for chunk in response.iter_content(chunk_size=1):
+            if time.monotonic() - started > 15 or len(content) + len(chunk) > MAINTENANCE_RESPONSE_LIMIT:
+                return MaintenanceState("unknown", "Maintenance issue response exceeded its read budget")
+            content.extend(chunk)
+        issue = json.loads(content)
+        if (not isinstance(issue, dict) or type(issue.get("id")) is not int
+                or issue["id"] != MAINTENANCE_ISSUE_ID or type(issue.get("number")) is not int
+                or issue["number"] != MAINTENANCE_ISSUE_NUMBER
+                or issue.get("html_url") != MAINTENANCE_ISSUE_URL
+                or "pull_request" in issue or issue.get("state") not in ("open", "closed")):
+            return MaintenanceState("unknown", "Maintenance issue identity or state did not match")
+        return MaintenanceState(issue["state"], "Verified pinned maintenance issue")
+    except (requests.RequestException, ValueError, TypeError, RecursionError):
+        return MaintenanceState("unknown", "Maintenance issue could not be read safely")
+    finally:
+        if response is not None:
+            try:
+                response.close()
+            except requests.RequestException:
+                pass
+
+
+def checked_maintenance(reader: Callable[[], MaintenanceState]) -> MaintenanceState:
+    try:
+        state = reader()
+    except (ControllerError, requests.RequestException, ValueError, TypeError):
+        return MaintenanceState("unknown", "Maintenance issue is unavailable")
+    if not isinstance(state, MaintenanceState) or state.state not in ("open", "closed", "unknown"):
+        return MaintenanceState("unknown", "Maintenance issue state is invalid")
+    return state
 
 
 def ipv6_records(values) -> tuple[str, ...]:
@@ -422,7 +488,8 @@ def matches(snapshot: Snapshot | None, records: tuple[str, ...], ttl: int) -> bo
 
 
 def reconcile(api: DeSEC | None, initial: Snapshot | None, decision: Decision,
-              ttl: int | None, apply: bool) -> dict:
+              ttl: int | None, apply: bool, *, maintenance: MaintenanceState | None = None,
+              maintenance_reader: Callable[[], MaintenanceState] | None = None) -> dict:
     result = {"decision": asdict(decision), "mode": "apply" if apply else "observe",
               "target_ttl": ttl, "changed": False, "api_verified": False,
               "initial_api_state": asdict(initial) if initial else None,
@@ -432,6 +499,11 @@ def reconcile(api: DeSEC | None, initial: Snapshot | None, decision: Decision,
         return result
     if decision.action not in ("sync", "withdraw"):
         raise ControllerError("Unknown reconciliation action")
+    if (maintenance is None or maintenance.state not in ("open", "closed")
+            or (maintenance.state == "closed" and decision.action != "withdraw")):
+        result.update(result="held: maintenance state does not permit this decision",
+                      decision=asdict(Decision("hold", reason="Verified maintenance state required")))
+        return result
     records = decision.records if decision.action == "sync" else ()
     if not apply:
         result["result"] = "would change" if api is None or not matches(initial, records, ttl) else "already matches"
@@ -447,6 +519,14 @@ def reconcile(api: DeSEC | None, initial: Snapshot | None, decision: Decision,
     if matches(current, records, ttl):
         result.update(result="already matches", api_verified=True)
         return result
+    latest = checked_maintenance(maintenance_reader) if maintenance_reader else MaintenanceState("unknown")
+    result["maintenance_recheck"] = asdict(latest)
+    if latest.state != maintenance.state or latest.state not in ("open", "closed"):
+        result.update(result="held: maintenance issue changed or could not be rechecked",
+                      decision=asdict(Decision("hold", reason="Maintenance changed or is unknown before write")))
+        return result
+    # GitHub and deSEC cannot commit atomically. A change after this final check
+    # is corrected by the next serialized job reading the current issue state.
     api.replace(records, ttl)
     # Do not automatically retry writes: an ambiguous result may already have
     # committed. A later scheduled run will safely re-read and reconcile.
@@ -476,8 +556,21 @@ def publication_status(endpoints, records: tuple[str, ...]) -> dict[str, str]:
     return result
 
 
-def run(apply: bool = False, environ=None) -> dict:
+def run(apply: bool = False, environ=None, *, maintenance_only: bool = False,
+        maintenance_reader: Callable[[], MaintenanceState] | None = None) -> dict:
     env = os.environ if environ is None else environ
+    reader = maintenance_reader or (lambda: read_maintenance_state(env.get("GITHUB_TOKEN", "")))
+    maintenance = checked_maintenance(reader)
+    context = {"domain": DOMAIN, "rrtype": "AAAA", "subname": "",
+               "maintenance": {**asdict(maintenance), "issue_url": MAINTENANCE_ISSUE_URL},
+               "maintenance_only": maintenance_only}
+    if maintenance.state == "unknown" or (maintenance_only and maintenance.state != "closed"):
+        reason = ("Maintenance issue is unavailable or invalid; hold without DNS probes"
+                  if maintenance.state == "unknown" else
+                  "Maintenance-only invocation found the issue open; no automatic sync is allowed")
+        result = reconcile(None, None, Decision("hold", reason=reason), None, apply)
+        result.update(context, trusted_bootstrap=False, rounds=[], bootstrap_diagnostics={})
+        return result
     token = env.get("DESEC_APEX_AAAA_TOKEN", "")
     if apply and (not token or env.get("EXCLUSIVE_APEX_AAAA_OWNER", "").lower() != "true"):
         raise ControllerError("Apply requires DESEC_APEX_AAAA_TOKEN and EXCLUSIVE_APEX_AAAA_OWNER=true after the Worker exemption is deployed")
@@ -486,20 +579,27 @@ def run(apply: bool = False, environ=None) -> dict:
     ttl = api.minimum_ttl() if api else None
     initial = api.snapshot() if api else None
     discovery_diagnostics = {}
-    endpoints, trusted = discover(discovery_diagnostics)
-    rounds = collect_rounds(endpoints)
-    decision = decide(rounds, trusted)
+    if maintenance.state == "closed":
+        endpoints, trusted, rounds = {}, False, []
+        decision = Decision("withdraw", reason="Maintenance issue is closed; keep apex AAAA withdrawn")
+    else:
+        endpoints, trusted = discover(discovery_diagnostics)
+        rounds = collect_rounds(endpoints)
+        decision = decide(rounds, trusted)
     if decision.action == "sync":
         try:
             validate_publish(decision.records, fetch_cf_ipv6_ranges())
         except ControllerError as exc:
             decision = Decision("hold", reason=str(exc))
-    result = reconcile(api, initial, decision, ttl, apply)
-    result.update(domain=DOMAIN, rrtype="AAAA", subname="", trusted_bootstrap=trusted,
+    result = reconcile(api, initial, decision, ttl, apply,
+                       maintenance=maintenance, maintenance_reader=reader)
+    result.update(context, trusted_bootstrap=trusted,
                   rounds=[asdict(sample) for sample in rounds],
                   bootstrap_diagnostics=discovery_diagnostics)
     if result["changed"]:
-        result["authoritative_checks"] = publication_status(endpoints, decision.records)
+        result["authoritative_checks"] = (publication_status(endpoints, decision.records)
+                                           if maintenance.state == "open" else
+                                           {"maintenance": "DNS probes skipped; deletion verified through deSEC API"})
     return result
 
 
@@ -515,6 +615,10 @@ def write_summary(result: dict):
              f"- Decision: `{decision.get('action', 'hold')}` — {decision.get('reason', '')}",
              f"- Target TTL: `{result.get('target_ttl')}` (unknown without API access)",
              "", "Cloudflare Pages and HTTP status are not decision inputs."]
+    if result.get("maintenance"):
+        state = result["maintenance"]["state"]
+        lines += ["", f"- Maintenance control: `{state}` — [issue #{MAINTENANCE_ISSUE_NUMBER}]({MAINTENANCE_ISSUE_URL})",
+                  "- A closed issue requests withdrawal; an open issue permits the configured automatic policy."]
     if result.get("bootstrap_diagnostics"):
         lines += ["", "### Nameserver discovery", "",
                   "| Nameserver | Provider | Result | Protocol | Agreement |",
@@ -534,9 +638,11 @@ def write_summary(result: dict):
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apply", action="store_true", help="Permit the single deSEC apex AAAA mutation")
+    parser.add_argument("--maintenance-only", action="store_true",
+                        help="Withdraw only if the maintenance issue is currently closed; never automatically sync")
     args = parser.parse_args(argv)
     try:
-        write_summary(run(args.apply))
+        write_summary(run(args.apply, maintenance_only=args.maintenance_only))
         return 0
     except ControllerError as exc:
         uncertain = isinstance(exc, ApiError) and exc.uncertain

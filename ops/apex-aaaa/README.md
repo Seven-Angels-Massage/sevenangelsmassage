@@ -20,8 +20,15 @@ This implements Nathan's DNS-based policy. Cloudflare Pages is deliberately not
 a condition for the apex AAAA: the apex currently uses a proxied Netlify origin,
 and `www` delivery is managed separately.
 
+The [manual control issue](https://github.com/Seven-Angels-Massage/sevenangelsmassage/issues/4)
+overrides automatic DNS health decisions. A closed issue requests certificate
+maintenance and prevents automatic restoration; an open issue permits automatic
+control. If the controller cannot verify the issue's current state, it holds the
+record instead of guessing.
+
 | Observations | Action |
 | --- | --- |
+| Manual control issue is closed | Withdraw deSEC apex AAAA and keep it absent, even while Cloudflare DNS is healthy. |
 | Both assigned Cloudflare nameservers consistently return the same valid public AAAA set | Synchronize that complete set to deSEC. |
 | All tested Cloudflare authoritative endpoints are consistently unreachable, while independent deSEC DNS controls work | Withdraw deSEC's apex AAAA. |
 | Partial outage, inconsistent answers, an unavailable probe network, or other ambiguous evidence | Hold the existing record and report the uncertainty. |
@@ -36,6 +43,34 @@ The workflow requests a run at minutes 2, 7, 12, ... 57 of each hour. GitHub's
 native minimum is five minutes, and scheduled jobs may start late or be dropped.
 This is best-effort automation, not a one-minute monitoring service or a
 guaranteed five-minute recovery system.
+
+## One-tap control during Netlify SSL/TLS renewal
+
+Bookmark [IPv6 control, issue #4](https://github.com/Seven-Angels-Massage/sevenangelsmassage/issues/4).
+While signed in to GitHub and viewing that page:
+
+| One action | Requested behavior |
+| --- | --- |
+| Tap **Close issue** | Remove only deSEC's apex AAAA and keep automatic restoration paused. |
+| Tap **Reopen issue** after renewal | Allow automatic control again; restore current AAAA only after the Cloudflare DNS checks pass and live mode is enabled. |
+
+Closing starts a deletion-only workflow without waiting for the next scheduled
+run. It requires the restricted token and ownership guard, but it can remove the
+record even when automatic mode is set to `observe`. A late close event cannot
+restore AAAA if the issue has already reopened. Reopening respects the global
+`APEX_AAAA_MODE` and `APEX_AAAA_PAUSED` settings.
+
+The job may queue, so the issue state records your requested mode, not proof of
+completed deletion. Check the latest
+[controller run](https://github.com/Seven-Angels-Massage/sevenangelsmassage/actions/workflows/apex-aaaa.yml)
+for the verified deSEC API result. Wait out the prior AAAA TTL before expecting
+cached IPv6 answers to disappear. Cloudflare's generated AAAA and proxy settings
+remain separate; deleting deSEC's AAAA alone does not guarantee certificate renewal.
+
+All controller jobs share one queue and read current issue state, including
+immediately before a write. Unrelated issue events do not enter that queue.
+Issue title, body, comments, and labels are not executed or interpreted as commands.
+Keep this issue in this repository and avoid automatic PR-closing references to it.
 
 ## Observation mode
 
@@ -94,7 +129,10 @@ deploy or configure the Worker.
 ### 2. Create a restricted deSEC token
 
 Use a new token named `GitHub apex AAAA controller`. Do not give it permission to
-create domains, delete domains, or manage tokens. Its write policies must be:
+create domains, delete domains, or manage tokens. Create it with
+`auto_policy: true`, which makes deSEC create a restrictive default policy as part
+of token creation. Then add only the specific apex-AAAA allowance. Its final
+write policies must be:
 
 ```json
 [
@@ -103,8 +141,8 @@ create domains, delete domains, or manage tokens. Its write policies must be:
 ]
 ```
 
-Create the deny-by-default policy before the specific allow policy. A token
-without restrictive policies may be broader than intended. deSEC allows token
+Verify the automatic deny-by-default policy before adding the specific allow
+policy. A token without restrictive policies may be broader than intended. deSEC allows token
 holders to read DNS record data even when write permissions are restricted.
 
 Store the token's secret value in this repository's Actions secret:
@@ -114,6 +152,35 @@ DESEC_APEX_AAAA_TOKEN
 ```
 
 Never put the secret in a committed file, issue, pull request, or workflow log.
+
+#### One-time credential setup from Windows 11
+
+[Set-DeSECSecret.ps1](./Set-DeSECSecret.ps1) automates this token creation and stores the secret directly
+in GitHub using the official GitHub CLI. It does not write DNS records. It leaves
+the controller in observation mode for the final authenticated check.
+
+1. Install GitHub CLI if needed (`winget install --id GitHub.cli --exact`), then
+   open a fresh PowerShell terminal and run
+   `gh auth login --hostname github.com --web --git-protocol https`.
+2. In [deSEC's token dashboard](https://desec.io/tokens), create a temporary setup
+   token with **Can manage tokens** enabled. Leave domain creation and deletion
+   off. A maximum age of one hour is sufficient for setup. This temporary token
+   stays on your PC and is not sent to GitHub.
+3. Review `Set-DeSECSecret.ps1`, then run it in PowerShell. Paste the temporary
+   token only into its masked prompt. The helper refuses to overwrite an existing
+   `DESEC_APEX_AAAA_TOKEN` secret and verifies the new token's policy before saving.
+4. After success, delete the temporary setup token in deSEC. Keep the newly
+   created production token; GitHub needs it for the controller.
+
+The helper checks GitHub access before creating credentials, sends the production
+secret through standard input rather than command-line arguments, and never
+prints either token. If setup fails, its message distinguishes revoked tokens
+from credentials that were already saved and need attention. It also sets
+`EXCLUSIVE_APEX_AAAA_OWNER=true` for the Worker exemption verified above and
+`APEX_AAAA_MODE=observe`; it does not enable live DNS writes.
+
+The ordinary deSEC token checkboxes do not provide the exact RRset restriction.
+The helper configures that restriction through the documented policy API.
 
 ### 3. Verify an observation on GitHub
 
@@ -146,7 +213,9 @@ IPv6 answers.
 
 ## Pause and rollback
 
-Set `APEX_AAAA_PAUSED=true` to skip new controller jobs, or disable the workflow.
+Set `APEX_AAAA_PAUSED=true` to skip automatic and ordinary manual controller jobs.
+An explicit **Close issue** maintenance request can still remove AAAA. Disable
+the workflow if all controller execution must stop.
 An already running job can finish: cancel it explicitly if necessary. Pausing
 does not remove an existing AAAA record. To return to the original no-AAAA state,
 pause the controller, remove only the apex AAAA at deSEC, and verify the answer.
@@ -183,6 +252,14 @@ python -m unittest discover -s ops/apex-aaaa -p 'test_*.py' -v
 Tests cover the decision states and the boundary that restricts every write to
 the single permitted RRset. Outage tests use simulated responses; production
 records should not be deleted merely to test the code.
+
+The initial [GitHub-hosted DNS validation run](https://github.com/Seven-Angels-Massage/sevenangelsmassage/actions/runs/46175166756)
+passed 42 tests and completed a usable public DNS observation: both independent
+resolvers agreed on nameserver addresses, both Cloudflare authorities returned
+the same IPv6 set in all four rounds, and the deSEC DNS controls succeeded.
+The current suite additionally covers the manual maintenance switch and the
+Windows credential helper's success and partial-failure paths without real
+credentials or DNS writes.
 
 ## References
 

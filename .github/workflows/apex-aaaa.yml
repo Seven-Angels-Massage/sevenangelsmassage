@@ -1,6 +1,8 @@
 name: deSEC apex AAAA controller
 
 on:
+  issues:
+    types: [closed, reopened]
   schedule:
     # GitHub's minimum is five minutes; schedules can still be delayed.
     - cron: "2-57/5 * * * *"
@@ -13,14 +15,20 @@ on:
 
 permissions:
   contents: read
-
-concurrency:
-  group: sevenangelsmassage-desec-apex-aaaa
-  cancel-in-progress: false
+  issues: read
 
 jobs:
   controller:
-    if: github.repository == 'Seven-Angels-Massage/sevenangelsmassage' && vars.APEX_AAAA_PAUSED != 'true'
+    if: >-
+      github.repository == 'Seven-Angels-Massage/sevenangelsmassage' &&
+      github.event.repository.private == false &&
+      (github.event_name != 'issues' || github.event.issue.number == 4) &&
+      (vars.APEX_AAAA_PAUSED != 'true' || (github.event_name == 'issues' && github.event.action == 'closed'))
+    # The issue filter is evaluated before this job enters the shared queue.
+    # Unrelated public issue events cannot displace pending controller jobs.
+    concurrency:
+      group: sevenangelsmassage-desec-apex-aaaa
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -38,9 +46,11 @@ jobs:
       - name: Observe or apply the AAAA decision
         env:
           PYTHONUNBUFFERED: "1"
+          GITHUB_TOKEN: ${{ github.token }}
           DESEC_APEX_AAAA_TOKEN: ${{ github.ref == 'refs/heads/main' && secrets.DESEC_APEX_AAAA_TOKEN || '' }}
           EXCLUSIVE_APEX_AAAA_OWNER: ${{ vars.EXCLUSIVE_APEX_AAAA_OWNER }}
-          APPLY_REQUESTED: ${{ (github.event_name == 'schedule' && vars.APEX_AAAA_MODE == 'apply') || (github.event_name == 'workflow_dispatch' && inputs.apply) }}
+          MAINTENANCE_REQUEST: ${{ github.event_name == 'issues' && github.event.action == 'closed' }}
+          APPLY_REQUESTED: ${{ (github.event_name == 'issues' && github.event.action == 'closed') || ((github.event_name == 'schedule' || github.event_name == 'issues') && vars.APEX_AAAA_MODE == 'apply') || (github.event_name == 'workflow_dispatch' && inputs.apply) }}
         shell: bash
         run: |
           if [[ "$APPLY_REQUESTED" == "true" ]]; then
@@ -48,7 +58,11 @@ jobs:
               echo "Live writes are restricted to the main branch."
               exit 1
             fi
-            python ops/apex-aaaa/controller.py --apply
+            if [[ "$MAINTENANCE_REQUEST" == "true" ]]; then
+              python ops/apex-aaaa/controller.py --apply --maintenance-only
+            else
+              python ops/apex-aaaa/controller.py --apply
+            fi
           else
             python ops/apex-aaaa/controller.py
           fi
